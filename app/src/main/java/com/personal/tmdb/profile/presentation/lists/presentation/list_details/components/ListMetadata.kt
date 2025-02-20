@@ -64,6 +64,12 @@ fun ListMetadata(
                 ),
                 shape = MaterialTheme.shapes.small
             ) {
+                Icon(
+                    modifier = Modifier.size(ButtonDefaults.IconSize),
+                    painter = if (listDetails.public) painterResource(id = R.drawable.icon_public_fill0_wght400) else painterResource(id = R.drawable.icon_lock_fill0_wght400),
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
                 Text(text = formatListVisibility(listDetails.public).asString().uppercase())
             }
             listDetails.averageRating?.let { averageRating ->

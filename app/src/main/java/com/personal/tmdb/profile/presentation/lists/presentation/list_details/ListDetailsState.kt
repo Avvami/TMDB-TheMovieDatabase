@@ -5,9 +5,11 @@ import com.personal.tmdb.core.domain.util.UiText
 
 data class ListDetailsState(
     val listId: Int,
-    val listName: String,
     val listDetails: ListDetailsInfo? = null,
     val editing: Boolean = false,
+    val listName: String = "",
+    val listDescription: String = "",
+    val publicList: Boolean = false,
     val loading: Boolean = false,
     val errorMessage: UiText? = null
 )

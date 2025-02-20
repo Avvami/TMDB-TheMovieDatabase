@@ -26,12 +26,7 @@ class ListDetailsViewModel @Inject constructor(
 
     private val routeData = savedStateHandle.toRoute<Route.ListDetails>()
 
-    private val _listDetailsState = MutableStateFlow(
-        ListDetailsState(
-            listId = routeData.listId,
-            listName = routeData.listName
-        )
-    )
+    private val _listDetailsState = MutableStateFlow(ListDetailsState(listId = routeData.listId))
     val listDetailsState = _listDetailsState.asStateFlow()
 
     init {
@@ -66,7 +61,10 @@ class ListDetailsViewModel @Inject constructor(
                     _listDetailsState.update {
                         it.copy(
                             loading = false,
-                            listDetails = result
+                            listDetails = result,
+                            listName = result.name ?: "",
+                            listDescription = result.description ?: "",
+                            publicList = result.public
                         )
                     }
                 }
@@ -80,6 +78,17 @@ class ListDetailsViewModel @Inject constructor(
             ListDetailsUiEvent.ChangeEditListState -> {
                 _listDetailsState.update { it.copy(editing = !it.editing) }
             }
+            is ListDetailsUiEvent.SetListVisibility -> {
+                _listDetailsState.update { it.copy(publicList = event.public) }
+            }
+            is ListDetailsUiEvent.SetListDescription -> {
+                _listDetailsState.update { it.copy(listDescription = event.text) }
+            }
+            is ListDetailsUiEvent.SetListName -> {
+                _listDetailsState.update { it.copy(listName = event.text) }
+            }
+            ListDetailsUiEvent.DeleteList -> {}
+            is ListDetailsUiEvent.DeleteItem -> {}
         }
     }
 }

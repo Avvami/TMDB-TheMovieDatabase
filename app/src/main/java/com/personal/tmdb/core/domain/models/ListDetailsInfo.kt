@@ -1,18 +1,17 @@
 package com.personal.tmdb.core.domain.models
 
 import com.personal.tmdb.core.data.models.CreatedBy
-import com.personal.tmdb.core.domain.util.UiText
 
 data class ListDetailsInfo(
     val averageRating: Float?,
     val backdropPath: String?,
     val createdBy: CreatedBy?,
-    val description: UiText,
+    val description: String?,
     val id: Int,
     val iso31661: String?,
     val iso6391: String?,
     val itemCount: Int,
-    val name: UiText,
+    val name: String?,
     val page: Int,
     val posterPath: String?,
     val public: Boolean,

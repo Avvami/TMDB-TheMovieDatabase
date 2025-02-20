@@ -15,6 +15,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +58,7 @@ import com.personal.tmdb.core.domain.util.shimmerEffect
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.ui.theme.onSurfaceDark
 import com.personal.tmdb.ui.theme.onSurfaceLight
+import com.personal.tmdb.ui.theme.surfaceDark
 import com.personal.tmdb.ui.theme.surfaceLight
 import com.personal.tmdb.ui.theme.surfaceVariantDark
 
@@ -346,6 +351,80 @@ fun MediaPoster(
 }
 
 @Composable
+fun MediaPosterRemove(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    shape: Shape = MaterialTheme.shapes.medium,
+    height: Dp = 170.dp,
+    mediaInfo: MediaInfo,
+    mediaType: MediaType?,
+    showTitle: Boolean,
+    showVoteAverage: Boolean
+) {
+    Column(
+        modifier = Modifier.width(IntrinsicSize.Min),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = modifier
+                .height(height)
+                .aspectRatio(2 / 3f)
+                .clip(shape)
+                .clickable { onClick() }
+        ) {
+            AsyncImage(
+                modifier = Modifier.fillMaxSize(),
+                model = C.TMDB_IMAGES_BASE_URL + C.POSTER_W300 + mediaInfo.posterPath,
+                placeholder = painterResource(id = R.drawable.placeholder),
+                error = painterResource(id = R.drawable.placeholder),
+                contentDescription = "Poster",
+                contentScale = ContentScale.Crop
+            )
+            if (showVoteAverage && mediaInfo.voteAverage != null) {
+                Text(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(onSurfaceLight.copy(alpha = .5f))
+                        .padding(horizontal = 4.dp)
+                        .align(Alignment.TopStart),
+                    text = formatVoteAverage(mediaInfo.voteAverage),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = surfaceLight
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(surfaceDark.copy(alpha = .65f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Delete,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+        if (showTitle) {
+            mediaInfo.name?.let { name ->
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = name,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                    minLines = 2,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun MediaPosterShimmer(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.medium,
@@ -390,10 +469,7 @@ fun ListItem(
             .clip(shape)
             .clickable {
                 onNavigateTo(
-                    Route.ListDetails(
-                        listId = listInfo.id,
-                        listName = listInfo.name ?: ""
-                    )
+                    Route.ListDetails(listId = listInfo.id)
                 )
             }
             .border(

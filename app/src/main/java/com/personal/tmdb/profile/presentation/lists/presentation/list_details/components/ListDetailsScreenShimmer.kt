@@ -12,6 +12,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.personal.tmdb.core.domain.util.shimmerEffect
@@ -36,6 +37,19 @@ fun ListDetailsScreenShimmer(
                 ) {
                     Text(
                         modifier = Modifier
+                            .clip(MaterialTheme.shapes.extraSmall)
+                            .shimmerEffect(),
+                        text = "ELON'S list",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+                item(
+                    span = { GridItemSpan(maxLineSpan) }
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(top = 8.dp)
                             .fillMaxWidth()
                             .clip(MaterialTheme.shapes.extraSmall)
                             .shimmerEffect(),

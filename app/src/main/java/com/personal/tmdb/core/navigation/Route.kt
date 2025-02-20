@@ -53,7 +53,7 @@ sealed interface Route {
     data object MyLists: Route
 
     @Serializable
-    data class ListDetails(val listId: Int, val listName: String): Route
+    data class ListDetails(val listId: Int): Route
 
     @Serializable
     data object Favorite: Route

@@ -156,6 +156,7 @@
     <string name="empty_watchlist">You haven’t added anything yet. Browse our recommendations and start building your list!</string>
     <string name="list_public">Public</string>
     <string name="list_private">Private</string>
+    <string name="is_public_list">Public list</string>
     <string name="updated_at">Updated at %s</string>
     <string name="updated_today">Updated today</string>
     <string name="updated_yesterday">Updated yesterday</string>
@@ -165,4 +166,8 @@
     <string name="empty_recommendations">No recommendations yet! Start by watching or liking some titles, and we’ll tailor suggestions just for you.</string>
     <string name="no_list_description">No description entered.</string>
     <string name="items">%d items</string>
+    <string name="list_name_placeholder">Name…</string>
+    <string name="list_description_placeholder">Description…</string>
+    <string name="edit">Edit</string>
+    <string name="delete_list">Delete List</string>
 </resources>
