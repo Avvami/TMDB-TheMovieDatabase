@@ -26,9 +26,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -42,7 +44,6 @@ import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.components.MediaGrid
 import com.personal.tmdb.core.presentation.components.MediaPoster
-import com.personal.tmdb.core.presentation.components.MediaPosterRemove
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.components.EditList
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.components.ListCreator
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.components.ListDescription
@@ -82,10 +83,15 @@ private fun ListDetailsScreen(
     listDetailsUiEvent: (ListDetailsUiEvent) -> Unit
 ) {
     BackHandler {
-        if (listDetailsState().editing) {
-            listDetailsUiEvent(ListDetailsUiEvent.ChangeEditListState)
-        } else {
-            listDetailsUiEvent(ListDetailsUiEvent.OnNavigateBack)
+        when {
+            listDetailsState().editing -> listDetailsUiEvent(ListDetailsUiEvent.SetEditingState(false))
+            listDetailsState().selectEnabled -> listDetailsUiEvent(ListDetailsUiEvent.SetSelectEnabled(false))
+            else -> listDetailsUiEvent(ListDetailsUiEvent.OnNavigateBack)
+        }
+    }
+    LaunchedEffect(listDetailsState().selectedItems) {
+        if (listDetailsState().selectedItems.isEmpty() && !listDetailsState().editing) {
+            listDetailsUiEvent(ListDetailsUiEvent.SetSelectEnabled(false))
         }
     }
     AnimatedContent(
@@ -97,17 +103,30 @@ private fun ListDetailsScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        if (editing) {
-                            Text(
-                                text = stringResource(id = R.string.edit),
-                                fontWeight = FontWeight.Medium
-                            )
+                        when {
+                            editing -> {
+                                Text(
+                                    text = stringResource(id = R.string.edit),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            listDetailsState().selectEnabled && listDetailsState().selectedItems.isNotEmpty() -> {
+                                Text(
+                                    text = listDetailsState().selectedItems.size.toString(),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
                         }
                     },
                     navigationIcon = {
-                        if (editing) {
+                        if (editing || listDetailsState().selectEnabled) {
                             IconButton(
-                                onClick = { listDetailsUiEvent(ListDetailsUiEvent.ChangeEditListState) }
+                                onClick = {
+                                    when {
+                                        editing -> listDetailsUiEvent(ListDetailsUiEvent.SetEditingState(false))
+                                        listDetailsState().selectEnabled -> listDetailsUiEvent(ListDetailsUiEvent.SetSelectEnabled(false))
+                                    }
+                                }
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Close,
@@ -126,20 +145,32 @@ private fun ListDetailsScreen(
                         }
                     },
                     actions = {
-                        if (editing) {
-                            IconButton(
-                                onClick = { /*TODO*/ }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Check,
-                                    contentDescription = null
-                                )
+                        if (listDetailsState().selectEnabled || editing) {
+                            if (listDetailsState().selectedItems.isNotEmpty()) {
+                                IconButton(
+                                    onClick = { /*TODO*/ }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.icon_delete_fill0_wght400),
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+                            if (editing) {
+                                IconButton(
+                                    onClick = { /*TODO*/ }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Check,
+                                        contentDescription = null
+                                    )
+                                }
                             }
                         } else {
                             val context = LocalContext.current
                             AnimatedVisibility(visible = listDetailsState().listDetails != null) {
                                 IconButton(
-                                    onClick = { listDetailsUiEvent(ListDetailsUiEvent.ChangeEditListState) }
+                                    onClick = { listDetailsUiEvent(ListDetailsUiEvent.SetEditingState(true)) }
                                 ) {
                                     Icon(
                                         imageVector = Icons.Rounded.Edit,
@@ -160,7 +191,7 @@ private fun ListDetailsScreen(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = if (editing) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surface,
+                        containerColor = if (editing || listDetailsState().selectEnabled) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surface,
                         titleContentColor = MaterialTheme.colorScheme.onSurface,
                         navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                         actionIconContentColor = MaterialTheme.colorScheme.onSurface
@@ -233,40 +264,33 @@ private fun ListDetailsScreen(
                         }
                     ) {
                         listDetails.results?.let { results ->
-                            if (editing) {
-                                items(
-                                    items = results,
-                                    key = { it.id }
-                                ) { mediaInfo ->
-                                    MediaPosterRemove(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .animateItem(),
-                                        onClick = { listDetailsUiEvent(ListDetailsUiEvent.DeleteItem(mediaInfo.id)) },
-                                        height = Dp.Unspecified,
-                                        mediaInfo = mediaInfo,
-                                        mediaType = mediaInfo.mediaType,
-                                        showTitle = preferencesState().showTitle,
-                                        showVoteAverage = preferencesState().showVoteAverage
-                                    )
-                                }
-                            } else {
-                                items(
-                                    items = results,
-                                    key = { it.id }
-                                ) { mediaInfo ->
-                                    MediaPoster(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .animateItem(),
-                                        onNavigateTo = { listDetailsUiEvent(ListDetailsUiEvent.OnNavigateTo(it)) },
-                                        height = Dp.Unspecified,
-                                        mediaInfo = mediaInfo,
-                                        mediaType = mediaInfo.mediaType,
-                                        showTitle = preferencesState().showTitle,
-                                        showVoteAverage = preferencesState().showVoteAverage
-                                    )
-                                }
+                            items(
+                                items = results,
+                                key = { it.id }
+                            ) { mediaInfo ->
+                                MediaPoster(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .animateItem(),
+                                    onNavigateTo = { listDetailsUiEvent(ListDetailsUiEvent.OnNavigateTo(it)) },
+                                    selectEnabled = { listDetailsState().selectEnabled || listDetailsState().editing },
+                                    selected = { listDetailsState().selectedItems.contains(mediaInfo) },
+                                    onSelect = {
+                                        if (listDetailsState().selectedItems.contains(mediaInfo))
+                                            listDetailsUiEvent(ListDetailsUiEvent.RemoveSelectedItem(mediaInfo))
+                                        else
+                                            listDetailsUiEvent(ListDetailsUiEvent.AddSelectedItem(mediaInfo))
+                                    },
+                                    onLongClick = {
+                                        listDetailsUiEvent(ListDetailsUiEvent.SetSelectEnabled(true))
+                                        listDetailsUiEvent(ListDetailsUiEvent.AddSelectedItem(mediaInfo))
+                                    },
+                                    height = Dp.Unspecified,
+                                    mediaInfo = mediaInfo,
+                                    mediaType = mediaInfo.mediaType,
+                                    showTitle = preferencesState().showTitle,
+                                    showVoteAverage = preferencesState().showVoteAverage
+                                )
                             }
                         }
                     }

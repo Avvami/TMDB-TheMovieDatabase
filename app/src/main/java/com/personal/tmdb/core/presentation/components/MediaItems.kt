@@ -1,8 +1,11 @@
 package com.personal.tmdb.core.presentation.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,11 +16,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
@@ -36,7 +40,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -239,10 +245,15 @@ fun MediaBannerShimmer(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaPoster(
     modifier: Modifier = Modifier,
     onNavigateTo: (route: Route) -> Unit,
+    selectEnabled: () -> Boolean = { false },
+    selected: () -> Boolean = { false },
+    onSelect: () -> Unit = {},
+    onLongClick: (() -> Unit)? = null,
     shape: Shape = MaterialTheme.shapes.medium,
     height: Dp = 170.dp,
     mediaInfo: MediaInfo,
@@ -250,6 +261,7 @@ fun MediaPoster(
     showTitle: Boolean,
     showVoteAverage: Boolean
 ) {
+    val haptic = LocalHapticFeedback.current
     Column(
         modifier = Modifier.width(IntrinsicSize.Min),
         verticalArrangement = Arrangement.spacedBy(2.dp),
@@ -260,33 +272,43 @@ fun MediaPoster(
                 .height(height)
                 .aspectRatio(2 / 3f)
                 .clip(shape)
-                .clickable {
-                    mediaType?.let { mediaType ->
-                        when (mediaType) {
-                            MediaType.TV, MediaType.MOVIE -> {
-                                onNavigateTo(
-                                    Route.Detail(
-                                        mediaType = mediaType.name.lowercase(),
-                                        mediaId = mediaInfo.id
-                                    )
-                                )
+                .then(
+                    if (!selectEnabled()) {
+                        Modifier.combinedClickable(
+                            onClick = {
+                                when (mediaType) {
+                                    MediaType.TV, MediaType.MOVIE -> {
+                                        onNavigateTo(
+                                            Route.Detail(
+                                                mediaType = mediaType.name.lowercase(),
+                                                mediaId = mediaInfo.id
+                                            )
+                                        )
+                                    }
+                                    MediaType.PERSON -> {
+                                        onNavigateTo(
+                                            Route.Person(
+                                                personName = mediaInfo.name ?: "",
+                                                personId = mediaInfo.id
+                                            )
+                                        )
+                                    }
+                                    else -> {
+                                        onNavigateTo(Route.Lost)
+                                    }
+                                }
+                            },
+                            onLongClick = {
+                                onLongClick?.let {
+                                    it()
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                }
                             }
-
-                            MediaType.PERSON -> {
-                                onNavigateTo(
-                                    Route.Person(
-                                        personName = mediaInfo.name ?: "",
-                                        personId = mediaInfo.id
-                                    )
-                                )
-                            }
-
-                            else -> {
-                                onNavigateTo(Route.Lost)
-                            }
-                        }
+                        )
+                    } else {
+                        Modifier.selectable(selected = selected(), onClick = onSelect)
                     }
-                }
+                )
         ) {
             AsyncImage(
                 modifier = Modifier.fillMaxSize(),
@@ -332,79 +354,37 @@ fun MediaPoster(
                     )
                 }
             }
-        }
-        if (showTitle) {
-            mediaInfo.name?.let { name ->
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = name,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                    minLines = 2,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun MediaPosterRemove(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    shape: Shape = MaterialTheme.shapes.medium,
-    height: Dp = 170.dp,
-    mediaInfo: MediaInfo,
-    mediaType: MediaType?,
-    showTitle: Boolean,
-    showVoteAverage: Boolean
-) {
-    Column(
-        modifier = Modifier.width(IntrinsicSize.Min),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = modifier
-                .height(height)
-                .aspectRatio(2 / 3f)
-                .clip(shape)
-                .clickable { onClick() }
-        ) {
-            AsyncImage(
+            androidx.compose.animation.AnimatedVisibility(
                 modifier = Modifier.fillMaxSize(),
-                model = C.TMDB_IMAGES_BASE_URL + C.POSTER_W300 + mediaInfo.posterPath,
-                placeholder = painterResource(id = R.drawable.placeholder),
-                error = painterResource(id = R.drawable.placeholder),
-                contentDescription = "Poster",
-                contentScale = ContentScale.Crop
-            )
-            if (showVoteAverage && mediaInfo.voteAverage != null) {
-                Text(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(onSurfaceLight.copy(alpha = .5f))
-                        .padding(horizontal = 4.dp)
-                        .align(Alignment.TopStart),
-                    text = formatVoteAverage(mediaInfo.voteAverage),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = surfaceLight
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(surfaceDark.copy(alpha = .65f)),
-                contentAlignment = Alignment.Center
+                visible = selectEnabled()
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Delete,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(surfaceDark.copy(alpha = .65f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AnimatedContent(
+                        targetState = selected(),
+                        label = "Selected animation"
+                    ) { selected ->
+                        if (selected) {
+                            Icon(
+                                modifier = Modifier.size(28.dp),
+                                imageVector = Icons.Rounded.CheckCircle,
+                                contentDescription = null,
+                                tint = surfaceLight
+                            )
+                        } else {
+                            Icon(
+                                modifier = Modifier.size(28.dp),
+                                painter = painterResource(id = R.drawable.icon_radio_button_unchecked_fill0_wght400),
+                                contentDescription = null,
+                                tint = surfaceLight
+                            )
+                        }
+                    }
+                }
             }
         }
         if (showTitle) {

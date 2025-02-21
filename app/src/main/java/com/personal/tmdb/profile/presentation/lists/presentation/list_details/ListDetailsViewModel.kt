@@ -75,8 +75,12 @@ class ListDetailsViewModel @Inject constructor(
         when (event) {
             ListDetailsUiEvent.OnNavigateBack -> {}
             is ListDetailsUiEvent.OnNavigateTo -> {}
-            ListDetailsUiEvent.ChangeEditListState -> {
-                _listDetailsState.update { it.copy(editing = !it.editing) }
+            is ListDetailsUiEvent.SetEditingState -> {
+                if (event.editing) {
+                    _listDetailsState.update { it.copy(editing = true) }
+                } else {
+                    _listDetailsState.update { it.copy(editing = false, selectedItems = emptyList()) }
+                }
             }
             is ListDetailsUiEvent.SetListVisibility -> {
                 _listDetailsState.update { it.copy(publicList = event.public) }
@@ -88,7 +92,20 @@ class ListDetailsViewModel @Inject constructor(
                 _listDetailsState.update { it.copy(listName = event.text) }
             }
             ListDetailsUiEvent.DeleteList -> {}
-            is ListDetailsUiEvent.DeleteItem -> {}
+            ListDetailsUiEvent.DeleteSelectedItems -> {}
+            is ListDetailsUiEvent.AddSelectedItem -> {
+                _listDetailsState.update { it.copy(selectedItems = it.selectedItems + event.mediaInfo) }
+            }
+            is ListDetailsUiEvent.RemoveSelectedItem -> {
+                _listDetailsState.update { it.copy(selectedItems = it.selectedItems - event.mediaInfo) }
+            }
+            is ListDetailsUiEvent.SetSelectEnabled -> {
+                if (event.enabled) {
+                    _listDetailsState.update { it.copy(selectEnabled = true) }
+                } else {
+                    _listDetailsState.update { it.copy(selectEnabled = false, selectedItems = emptyList()) }
+                }
+            }
         }
     }
 }
