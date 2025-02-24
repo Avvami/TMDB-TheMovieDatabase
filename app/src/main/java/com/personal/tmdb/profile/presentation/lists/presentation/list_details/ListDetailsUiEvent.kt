@@ -11,7 +11,7 @@ sealed interface ListDetailsUiEvent {
     data class SetListName(val text: String): ListDetailsUiEvent
     data class SetListDescription(val text: String): ListDetailsUiEvent
     data object DeleteList: ListDetailsUiEvent
-    data object DeleteSelectedItems: ListDetailsUiEvent
+    data class DeleteSelectedItems(val listId: Int, val items: List<MediaInfo>): ListDetailsUiEvent
     data class SetSelectEnabled(val enabled: Boolean): ListDetailsUiEvent
     data class AddSelectedItem(val mediaInfo: MediaInfo): ListDetailsUiEvent
     data class RemoveSelectedItem(val mediaInfo: MediaInfo): ListDetailsUiEvent

@@ -11,6 +11,7 @@ import com.personal.tmdb.auth.data.models.UserDto
 import com.personal.tmdb.core.data.models.ListDetailsDto
 import com.personal.tmdb.core.data.models.ListsResponseDto
 import com.personal.tmdb.core.data.models.MediaResponseDto
+import com.personal.tmdb.core.domain.models.RemoveMediaRequest
 import com.personal.tmdb.detail.data.models.CollectionDto
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeDetailsDto
@@ -22,6 +23,7 @@ import com.personal.tmdb.detail.data.models.Reviews
 import com.personal.tmdb.detail.data.models.SeasonDto
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -196,6 +198,14 @@ interface TmdbApi {
         @Query("page") page: Int,
         @Query("language") language: String?
     ): ListDetailsDto
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @HTTP(method = "DELETE", path = "4/list/{list_id}/items?", hasBody = true)
+    suspend fun deleteListItems(
+        @Path("list_id") listId: Int,
+        @Query("session_id") sessionId: String,
+        @Body request: RemoveMediaRequest
+    )
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @GET("4/account/{account_object_id}/{media_type}/recommendations?")

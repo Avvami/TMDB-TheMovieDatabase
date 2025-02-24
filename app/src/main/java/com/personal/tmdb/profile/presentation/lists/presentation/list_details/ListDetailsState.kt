@@ -14,5 +14,7 @@ data class ListDetailsState(
     val selectEnabled: Boolean = false,
     val selectedItems: List<MediaInfo> = emptyList(),
     val loading: Boolean = false,
+    val deleting: Boolean = false,
+    val updating: Boolean = false,
     val errorMessage: UiText? = null
 )

@@ -11,9 +11,11 @@ import com.personal.tmdb.core.data.remote.safeApiCall
 import com.personal.tmdb.core.domain.models.ListDetailsInfo
 import com.personal.tmdb.core.domain.models.ListsResponseInfo
 import com.personal.tmdb.core.domain.models.MediaResponseInfo
+import com.personal.tmdb.core.domain.models.RemoveMediaRequest
 import com.personal.tmdb.core.domain.models.User
 import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.DataError
+import com.personal.tmdb.core.domain.util.EmptyResult
 import com.personal.tmdb.core.domain.util.Result
 import javax.inject.Inject
 
@@ -64,6 +66,16 @@ class UserRepositoryImpl @Inject constructor(
     ): Result<ListDetailsInfo, DataError.Remote> {
         return safeApiCall {
             tmdbApi.getListDetails(listId, sessionId, page, language).toListDetailsInfo()
+        }
+    }
+
+    override suspend fun deleteListItems(
+        listId: Int,
+        sessionId: String,
+        removeMediaRequest: RemoveMediaRequest
+    ): EmptyResult<DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.deleteListItems(listId, sessionId, removeMediaRequest)
         }
     }
 

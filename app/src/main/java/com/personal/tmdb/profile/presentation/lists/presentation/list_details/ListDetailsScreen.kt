@@ -9,6 +9,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +31,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -148,12 +152,32 @@ private fun ListDetailsScreen(
                         if (listDetailsState().selectEnabled || editing) {
                             if (listDetailsState().selectedItems.isNotEmpty()) {
                                 IconButton(
-                                    onClick = { /*TODO*/ }
+                                    onClick = {
+                                        listDetailsUiEvent(ListDetailsUiEvent.DeleteSelectedItems(
+                                            listId = listDetailsState().listId,
+                                            items = listDetailsState().selectedItems
+                                        ))
+                                    }
                                 ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.icon_delete_fill0_wght400),
-                                        contentDescription = null
-                                    )
+                                    AnimatedContent(
+                                        targetState = listDetailsState().deleting,
+                                        label = "Delete animation"
+                                    ) { deleting ->
+                                        if (deleting) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(18.dp),
+                                                color = MaterialTheme.colorScheme.onSurface,
+                                                trackColor = Color.Transparent,
+                                                strokeWidth = 2.dp,
+                                                strokeCap = StrokeCap.Round
+                                            )
+                                        } else {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.icon_delete_fill0_wght400),
+                                                contentDescription = null
+                                            )
+                                        }
+                                    }
                                 }
                             }
                             if (editing) {

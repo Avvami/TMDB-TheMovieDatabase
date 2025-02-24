@@ -4,8 +4,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.personal.tmdb.R
+import com.personal.tmdb.core.domain.models.MediaInfo
+import com.personal.tmdb.core.domain.models.RemoveMedia
+import com.personal.tmdb.core.domain.models.RemoveMediaRequest
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.repository.UserRepository
+import com.personal.tmdb.core.domain.util.MediaType
+import com.personal.tmdb.core.domain.util.SnackbarController
+import com.personal.tmdb.core.domain.util.SnackbarEvent
+import com.personal.tmdb.core.domain.util.UiText
 import com.personal.tmdb.core.domain.util.onError
 import com.personal.tmdb.core.domain.util.onSuccess
 import com.personal.tmdb.core.domain.util.toUiText
@@ -71,6 +79,44 @@ class ListDetailsViewModel @Inject constructor(
         }
     }
 
+    private fun deleteSelectedItems(listId: Int, items: List<MediaInfo>) {
+        viewModelScope.launch {
+            _listDetailsState.update { it.copy(deleting = true) }
+
+            val sessionId = userRepository.getUser()?.sessionId ?: ""
+            val request = RemoveMediaRequest(
+                items = items.map { RemoveMedia(
+                    mediaType = it.mediaType?.name?.lowercase() ?: MediaType.UNKNOWN.name.lowercase(),
+                    mediaId = it.id
+                ) }
+            )
+
+            userRepository.deleteListItems(listId, sessionId, request)
+                .onError { error ->
+                    _listDetailsState.update { it.copy(deleting = false) }
+                    SnackbarController.sendEvent(
+                        event = SnackbarEvent(
+                            message = error.toUiText()
+                        )
+                    )
+                }
+                .onSuccess {
+                    _listDetailsState.update {
+                        it.copy(
+                            selectedItems = it.selectedItems - items.toSet(),
+                            deleting = false
+                        )
+                    }
+                    getListDetails(listId = listId, page = 1)
+                    SnackbarController.sendEvent(
+                        event = SnackbarEvent(
+                            message = UiText.StringResource(R.string.deleted_successfully)
+                        )
+                    )
+                }
+        }
+    }
+
     fun listDetailsUiEvent(event: ListDetailsUiEvent) {
         when (event) {
             ListDetailsUiEvent.OnNavigateBack -> {}
@@ -92,7 +138,9 @@ class ListDetailsViewModel @Inject constructor(
                 _listDetailsState.update { it.copy(listName = event.text) }
             }
             ListDetailsUiEvent.DeleteList -> {}
-            ListDetailsUiEvent.DeleteSelectedItems -> {}
+            is ListDetailsUiEvent.DeleteSelectedItems -> {
+                deleteSelectedItems(event.listId, event.items)
+            }
             is ListDetailsUiEvent.AddSelectedItem -> {
                 _listDetailsState.update { it.copy(selectedItems = it.selectedItems + event.mediaInfo) }
             }

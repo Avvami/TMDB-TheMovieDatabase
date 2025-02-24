@@ -36,6 +36,7 @@ suspend inline fun <T> safeApiCall(
             )
         }
     } catch (e: Exception) {
+        e.printStackTrace()
         Result.Error(DataError.Remote.Unknown)
     }
 }
