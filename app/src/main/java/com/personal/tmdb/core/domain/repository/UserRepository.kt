@@ -4,6 +4,7 @@ import com.personal.tmdb.core.domain.models.ListDetailsInfo
 import com.personal.tmdb.core.domain.models.ListsResponseInfo
 import com.personal.tmdb.core.domain.models.MediaResponseInfo
 import com.personal.tmdb.core.domain.models.RemoveMediaRequest
+import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
 import com.personal.tmdb.core.domain.models.User
 import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.EmptyResult
@@ -28,6 +29,8 @@ interface UserRepository {
     suspend fun getLists(accountObjectId: String, sessionId: String, page: Int): Result<ListsResponseInfo, DataError.Remote>
 
     suspend fun getListDetails(listId: Int, sessionId: String, page: Int, language: String? = null): Result<ListDetailsInfo, DataError.Remote>
+
+    suspend fun updateListDetails(listId: Int, sessionId: String, updateListDetailsRequest: UpdateListDetailsRequest): EmptyResult<DataError.Remote>
 
     suspend fun deleteListItems(listId: Int, sessionId: String, removeMediaRequest: RemoveMediaRequest): EmptyResult<DataError.Remote>
 

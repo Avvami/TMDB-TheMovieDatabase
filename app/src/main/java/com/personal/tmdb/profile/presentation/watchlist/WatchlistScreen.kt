@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -42,7 +41,7 @@ import com.personal.tmdb.profile.presentation.watchlist.components.WatchlistFilt
 fun WatchlistScreenRoot(
     bottomPadding: Dp,
     canNavigateBack: Boolean = true,
-    lazyGridState: LazyGridState = rememberLazyGridState(),
+    lazyGridState: LazyGridState,
     onNavigateBack: () -> Unit,
     onNavigateTo: (route: Route) -> Unit,
     preferencesState: () -> PreferencesState,

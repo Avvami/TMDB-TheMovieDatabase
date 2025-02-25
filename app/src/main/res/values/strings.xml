@@ -171,4 +171,5 @@
     <string name="edit">Edit</string>
     <string name="delete_list">Delete List</string>
     <string name="deleted_successfully">Deleted successfully</string>
+    <string name="updated_successfully">Updated successfully</string>
 </resources>

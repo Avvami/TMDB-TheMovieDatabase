@@ -12,6 +12,7 @@ import com.personal.tmdb.core.data.models.ListDetailsDto
 import com.personal.tmdb.core.data.models.ListsResponseDto
 import com.personal.tmdb.core.data.models.MediaResponseDto
 import com.personal.tmdb.core.domain.models.RemoveMediaRequest
+import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
 import com.personal.tmdb.detail.data.models.CollectionDto
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeDetailsDto
@@ -26,6 +27,7 @@ import retrofit2.http.GET
 import retrofit2.http.HTTP
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -198,6 +200,14 @@ interface TmdbApi {
         @Query("page") page: Int,
         @Query("language") language: String?
     ): ListDetailsDto
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @PUT("4/list/{list_id}")
+    suspend fun updateListDetails(
+        @Path("list_id") listId: Int,
+        @Query("session_id") sessionId: String,
+        @Body request: UpdateListDetailsRequest
+    )
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @HTTP(method = "DELETE", path = "4/list/{list_id}/items?", hasBody = true)

@@ -12,6 +12,7 @@ import com.personal.tmdb.core.domain.models.ListDetailsInfo
 import com.personal.tmdb.core.domain.models.ListsResponseInfo
 import com.personal.tmdb.core.domain.models.MediaResponseInfo
 import com.personal.tmdb.core.domain.models.RemoveMediaRequest
+import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
 import com.personal.tmdb.core.domain.models.User
 import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.DataError
@@ -66,6 +67,16 @@ class UserRepositoryImpl @Inject constructor(
     ): Result<ListDetailsInfo, DataError.Remote> {
         return safeApiCall {
             tmdbApi.getListDetails(listId, sessionId, page, language).toListDetailsInfo()
+        }
+    }
+
+    override suspend fun updateListDetails(
+        listId: Int,
+        sessionId: String,
+        updateListDetailsRequest: UpdateListDetailsRequest
+    ): EmptyResult<DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.updateListDetails(listId, sessionId, updateListDetailsRequest)
         }
     }
 

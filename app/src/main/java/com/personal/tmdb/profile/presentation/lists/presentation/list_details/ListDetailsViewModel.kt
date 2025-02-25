@@ -8,6 +8,7 @@ import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.models.MediaInfo
 import com.personal.tmdb.core.domain.models.RemoveMedia
 import com.personal.tmdb.core.domain.models.RemoveMediaRequest
+import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.MediaType
@@ -117,6 +118,39 @@ class ListDetailsViewModel @Inject constructor(
         }
     }
 
+    private fun updateListDetails(listId: Int, name: String, description: String, public: Boolean) {
+        viewModelScope.launch {
+            _listDetailsState.update { it.copy(updating = true) }
+
+            val sessionId = userRepository.getUser()?.sessionId ?: ""
+            val request = UpdateListDetailsRequest(name.trim(), description.trim(), public)
+
+            userRepository.updateListDetails(listId, sessionId, request)
+                .onError { error ->
+                    _listDetailsState.update { it.copy(updating = false) }
+                    SnackbarController.sendEvent(
+                        event = SnackbarEvent(
+                            message = error.toUiText()
+                        )
+                    )
+                }
+                .onSuccess {
+                    _listDetailsState.update {
+                        it.copy(
+                            editing = it.selectedItems.isNotEmpty(),
+                            updating = false
+                        )
+                    }
+                    getListDetails(listId = listId, page = 1)
+                    SnackbarController.sendEvent(
+                        event = SnackbarEvent(
+                            message = UiText.StringResource(R.string.updated_successfully)
+                        )
+                    )
+                }
+        }
+    }
+
     fun listDetailsUiEvent(event: ListDetailsUiEvent) {
         when (event) {
             ListDetailsUiEvent.OnNavigateBack -> {}
@@ -136,6 +170,9 @@ class ListDetailsViewModel @Inject constructor(
             }
             is ListDetailsUiEvent.SetListName -> {
                 _listDetailsState.update { it.copy(listName = event.text) }
+            }
+            is ListDetailsUiEvent.UpdateListDetails -> {
+                updateListDetails(event.listId, event.name, event.description, event.public)
             }
             ListDetailsUiEvent.DeleteList -> {}
             is ListDetailsUiEvent.DeleteSelectedItems -> {

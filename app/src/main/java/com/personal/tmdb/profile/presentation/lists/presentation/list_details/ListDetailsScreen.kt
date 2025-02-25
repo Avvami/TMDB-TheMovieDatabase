@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -86,6 +87,7 @@ private fun ListDetailsScreen(
     listDetailsState: () -> ListDetailsState,
     listDetailsUiEvent: (ListDetailsUiEvent) -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
     BackHandler {
         when {
             listDetailsState().editing -> listDetailsUiEvent(ListDetailsUiEvent.SetEditingState(false))
@@ -153,11 +155,15 @@ private fun ListDetailsScreen(
                             if (listDetailsState().selectedItems.isNotEmpty()) {
                                 IconButton(
                                     onClick = {
-                                        listDetailsUiEvent(ListDetailsUiEvent.DeleteSelectedItems(
-                                            listId = listDetailsState().listId,
-                                            items = listDetailsState().selectedItems
-                                        ))
-                                    }
+                                        focusManager.clearFocus()
+                                        listDetailsUiEvent(
+                                            ListDetailsUiEvent.DeleteSelectedItems(
+                                                listId = listDetailsState().listId,
+                                                items = listDetailsState().selectedItems
+                                            )
+                                        )
+                                    },
+                                    enabled = !listDetailsState().deleting
                                 ) {
                                     AnimatedContent(
                                         targetState = listDetailsState().deleting,
@@ -182,12 +188,38 @@ private fun ListDetailsScreen(
                             }
                             if (editing) {
                                 IconButton(
-                                    onClick = { /*TODO*/ }
+                                    onClick = {
+                                        focusManager.clearFocus()
+                                        listDetailsUiEvent(
+                                            ListDetailsUiEvent.UpdateListDetails(
+                                                listId = listDetailsState().listId,
+                                                name = listDetailsState().listName,
+                                                description = listDetailsState().listDescription,
+                                                public = listDetailsState().publicList
+                                            )
+                                        )
+                                    },
+                                    enabled = listDetailsState().listName.isNotBlank() && !listDetailsState().updating
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Check,
-                                        contentDescription = null
-                                    )
+                                    AnimatedContent(
+                                        targetState = listDetailsState().updating,
+                                        label = "Update animation"
+                                    ) { deleting ->
+                                        if (deleting) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(18.dp),
+                                                color = MaterialTheme.colorScheme.onSurface,
+                                                trackColor = Color.Transparent,
+                                                strokeWidth = 2.dp,
+                                                strokeCap = StrokeCap.Round
+                                            )
+                                        } else {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Check,
+                                                contentDescription = null
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         } else {

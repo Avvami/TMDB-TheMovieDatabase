@@ -266,7 +266,7 @@ fun ChildNavHost(
             WatchlistScreenRoot(
                 bottomPadding = bottomBarPadding,
                 canNavigateBack = preferencesState().additionalNavigationItem != AdditionalNavigationItem.WATCHLIST,
-                lazyGridState = scrollState as LazyGridState,
+                lazyGridState = if (preferencesState().additionalNavigationItem == AdditionalNavigationItem.WATCHLIST) scrollState as LazyGridState else rememberLazyGridState(),
                 onNavigateBack = onNavigateBack,
                 onNavigateTo = onNavigateTo,
                 preferencesState = preferencesState
@@ -276,6 +276,7 @@ fun ChildNavHost(
             ListsScreenRoot(
                 bottomPadding = bottomBarPadding,
                 canNavigateBack = preferencesState().additionalNavigationItem != AdditionalNavigationItem.LISTS,
+                lazyGridState = if (preferencesState().additionalNavigationItem == AdditionalNavigationItem.LISTS) scrollState as LazyGridState else rememberLazyGridState(),
                 onNavigateBack = onNavigateBack,
                 onNavigateTo = onNavigateTo
             )
