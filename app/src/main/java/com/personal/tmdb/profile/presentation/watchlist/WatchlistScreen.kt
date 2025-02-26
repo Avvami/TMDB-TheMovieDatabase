@@ -21,14 +21,19 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.personal.tmdb.R
+import com.personal.tmdb.core.domain.util.SnackbarController
+import com.personal.tmdb.core.domain.util.SnackbarEvent
+import com.personal.tmdb.core.domain.util.UiText
 import com.personal.tmdb.core.domain.util.negativeHorizontalPadding
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.PreferencesState
@@ -36,6 +41,7 @@ import com.personal.tmdb.core.presentation.components.MediaGrid
 import com.personal.tmdb.core.presentation.components.MediaPoster
 import com.personal.tmdb.core.presentation.components.MediaPosterShimmer
 import com.personal.tmdb.profile.presentation.watchlist.components.WatchlistFilterChips
+import kotlinx.coroutines.launch
 
 @Composable
 fun WatchlistScreenRoot(
@@ -75,6 +81,7 @@ private fun WatchlistScreen(
     preferencesState: () -> PreferencesState,
     watchlistUiEvent: (WatchlistUiEvent) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     LaunchedEffect(key1 = true) {
         if (!lazyGridState.canScrollBackward && !watchlistState().showRecommendations) {
             watchlistUiEvent(WatchlistUiEvent.GetWatchlist(watchlistState().mediaType, 1))
@@ -84,7 +91,10 @@ private fun WatchlistScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.watchlist))
+                    Text(
+                        text = stringResource(id = R.string.watchlist),
+                        fontWeight = FontWeight.Medium
+                    )
                 },
                 navigationIcon = {
                     if (canNavigateBack) {
@@ -170,6 +180,15 @@ private fun WatchlistScreen(
                                             .fillMaxWidth()
                                             .animateItem(),
                                         onNavigateTo = { watchlistUiEvent(WatchlistUiEvent.OnNavigateTo(it)) },
+                                        onLongClick = {
+                                            scope.launch {
+                                                SnackbarController.sendEvent(
+                                                    event = SnackbarEvent(
+                                                        message = UiText.StringResource(R.string.watchlist_sorry)
+                                                    )
+                                                )
+                                            }
+                                        },
                                         height = Dp.Unspecified,
                                         mediaInfo = mediaInfo,
                                         mediaType = watchlistState().mediaType,

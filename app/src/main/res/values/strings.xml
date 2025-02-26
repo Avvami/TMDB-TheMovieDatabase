@@ -154,6 +154,7 @@
     <string name="error_backend_connection">Couldn\'t connect to the backend server</string>
     <string name="error_session_id">Error obtaining session ID</string>
     <string name="empty_watchlist">You haven’t added anything yet. Browse our recommendations and start building your list!</string>
+    <string name="empty_favorites">You haven’t added any favorites. Start exploring and add items you love!</string>
     <string name="list_public">Public</string>
     <string name="list_private">Private</string>
     <string name="is_public_list">Public list</string>
@@ -172,4 +173,5 @@
     <string name="delete_list">Delete List</string>
     <string name="deleted_successfully">Deleted successfully</string>
     <string name="updated_successfully">Updated successfully</string>
+    <string name="watchlist_sorry">Sorry that\'s not available here :( TMDB&#128077;</string>
 </resources>

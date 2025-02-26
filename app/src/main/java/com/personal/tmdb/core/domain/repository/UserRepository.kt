@@ -41,4 +41,12 @@ interface UserRepository {
         page: Int,
         language: String? = null
     ): Result<MediaResponseInfo, DataError.Remote>
+
+    suspend fun getFavorites(
+        accountObjectId: String,
+        mediaType: String,
+        sessionId: String,
+        page: Int,
+        language: String? = null
+    ): Result<MediaResponseInfo, DataError.Remote>
 }

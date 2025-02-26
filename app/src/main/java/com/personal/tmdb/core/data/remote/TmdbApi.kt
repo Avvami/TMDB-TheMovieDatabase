@@ -226,4 +226,14 @@ interface TmdbApi {
         @Query("page") page: Int,
         @Query("language") language: String?
     ): MediaResponseDto
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @GET("4/account/{account_object_id}/{media_type}/favorites?")
+    suspend fun getFavorites(
+        @Path("account_object_id") accountObjectId: String,
+        @Path("media_type") mediaType: String,
+        @Query("session_id") sessionId: String,
+        @Query("page") page: Int,
+        @Query("language") language: String?
+    ): MediaResponseDto
 }

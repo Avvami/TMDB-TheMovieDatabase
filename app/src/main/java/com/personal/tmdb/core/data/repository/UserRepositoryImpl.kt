@@ -107,4 +107,22 @@ class UserRepositoryImpl @Inject constructor(
             ).toMediaResponseInfo()
         }
     }
+
+    override suspend fun getFavorites(
+        accountObjectId: String,
+        mediaType: String,
+        sessionId: String,
+        page: Int,
+        language: String?
+    ): Result<MediaResponseInfo, DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.getFavorites(
+                accountObjectId = accountObjectId,
+                mediaType = mediaType,
+                sessionId = sessionId,
+                page = page,
+                language = language
+            ).toMediaResponseInfo()
+        }
+    }
 }

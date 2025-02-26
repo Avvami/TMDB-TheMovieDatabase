@@ -29,6 +29,7 @@ import com.personal.tmdb.detail.presentation.image.ImageViewerScreenRoot
 import com.personal.tmdb.detail.presentation.person.PersonScreenRoot
 import com.personal.tmdb.detail.presentation.reviews.ReviewsScreenRoot
 import com.personal.tmdb.home.presentation.home.HomeScreenRoot
+import com.personal.tmdb.profile.presentation.favorite.FavoriteScreenRoot
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.ListDetailsScreenRoot
 import com.personal.tmdb.profile.presentation.lists.presentation.lists.ListsScreenRoot
 import com.personal.tmdb.profile.presentation.profile.ProfileScreenRoot
@@ -281,7 +282,16 @@ fun ChildNavHost(
                 onNavigateTo = onNavigateTo
             )
         }
-        animatedComposable<Route.Favorite> {}
+        animatedComposable<Route.Favorite> {
+            FavoriteScreenRoot(
+                bottomPadding = bottomBarPadding,
+                canNavigateBack = preferencesState().additionalNavigationItem != AdditionalNavigationItem.FAVORITE,
+                lazyGridState = if (preferencesState().additionalNavigationItem == AdditionalNavigationItem.FAVORITE) scrollState as LazyGridState else rememberLazyGridState(),
+                onNavigateBack = onNavigateBack,
+                onNavigateTo = onNavigateTo,
+                preferencesState = preferencesState
+            )
+        }
         animatedComposable<Route.Profile> {
             val approved = it.toRoute<Route.Profile>().approved
             LaunchedEffect(key1 = true) {
