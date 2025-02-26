@@ -11,6 +11,7 @@ import com.personal.tmdb.auth.data.models.UserDto
 import com.personal.tmdb.core.data.models.ListDetailsDto
 import com.personal.tmdb.core.data.models.ListsResponseDto
 import com.personal.tmdb.core.data.models.MediaResponseDto
+import com.personal.tmdb.core.domain.models.CreateListRequest
 import com.personal.tmdb.core.domain.models.RemoveMediaRequest
 import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
 import com.personal.tmdb.detail.data.models.CollectionDto
@@ -23,6 +24,7 @@ import com.personal.tmdb.detail.data.models.PersonDto
 import com.personal.tmdb.detail.data.models.Reviews
 import com.personal.tmdb.detail.data.models.SeasonDto
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.HTTP
 import retrofit2.http.Headers
@@ -215,6 +217,20 @@ interface TmdbApi {
         @Path("list_id") listId: Int,
         @Query("session_id") sessionId: String,
         @Body request: RemoveMediaRequest
+    )
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @DELETE("4/list/{list_id}")
+    suspend fun deleteList(
+        @Path("list_id") listId: Int,
+        @Query("session_id") sessionId: String
+    )
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @POST("4/list")
+    suspend fun createList(
+        @Query("session_id") sessionId: String,
+        @Body request: CreateListRequest
     )
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")

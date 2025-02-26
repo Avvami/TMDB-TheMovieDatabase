@@ -16,5 +16,6 @@ data class ListDetailsState(
     val loading: Boolean = false,
     val deleting: Boolean = false,
     val updating: Boolean = false,
+    val deletingList: Boolean = false,
     val errorMessage: UiText? = null
 )

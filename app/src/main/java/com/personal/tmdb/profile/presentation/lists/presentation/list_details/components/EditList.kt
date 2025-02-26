@@ -124,7 +124,7 @@ fun EditList(
         ) {
             TextButton(
                 modifier = Modifier.width(200.dp),
-                onClick = { listDetailsUiEvent(ListDetailsUiEvent.DeleteList) },
+                onClick = { listDetailsUiEvent(ListDetailsUiEvent.DeleteList(listDetailsState().listId)) },
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.error
                 ),

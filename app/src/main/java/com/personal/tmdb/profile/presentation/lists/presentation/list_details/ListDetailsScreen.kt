@@ -44,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.util.C
+import com.personal.tmdb.core.domain.util.ObserveAsEvents
 import com.personal.tmdb.core.domain.util.shareText
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.PreferencesState
@@ -64,6 +65,11 @@ fun ListDetailsScreenRoot(
     viewModel: ListDetailsViewModel = hiltViewModel()
 ) {
     val listDetailsState by viewModel.listDetailsState.collectAsStateWithLifecycle()
+    ObserveAsEvents(flow = viewModel.deleteListChannelFlow) { event ->
+        if (event is ListDetailsUiEvent.OnNavigateBack) {
+            onNavigateBack()
+        }
+    }
     ListDetailsScreen(
         modifier = Modifier.padding(bottom = bottomPadding),
         preferencesState = preferencesState,

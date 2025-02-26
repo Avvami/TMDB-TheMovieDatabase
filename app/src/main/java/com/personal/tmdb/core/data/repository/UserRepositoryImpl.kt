@@ -8,6 +8,7 @@ import com.personal.tmdb.core.data.mappers.toUser
 import com.personal.tmdb.core.data.mappers.toUserEntity
 import com.personal.tmdb.core.data.remote.TmdbApi
 import com.personal.tmdb.core.data.remote.safeApiCall
+import com.personal.tmdb.core.domain.models.CreateListRequest
 import com.personal.tmdb.core.domain.models.ListDetailsInfo
 import com.personal.tmdb.core.domain.models.ListsResponseInfo
 import com.personal.tmdb.core.domain.models.MediaResponseInfo
@@ -87,6 +88,21 @@ class UserRepositoryImpl @Inject constructor(
     ): EmptyResult<DataError.Remote> {
         return safeApiCall {
             tmdbApi.deleteListItems(listId, sessionId, removeMediaRequest)
+        }
+    }
+
+    override suspend fun deleteList(listId: Int, sessionId: String): EmptyResult<DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.deleteList(listId, sessionId)
+        }
+    }
+
+    override suspend fun createList(
+        sessionId: String,
+        createListRequest: CreateListRequest
+    ): EmptyResult<DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.createList(sessionId, createListRequest)
         }
     }
 

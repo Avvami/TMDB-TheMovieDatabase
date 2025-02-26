@@ -1,5 +1,6 @@
 package com.personal.tmdb.profile.presentation.lists.presentation.list_details
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,8 +21,10 @@ import com.personal.tmdb.core.domain.util.onSuccess
 import com.personal.tmdb.core.domain.util.toUiText
 import com.personal.tmdb.core.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -151,6 +154,36 @@ class ListDetailsViewModel @Inject constructor(
         }
     }
 
+    private val _deleteListChannel = Channel<ListDetailsUiEvent>()
+    val deleteListChannelFlow = _deleteListChannel.receiveAsFlow()
+
+    private fun deleteList(listId: Int) {
+        viewModelScope.launch {
+            _listDetailsState.update { it.copy(deletingList = true) }
+
+            val sessionId = userRepository.getUser()?.sessionId ?: ""
+
+            userRepository.deleteList(listId, sessionId)
+                .onError { error ->
+                    _listDetailsState.update { it.copy(deletingList = false) }
+                    SnackbarController.sendEvent(
+                        event = SnackbarEvent(
+                            message = error.toUiText()
+                        )
+                    )
+                }
+                .onSuccess {
+                    _listDetailsState.update { it.copy(deletingList = false) }
+                    SnackbarController.sendEvent(
+                        event = SnackbarEvent(
+                            message = UiText.StringResource(R.string.deleted_successfully)
+                        )
+                    )
+                    _deleteListChannel.send(ListDetailsUiEvent.OnNavigateBack)
+                }
+        }
+    }
+
     fun listDetailsUiEvent(event: ListDetailsUiEvent) {
         when (event) {
             ListDetailsUiEvent.OnNavigateBack -> {}
@@ -174,7 +207,9 @@ class ListDetailsViewModel @Inject constructor(
             is ListDetailsUiEvent.UpdateListDetails -> {
                 updateListDetails(event.listId, event.name, event.description, event.public)
             }
-            ListDetailsUiEvent.DeleteList -> {}
+            is ListDetailsUiEvent.DeleteList -> {
+                deleteList(event.listId)
+            }
             is ListDetailsUiEvent.DeleteSelectedItems -> {
                 deleteSelectedItems(event.listId, event.items)
             }

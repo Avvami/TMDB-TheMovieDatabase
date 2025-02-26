@@ -1,5 +1,6 @@
 package com.personal.tmdb.core.domain.repository
 
+import com.personal.tmdb.core.domain.models.CreateListRequest
 import com.personal.tmdb.core.domain.models.ListDetailsInfo
 import com.personal.tmdb.core.domain.models.ListsResponseInfo
 import com.personal.tmdb.core.domain.models.MediaResponseInfo
@@ -33,6 +34,10 @@ interface UserRepository {
     suspend fun updateListDetails(listId: Int, sessionId: String, updateListDetailsRequest: UpdateListDetailsRequest): EmptyResult<DataError.Remote>
 
     suspend fun deleteListItems(listId: Int, sessionId: String, removeMediaRequest: RemoveMediaRequest): EmptyResult<DataError.Remote>
+
+    suspend fun deleteList(listId: Int, sessionId: String): EmptyResult<DataError.Remote>
+
+    suspend fun createList(sessionId: String, createListRequest: CreateListRequest): EmptyResult<DataError.Remote>
 
     suspend fun getRecommendations(
         accountObjectId: String,
