@@ -1,6 +1,5 @@
 package com.personal.tmdb.profile.presentation.lists.presentation.list_details
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

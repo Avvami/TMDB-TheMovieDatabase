@@ -161,7 +161,7 @@ fun SignedOutUser(
                 modifier = Modifier
                     .widthIn(max = 200.dp)
                     .clip(MaterialTheme.shapes.large)
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally

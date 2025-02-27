@@ -174,4 +174,9 @@
     <string name="deleted_successfully">Deleted successfully</string>
     <string name="updated_successfully">Updated successfully</string>
     <string name="watchlist_sorry">Sorry that\'s not available here :( TMDB&#128077;</string>
+    <string name="cleaning_up">Cleaning up…</string>
+    <string name="create_list">Create New</string>
+    <string name="empty_lists">Your list space is waiting to be filled. Begin with your first list!</string>
+    <string name="created_successfully">Created successfully</string>
+    <string name="create">Create</string>
 </resources>
