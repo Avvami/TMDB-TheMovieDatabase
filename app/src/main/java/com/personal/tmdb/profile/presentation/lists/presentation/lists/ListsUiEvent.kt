@@ -1,5 +1,6 @@
 package com.personal.tmdb.profile.presentation.lists.presentation.lists
 
+import com.personal.tmdb.core.domain.models.ListInfo
 import com.personal.tmdb.core.navigation.Route
 
 sealed interface ListsUiEvent {
@@ -11,4 +12,9 @@ sealed interface ListsUiEvent {
     data class SetListName(val text: String): ListsUiEvent
     data class SetListDescription(val text: String): ListsUiEvent
     data class CreateList(val name: String, val description: String, val public: Boolean): ListsUiEvent
+    data class DeleteSelectedLists(val items: List<ListInfo>): ListsUiEvent
+    data class SetSelectEnabled(val enabled: Boolean): ListsUiEvent
+    data class AddSelectedItem(val listInfo: ListInfo): ListsUiEvent
+    data class ReplaceSelectedItem(val listInfo: ListInfo): ListsUiEvent
+    data class RemoveSelectedItem(val listInfo: ListInfo): ListsUiEvent
 }

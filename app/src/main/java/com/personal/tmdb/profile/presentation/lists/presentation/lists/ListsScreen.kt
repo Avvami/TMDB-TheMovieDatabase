@@ -1,6 +1,7 @@
 package com.personal.tmdb.profile.presentation.lists.presentation.lists
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -35,12 +36,17 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,6 +60,8 @@ import com.personal.tmdb.core.presentation.components.ListItem
 import com.personal.tmdb.core.presentation.components.ListItemShimmer
 import com.personal.tmdb.core.presentation.components.MediaGrid
 import com.personal.tmdb.profile.presentation.lists.presentation.lists.components.CreateList
+import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.launch
 
 @Composable
 fun ListsScreenRoot(
@@ -96,12 +104,30 @@ private fun ListsScreen(
             listsUiEvent(ListsUiEvent.GetLists(1))
         }
     }
-    BackHandler {
-        if (listsState().createEnabled) {
-            /*TODO: Show warning dialog*/
-            listsUiEvent(ListsUiEvent.CreateMode(false))
-        } else {
-            listsUiEvent(ListsUiEvent.OnNavigateBack)
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    var backPressHandled by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    BackHandler(enabled = !backPressHandled) {
+        when {
+            listsState().createEnabled -> {
+                /*TODO: Show warning dialog*/
+                listsUiEvent(ListsUiEvent.CreateMode(false))
+            }
+            listsState().selectEnabled -> listsUiEvent(ListsUiEvent.SetSelectEnabled(false))
+            else -> {
+                /*TODO: Find a better solution???*/
+                backPressHandled = true
+                scope.launch {
+                    awaitFrame()
+                    onBackPressedDispatcher?.onBackPressed()
+                    backPressHandled = false
+                }
+            }
+        }
+    }
+    LaunchedEffect(listsState().selectedItems) {
+        if (listsState().selectedItems.isEmpty()) {
+            listsUiEvent(ListsUiEvent.SetSelectEnabled(false))
         }
     }
     AnimatedContent(
@@ -113,23 +139,37 @@ private fun ListsScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        if (creating) {
-                            Text(
-                                text = stringResource(id = R.string.create),
-                                fontWeight = FontWeight.Medium
-                            )
-                        } else {
-                            Text(
-                                text = stringResource(id = R.string.my_lists),
-                                fontWeight = FontWeight.Medium
-                            )
+                        when {
+                            creating -> {
+                                Text(
+                                    text = stringResource(id = R.string.create),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            listsState().selectEnabled -> {
+                                Text(
+                                    text = stringResource(id = R.string.edit),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            else -> {
+                                Text(
+                                    text = stringResource(id = R.string.my_lists),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
                         }
                     },
                     navigationIcon = {
                         when {
-                            creating -> {
+                            creating || listsState().selectEnabled -> {
                                 IconButton(
-                                    onClick = { listsUiEvent(ListsUiEvent.CreateMode(false)) }
+                                    onClick = {
+                                        when {
+                                            creating -> listsUiEvent(ListsUiEvent.CreateMode(false))
+                                            listsState().selectEnabled -> listsUiEvent(ListsUiEvent.SetSelectEnabled(false))
+                                        }
+                                    }
                                 ) {
                                     Icon(
                                         imageVector = Icons.Rounded.Close,
@@ -147,10 +187,37 @@ private fun ListsScreen(
                                     )
                                 }
                             }
-                            else -> Unit
                         }
                     },
                     actions = {
+                        if (listsState().selectedItems.isNotEmpty()) {
+                            IconButton(
+                                onClick = {
+                                    listsUiEvent(ListsUiEvent.DeleteSelectedLists(listsState().selectedItems))
+                                },
+                                enabled = !listsState().deleting
+                            ) {
+                                AnimatedContent(
+                                    targetState = listsState().deleting,
+                                    label = "Delete animation"
+                                ) { deleting ->
+                                    if (deleting) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(18.dp),
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            trackColor = Color.Transparent,
+                                            strokeWidth = 2.dp,
+                                            strokeCap = StrokeCap.Round
+                                        )
+                                    } else {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.icon_delete_fill0_wght400),
+                                            contentDescription = null
+                                        )
+                                    }
+                                }
+                            }
+                        }
                         if (creating) {
                             IconButton(
                                 onClick = {
@@ -188,7 +255,7 @@ private fun ListsScreen(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = if (creating) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surface,
+                        containerColor = if (creating || listsState().selectEnabled) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surface,
                         titleContentColor = MaterialTheme.colorScheme.onSurface,
                         navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                         actionIconContentColor = MaterialTheme.colorScheme.onSurface
@@ -235,12 +302,16 @@ private fun ListsScreen(
                                             .fillMaxWidth()
                                             .animateItem()
                                             .clip(MaterialTheme.shapes.large)
-                                            .clickable {
+                                            .clickable(
+                                                enabled = !listsState().selectEnabled
+                                            ) {
                                                 listsUiEvent(ListsUiEvent.CreateMode(true))
                                             }
                                             .border(
                                                 width = 2.dp,
-                                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
+                                                color = MaterialTheme.colorScheme.onSurface.copy(
+                                                    alpha = .1f
+                                                ),
                                                 shape = MaterialTheme.shapes.large
                                             )
                                             .padding(16.dp),
@@ -284,6 +355,19 @@ private fun ListsScreen(
                                                 .fillMaxWidth()
                                                 .animateItem(),
                                             onNavigateTo = { listsUiEvent(ListsUiEvent.OnNavigateTo(it)) },
+                                            selectEnabled = { listsState().selectEnabled },
+                                            multipleSelectEnabled = false,
+                                            selected = { listsState().selectedItems.contains(listInfo) },
+                                            onSelect = {
+                                                if (listsState().selectedItems.contains(listInfo))
+                                                    listsUiEvent(ListsUiEvent.RemoveSelectedItem(listInfo))
+                                                else
+                                                    listsUiEvent(ListsUiEvent.ReplaceSelectedItem(listInfo))
+                                            },
+                                            onLongClick = {
+                                                listsUiEvent(ListsUiEvent.SetSelectEnabled(true))
+                                                listsUiEvent(ListsUiEvent.AddSelectedItem(listInfo))
+                                            },
                                             listInfo = listInfo,
                                             height = Dp.Unspecified
                                         )

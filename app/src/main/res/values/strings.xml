@@ -179,4 +179,5 @@
     <string name="empty_lists">Your list space is waiting to be filled. Begin with your first list!</string>
     <string name="created_successfully">Created successfully</string>
     <string name="create">Create</string>
+    <string name="create_list_note">TMDB sets lists to public initially. You can switch it to private after creation.</string>
 </resources>

@@ -434,24 +434,45 @@ fun MediaPosterShimmer(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListItem(
     modifier: Modifier = Modifier,
     onNavigateTo: (route: Route) -> Unit,
+    selectEnabled: () -> Boolean = { false },
+    multipleSelectEnabled: Boolean = true,
+    selected: () -> Boolean = { false },
+    onSelect: () -> Unit = {},
+    onLongClick: (() -> Unit)? = null,
     shape: Shape = MaterialTheme.shapes.large,
     height: Dp = 200.dp,
     listInfo: ListInfo
 ) {
+    val haptic = LocalHapticFeedback.current
     Box(
         modifier = modifier
             .height(height)
             .aspectRatio(16 / 9f)
             .clip(shape)
-            .clickable {
-                onNavigateTo(
-                    Route.ListDetails(listId = listInfo.id)
-                )
-            }
+            .then(
+                if (!selectEnabled()) {
+                    Modifier.combinedClickable(
+                        onClick = {
+                            onNavigateTo(
+                                Route.ListDetails(listId = listInfo.id)
+                            )
+                        },
+                        onLongClick = {
+                            onLongClick?.let {
+                                it()
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
+                        }
+                    )
+                } else {
+                    Modifier.selectable(selected = selected(), onClick = onSelect)
+                }
+            )
             .border(
                 width = 2.dp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
@@ -510,6 +531,42 @@ fun ListItem(
                         style = MaterialTheme.typography.bodyMedium,
                         color = surfaceVariantDark
                     )
+                }
+            }
+        }
+        androidx.compose.animation.AnimatedVisibility(
+            modifier = Modifier.fillMaxSize(),
+            visible = selectEnabled()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(surfaceDark.copy(alpha = .65f)),
+                contentAlignment = Alignment.Center
+            ) {
+                AnimatedContent(
+                    targetState = selected(),
+                    label = "Selected animation"
+                ) { selected ->
+                    when {
+                        selected -> {
+                            Icon(
+                                modifier = Modifier.size(28.dp),
+                                imageVector = Icons.Rounded.CheckCircle,
+                                contentDescription = null,
+                                tint = surfaceLight
+                            )
+                        }
+                        multipleSelectEnabled && !selected -> {
+                            Icon(
+                                modifier = Modifier.size(28.dp),
+                                painter = painterResource(id = R.drawable.icon_radio_button_unchecked_fill0_wght400),
+                                contentDescription = null,
+                                tint = surfaceLight
+                            )
+                        }
+                        else -> Unit
+                    }
                 }
             }
         }

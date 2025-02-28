@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.models.CreateListRequest
+import com.personal.tmdb.core.domain.models.ListInfo
 import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.SnackbarController
 import com.personal.tmdb.core.domain.util.SnackbarEvent
@@ -88,10 +89,42 @@ class ListsViewModel @Inject constructor(
                             publicList = false
                         )
                     }
-                    getLists(1)
+                    getLists(page = 1)
                     SnackbarController.sendEvent(
                         event = SnackbarEvent(
                             message = UiText.StringResource(R.string.created_successfully)
+                        )
+                    )
+                }
+        }
+    }
+
+    private fun deleteList(listInfo: ListInfo) {
+        viewModelScope.launch {
+            _listsState.update { it.copy(deleting = true) }
+
+            val sessionId = userRepository.getUser()?.sessionId ?: ""
+
+            userRepository.deleteList(listInfo.id, sessionId)
+                .onError { error ->
+                    _listsState.update { it.copy(deleting = false) }
+                    SnackbarController.sendEvent(
+                        event = SnackbarEvent(
+                            message = error.toUiText()
+                        )
+                    )
+                }
+                .onSuccess {
+                    _listsState.update {
+                        it.copy(
+                            deleting = false,
+                            selectedItems = it.selectedItems - listInfo
+                        )
+                    }
+                    getLists(page = 1)
+                    SnackbarController.sendEvent(
+                        event = SnackbarEvent(
+                            message = UiText.StringResource(R.string.deleted_successfully)
                         )
                     )
                 }
@@ -121,7 +154,6 @@ class ListsViewModel @Inject constructor(
                     }
                 }
             }
-
             is ListsUiEvent.SetListDescription -> {
                 _listsState.update { it.copy(listDescription = event.text) }
             }
@@ -130,6 +162,25 @@ class ListsViewModel @Inject constructor(
             }
             is ListsUiEvent.SetListVisibility -> {
                 _listsState.update { it.copy(publicList = event.public) }
+            }
+            is ListsUiEvent.AddSelectedItem -> {
+                _listsState.update { it.copy(selectedItems = it.selectedItems + event.listInfo) }
+            }
+            is ListsUiEvent.RemoveSelectedItem -> {
+                _listsState.update { it.copy(selectedItems = it.selectedItems - event.listInfo) }
+            }
+            is ListsUiEvent.ReplaceSelectedItem -> {
+                _listsState.update { it.copy(selectedItems = listOf(event.listInfo)) }
+            }
+            is ListsUiEvent.SetSelectEnabled -> {
+                if (event.enabled) {
+                    _listsState.update { it.copy(selectEnabled = true) }
+                } else {
+                    _listsState.update { it.copy(selectEnabled = false, selectedItems = emptyList()) }
+                }
+            }
+            is ListsUiEvent.DeleteSelectedLists -> {
+                deleteList(event.items.first())
             }
         }
     }
