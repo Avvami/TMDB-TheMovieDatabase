@@ -251,6 +251,7 @@ fun MediaPoster(
     modifier: Modifier = Modifier,
     onNavigateTo: (route: Route) -> Unit,
     selectEnabled: () -> Boolean = { false },
+    multipleSelectEnabled: Boolean = true,
     selected: () -> Boolean = { false },
     onSelect: () -> Unit = {},
     onLongClick: (() -> Unit)? = null,
@@ -368,20 +369,23 @@ fun MediaPoster(
                         targetState = selected(),
                         label = "Selected animation"
                     ) { selected ->
-                        if (selected) {
-                            Icon(
-                                modifier = Modifier.size(28.dp),
-                                imageVector = Icons.Rounded.CheckCircle,
-                                contentDescription = null,
-                                tint = surfaceLight
-                            )
-                        } else {
-                            Icon(
-                                modifier = Modifier.size(28.dp),
-                                painter = painterResource(id = R.drawable.icon_radio_button_unchecked_fill0_wght400),
-                                contentDescription = null,
-                                tint = surfaceLight
-                            )
+                        when {
+                            selected -> {
+                                Icon(
+                                    modifier = Modifier.size(28.dp),
+                                    imageVector = Icons.Rounded.CheckCircle,
+                                    contentDescription = null,
+                                    tint = surfaceLight
+                                )
+                            }
+                            multipleSelectEnabled && !selected -> {
+                                Icon(
+                                    modifier = Modifier.size(28.dp),
+                                    painter = painterResource(id = R.drawable.icon_radio_button_unchecked_fill0_wght400),
+                                    contentDescription = null,
+                                    tint = surfaceLight
+                                )
+                            }
                         }
                     }
                 }
@@ -493,7 +497,9 @@ fun ListItem(
             LocalContentColor provides onSurfaceDark
         ) {
             Column(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.Center),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -501,7 +507,10 @@ fun ListItem(
                     Text(
                         text = name,
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
                     )
                 }
                 Row(
@@ -565,7 +574,6 @@ fun ListItem(
                                 tint = surfaceLight
                             )
                         }
-                        else -> Unit
                     }
                 }
             }

@@ -47,7 +47,7 @@ fun PersonKnownForMedia(
                         )
                     }
                     else -> {
-                        /*TODO: Navigate to lost your way screen*/
+                        onNavigateTo(Route.Lost)
                     }
                 }
             }

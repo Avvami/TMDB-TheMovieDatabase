@@ -138,21 +138,19 @@ private fun WatchlistScreen(
                 }
             },
             items = {
-                if (watchlistState().loading) {
-                    if ((watchlistState().showRecommendations && watchlistState().recommendations == null) ||
-                        (!watchlistState().showRecommendations &&  watchlistState().watchlist == null)) {
-                        items(
-                            count = 15,
-                            contentType = { "Poster" }
-                        ) {
-                            MediaPosterShimmer(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .animateItem(),
-                                height = Dp.Unspecified,
-                                showTitle = preferencesState().showTitle,
-                            )
-                        }
+                if (watchlistState().loading && (watchlistState().showRecommendations && watchlistState().recommendations == null) ||
+                    (!watchlistState().showRecommendations &&  watchlistState().watchlist == null)) {
+                    items(
+                        count = 15,
+                        contentType = { "Poster" }
+                    ) {
+                        MediaPosterShimmer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateItem(),
+                            height = Dp.Unspecified,
+                            showTitle = preferencesState().showTitle,
+                        )
                     }
                 } else {
                     watchlistState().errorMessage?.let {  }

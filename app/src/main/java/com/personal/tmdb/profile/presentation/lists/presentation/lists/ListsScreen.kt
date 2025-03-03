@@ -57,9 +57,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.personal.tmdb.R
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.components.ListItem
-import com.personal.tmdb.core.presentation.components.ListItemShimmer
 import com.personal.tmdb.core.presentation.components.MediaGrid
 import com.personal.tmdb.profile.presentation.lists.presentation.lists.components.CreateList
+import com.personal.tmdb.profile.presentation.lists.presentation.lists.components.ListScreenShimmer
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.launch
 
@@ -271,15 +271,7 @@ private fun ListsScreen(
                 columns = GridCells.Adaptive(360.dp),
                 items = {
                     if (listsState().loading && listsState().lists == null) {
-                        items(
-                            count = 4,
-                            contentType = { "List" }
-                        ) {
-                            ListItemShimmer(
-                                modifier = Modifier.fillMaxWidth(),
-                                height = Dp.Unspecified
-                            )
-                        }
+                        ListScreenShimmer()
                     } else {
                         listsState().errorMessage?.let {  }
                         listsState().lists?.results?.let { lists ->
