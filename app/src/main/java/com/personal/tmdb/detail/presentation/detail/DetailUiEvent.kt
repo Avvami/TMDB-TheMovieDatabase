@@ -9,4 +9,5 @@ sealed interface DetailUiEvent {
     data class SetAvailableSearchQuery(val query: String): DetailUiEvent
     data object ChangeAvailableSearchState: DetailUiEvent
     data object ChangeAvailableDialogState: DetailUiEvent
+    data class ShowMoreDetails(val state: Boolean): DetailUiEvent
 }

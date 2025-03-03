@@ -11,6 +11,7 @@ data class DetailState(
     val details: MediaDetailInfo? = null,
     val collection: CollectionInfo? = null,
     val watchCountry: String = "",
+    val showMoreDetails: Boolean = false,
     val loading: Boolean = false,
     val errorMessage: UiText? = null
 )

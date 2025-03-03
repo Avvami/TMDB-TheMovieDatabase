@@ -376,7 +376,8 @@ fun ChildNavHost(
             AppearanceScreenRoot(
                 bottomPadding = bottomBarPadding,
                 onNavigateBack = onNavigateBack,
-                preferencesState = preferencesState
+                preferencesState = preferencesState,
+                userState = userState
             )
         }
         animatedComposable<Route.Language> {}

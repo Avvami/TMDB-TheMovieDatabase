@@ -128,8 +128,8 @@ class DetailViewModel @Inject constructor(
 
     fun detailUiEvent(event: DetailUiEvent) {
         when (event) {
-            DetailUiEvent.OnNavigateBack -> {}
-            is DetailUiEvent.OnNavigateTo -> {}
+            DetailUiEvent.OnNavigateBack -> Unit
+            is DetailUiEvent.OnNavigateTo -> Unit
             is DetailUiEvent.SetSelectedCountry -> {
                 availableState = availableState.copy(
                     selectedCountry = event.country,
@@ -149,6 +149,9 @@ class DetailViewModel @Inject constructor(
                 availableState = availableState.copy(
                     isDialogShown = !availableState.isDialogShown
                 )
+            }
+            is DetailUiEvent.ShowMoreDetails -> {
+                _detailState.update { it.copy(showMoreDetails = event.state) }
             }
         }
     }

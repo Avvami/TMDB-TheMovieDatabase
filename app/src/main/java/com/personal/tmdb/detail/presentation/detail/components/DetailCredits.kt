@@ -72,7 +72,7 @@ fun DetailCredits(
                 }
             }
             info().createdBy?.takeIf { it.isNotEmpty() }?.let { createdBy ->
-                AnnotatedListText(
+                AnnotatedListTextWithLinks(
                     annotationTag = AnnotationTag.CAST,
                     titlePrefix = stringResource(id = R.string.creator),
                     items = createdBy.map { AnnotatedItem(id = it.id, name = it.name) },
@@ -82,7 +82,7 @@ fun DetailCredits(
                 )
             }
             info().credits?.crew?.find { it.department == "Directing" }?.let { director ->
-                AnnotatedListText(
+                AnnotatedListTextWithLinks(
                     annotationTag = AnnotationTag.CAST,
                     titlePrefix = stringResource(id = R.string.director),
                     items = listOf(

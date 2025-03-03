@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.personal.tmdb.R
+import com.personal.tmdb.UserState
 import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.settings.presentation.appearance.components.AppearanceAdditionalNavItem
 import com.personal.tmdb.settings.presentation.appearance.components.AppearancePoster
@@ -31,11 +32,13 @@ fun AppearanceScreenRoot(
     bottomPadding: Dp,
     onNavigateBack: () -> Unit,
     preferencesState: () -> PreferencesState,
+    userState: () -> UserState,
     appearanceViewModel: AppearanceViewModel = hiltViewModel()
 ) {
     AppearanceScreen(
         modifier = Modifier.padding(bottom = bottomPadding),
         preferencesState = preferencesState,
+        userState = userState,
         appearanceUiEvent = { event ->
             when (event) {
                 AppearanceUiEvent.OnNavigateBack -> onNavigateBack()
@@ -51,6 +54,7 @@ fun AppearanceScreenRoot(
 private fun AppearanceScreen(
     modifier: Modifier = Modifier,
     preferencesState: () -> PreferencesState,
+    userState: () -> UserState,
     appearanceUiEvent: (AppearanceUiEvent) -> Unit
 ) {
     Scaffold(
@@ -95,14 +99,16 @@ private fun AppearanceScreen(
                     appearanceUiEvent = appearanceUiEvent
                 )
             }
-            item(
-                contentType = { "Additional navigation bar item" }
-            ) {
-                AppearanceAdditionalNavItem(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    preferencesState = preferencesState,
-                    appearanceUiEvent = appearanceUiEvent
-                )
+            if (!userState().user?.sessionId.isNullOrEmpty()) {
+                item(
+                    contentType = { "Additional navigation bar item" }
+                ) {
+                    AppearanceAdditionalNavItem(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        preferencesState = preferencesState,
+                        appearanceUiEvent = appearanceUiEvent
+                    )
+                }
             }
             item(
                 contentType = { "Theme" }

@@ -1,5 +1,10 @@
 package com.personal.tmdb.detail.presentation.detail
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Share
@@ -22,11 +28,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,6 +50,7 @@ import com.personal.tmdb.core.presentation.components.MediaPoster
 import com.personal.tmdb.core.domain.util.C
 import com.personal.tmdb.core.domain.util.shareText
 import com.personal.tmdb.detail.presentation.detail.components.DetailActionButtons
+import com.personal.tmdb.detail.presentation.detail.components.DetailAll
 import com.personal.tmdb.detail.presentation.detail.components.DetailBanner
 import com.personal.tmdb.detail.presentation.detail.components.DetailCollection
 import com.personal.tmdb.detail.presentation.detail.components.DetailCredits
@@ -85,10 +96,38 @@ private fun DetailScreen(
     detailState: () -> DetailState,
     detailUiEvent: (DetailUiEvent) -> Unit
 ) {
+    val lazyListState = rememberLazyListState()
+    val showTitle by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex >= 1
+        }
+    }
+    BackHandler {
+        if (detailState().showMoreDetails) {
+            detailUiEvent(DetailUiEvent.ShowMoreDetails(false))
+        } else {
+            detailUiEvent(DetailUiEvent.OnNavigateBack)
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {},
+                title = {
+                    if (!detailState().showMoreDetails) {
+                        AnimatedVisibility(
+                            visible = showTitle,
+                            enter = fadeIn(),
+                            exit = fadeOut()
+                        ) {
+                            Text(
+                                text = detailState().details?.name ?: "",
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
@@ -96,7 +135,13 @@ private fun DetailScreen(
                 ),
                 navigationIcon = {
                     IconButton(
-                        onClick = { detailUiEvent(DetailUiEvent.OnNavigateBack) }
+                        onClick = {
+                            if (detailState().showMoreDetails) {
+                                detailUiEvent(DetailUiEvent.ShowMoreDetails(false))
+                            } else {
+                                detailUiEvent(DetailUiEvent.OnNavigateBack)
+                            }
+                        }
                     )  {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
@@ -106,15 +151,17 @@ private fun DetailScreen(
                 },
                 actions = {
                     val context = LocalContext.current
-                    IconButton(
-                        onClick = {
-                            context.shareText(C.SHARE_MEDIA.format(detailState().mediaType.name.lowercase(), detailState().mediaId))
+                    if (!detailState().showMoreDetails) {
+                        IconButton(
+                            onClick = {
+                                context.shareText(C.SHARE_MEDIA.format(detailState().mediaType.name.lowercase(), detailState().mediaId))
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Share,
+                                contentDescription = "Share"
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Share,
-                            contentDescription = "Share"
-                        )
                     }
                 }
             )
@@ -122,181 +169,198 @@ private fun DetailScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface
     ) { innerPadding ->
-        LazyColumn(
-            modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(top = innerPadding.calculateTopPadding(), bottom = 16.dp)
-        ) {
-            if (detailState().loading) {
-                item {
-                    DetailScreenShimmer(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        userState = userState
-                    )
-                }
+        AnimatedContent(
+            targetState = detailState().showMoreDetails,
+            label = "Show details animation"
+        ) { showMoreDetails ->
+            if (showMoreDetails) {
+                DetailAll(
+                    modifier = modifier,
+                    innerPadding = innerPadding,
+                    detailState = detailState,
+                    userState = userState
+                )
             } else {
-                detailState().errorMessage?.let {
-                    item { /*TODO: Display error*/ }
-                }
-                detailState().details?.let { info ->
-                    item {
-                        DetailTitle(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            info = { info },
-                            userState = userState
-                        )
-                    }
-                    item {
-                        DetailBanner(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .clip(MaterialTheme.shapes.large)
-                                .border(
-                                    width = 2.dp,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
-                                    shape = MaterialTheme.shapes.large
-                                ),
-                            info = { info },
-                            watchCountry = detailState()::watchCountry,
-                            detailUiEvent = detailUiEvent
-                        )
-                    }
-                    info.overview?.let { overview ->
+                LazyColumn(
+                    modifier = modifier,
+                    state = lazyListState,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(top = innerPadding.calculateTopPadding(), bottom = 16.dp)
+                ) {
+                    if (detailState().loading) {
                         item {
-                            DetailOverview(
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .fillMaxWidth()
-                                    .clickable(
-                                        interactionSource = null,
-                                        indication = null
-                                    ) {
-                                        /*TODO: Show more info*/
-                                    },
-                                overview = overview
-                            )
-                        }
-                    }
-                    item {
-                        DetailCredits(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            info = { info },
-                            mediaType = detailState()::mediaType,
-                            detailUiEvent = detailUiEvent
-                        )
-                    }
-                    item {
-                        DetailActionButtons(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            info = { info },
-                            userState = userState,
-                            detailUiEvent = detailUiEvent
-                        )
-                    }
-                    detailState().collection?.let { collectionInfo ->
-                        item {
-                            DetailCollection(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
-                                    .animateItem()
-                                    .height(IntrinsicSize.Min)
-                                    .clip(MaterialTheme.shapes.medium)
-                                    .clickable {
-                                        detailUiEvent(
-                                            DetailUiEvent.OnNavigateTo(
-                                                Route.Collection(
-                                                    collectionId = collectionInfo.id
-                                                )
-                                            )
-                                        )
-                                    }
-                                    .border(
-                                        width = 2.dp,
-                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
-                                        shape = MaterialTheme.shapes.large
-                                    ),
-                                collectionInfo = { collectionInfo }
-                            )
-                        }
-                    }
-                    info.seasons?.takeIf { it.isNotEmpty() }?.let { seasons ->
-                        item {
-                            DetailEpisodes(
+                            DetailScreenShimmer(
                                 modifier = Modifier.padding(horizontal = 16.dp),
-                                info = info,
-                                seasons = seasons,
-                                detailUiEvent = detailUiEvent
+                                userState = userState
                             )
                         }
-                    }
-                    info.reviews?.results?.takeIf { it.isNotEmpty() }?.let { reviews ->
-                        item {
-                            DetailReview(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                reviews = { reviews },
-                                mediaId = detailState()::mediaId,
-                                mediaType = detailState()::mediaType,
-                                detailUiEvent = detailUiEvent
-                            )
+                    } else {
+                        detailState().errorMessage?.let {
+                            item { /*TODO: Display error*/ }
                         }
-                    }
-                    info.images?.let { images ->
-                        if (!images.posters.isNullOrEmpty() || !images.backdrops.isNullOrEmpty()) {
+                        detailState().details?.let { info ->
                             item {
-                                DetailMedia(
-                                    images = { images },
-                                    mediaId = detailState()::mediaId,
+                                DetailTitle(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    info = { info },
+                                    userState = userState
+                                )
+                            }
+                            item {
+                                DetailBanner(
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp)
+                                        .clip(MaterialTheme.shapes.large)
+                                        .border(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
+                                            shape = MaterialTheme.shapes.large
+                                        ),
+                                    info = { info },
+                                    watchCountry = detailState()::watchCountry,
+                                    detailUiEvent = detailUiEvent
+                                )
+                            }
+                            info.overview?.let { overview ->
+                                item {
+                                    DetailOverview(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                            .fillMaxWidth()
+                                            .clickable(
+                                                interactionSource = null,
+                                                indication = null
+                                            ) {
+                                                detailUiEvent(DetailUiEvent.ShowMoreDetails(true))
+                                            },
+                                        overview = overview
+                                    )
+                                }
+                            }
+                            item {
+                                DetailCredits(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    info = { info },
                                     mediaType = detailState()::mediaType,
                                     detailUiEvent = detailUiEvent
                                 )
                             }
-                        }
-                    }
-                    info.similar?.results?.takeIf { it.isNotEmpty() }?.let { similar ->
-                        item {
-                            MediaCarousel(
-                                titleContent = {
-                                    Text(text = stringResource(id = R.string.similar))
-                                },
-                                items = {
-                                    items(
-                                        items = similar,
-                                        key = { it.id }
-                                    ) { mediaInfo ->
-                                        MediaPoster(
-                                            onNavigateTo = { detailUiEvent(DetailUiEvent.OnNavigateTo(it)) },
-                                            mediaInfo = mediaInfo,
-                                            mediaType = mediaInfo.mediaType ?: detailState().mediaType,
-                                            showTitle = preferencesState().showTitle,
-                                            showVoteAverage = preferencesState().showVoteAverage,
+                            item {
+                                DetailActionButtons(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    info = { info },
+                                    userState = userState,
+                                    detailUiEvent = detailUiEvent
+                                )
+                            }
+                            detailState().collection?.let { collectionInfo ->
+                                item {
+                                    DetailCollection(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp)
+                                            .animateItem()
+                                            .height(IntrinsicSize.Min)
+                                            .clip(MaterialTheme.shapes.medium)
+                                            .clickable {
+                                                detailUiEvent(
+                                                    DetailUiEvent.OnNavigateTo(
+                                                        Route.Collection(
+                                                            collectionId = collectionInfo.id
+                                                        )
+                                                    )
+                                                )
+                                            }
+                                            .border(
+                                                width = 2.dp,
+                                                color = MaterialTheme.colorScheme.onSurface.copy(
+                                                    alpha = .1f
+                                                ),
+                                                shape = MaterialTheme.shapes.large
+                                            ),
+                                        collectionInfo = { collectionInfo }
+                                    )
+                                }
+                            }
+                            info.seasons?.takeIf { it.isNotEmpty() }?.let { seasons ->
+                                item {
+                                    DetailEpisodes(
+                                        modifier = Modifier.padding(horizontal = 16.dp),
+                                        info = info,
+                                        seasons = seasons,
+                                        detailUiEvent = detailUiEvent
+                                    )
+                                }
+                            }
+                            info.reviews?.results?.takeIf { it.isNotEmpty() }?.let { reviews ->
+                                item {
+                                    DetailReview(
+                                        modifier = Modifier.padding(horizontal = 16.dp),
+                                        reviews = { reviews },
+                                        mediaId = detailState()::mediaId,
+                                        mediaType = detailState()::mediaType,
+                                        detailUiEvent = detailUiEvent
+                                    )
+                                }
+                            }
+                            info.images?.let { images ->
+                                if (!images.posters.isNullOrEmpty() || !images.backdrops.isNullOrEmpty()) {
+                                    item {
+                                        DetailMedia(
+                                            images = { images },
+                                            mediaId = detailState()::mediaId,
+                                            mediaType = detailState()::mediaType,
+                                            detailUiEvent = detailUiEvent
                                         )
                                     }
                                 }
-                            )
-                        }
-                    }
-                    info.recommendations?.results?.takeIf { it.isNotEmpty() }?.let { recommendations ->
-                        item {
-                            MediaCarousel(
-                                titleContent = {
-                                    Text(text = stringResource(id = R.string.recommendations))
-                                },
-                                items = {
-                                    items(
-                                        items = recommendations,
-                                        key = { it.id }
-                                    ) { mediaInfo ->
-                                        MediaPoster(
-                                            onNavigateTo = { detailUiEvent(DetailUiEvent.OnNavigateTo(it)) },
-                                            mediaInfo = mediaInfo,
-                                            mediaType = mediaInfo.mediaType ?: detailState().mediaType,
-                                            showTitle = preferencesState().showTitle,
-                                            showVoteAverage = preferencesState().showVoteAverage,
-                                        )
-                                    }
+                            }
+                            info.similar?.results?.takeIf { it.isNotEmpty() }?.let { similar ->
+                                item {
+                                    MediaCarousel(
+                                        titleContent = {
+                                            Text(text = stringResource(id = R.string.similar))
+                                        },
+                                        items = {
+                                            items(
+                                                items = similar,
+                                                key = { it.id }
+                                            ) { mediaInfo ->
+                                                MediaPoster(
+                                                    onNavigateTo = { detailUiEvent(DetailUiEvent.OnNavigateTo(it)) },
+                                                    mediaInfo = mediaInfo,
+                                                    mediaType = mediaInfo.mediaType ?: detailState().mediaType,
+                                                    showTitle = preferencesState().showTitle,
+                                                    showVoteAverage = preferencesState().showVoteAverage,
+                                                )
+                                            }
+                                        }
+                                    )
                                 }
-                            )
+                            }
+                            info.recommendations?.results?.takeIf { it.isNotEmpty() }?.let { recommendations ->
+                                item {
+                                    MediaCarousel(
+                                        titleContent = {
+                                            Text(text = stringResource(id = R.string.recommendations))
+                                        },
+                                        items = {
+                                            items(
+                                                items = recommendations,
+                                                key = { it.id }
+                                            ) { mediaInfo ->
+                                                MediaPoster(
+                                                    onNavigateTo = { detailUiEvent(DetailUiEvent.OnNavigateTo(it)) },
+                                                    mediaInfo = mediaInfo,
+                                                    mediaType = mediaInfo.mediaType ?: detailState().mediaType,
+                                                    showTitle = preferencesState().showTitle,
+                                                    showVoteAverage = preferencesState().showVoteAverage,
+                                                )
+                                            }
+                                        }
+                                    )
+                                }
+                            }
                         }
                     }
                 }

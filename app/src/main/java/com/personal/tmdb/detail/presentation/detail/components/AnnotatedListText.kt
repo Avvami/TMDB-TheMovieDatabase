@@ -37,7 +37,7 @@ enum class AnnotationTag {
 }
 
 @Composable
-fun AnnotatedListText(
+fun AnnotatedListTextWithLinks(
     modifier: Modifier = Modifier,
     annotationTag: AnnotationTag,
     titlePrefix: String? = null,
@@ -74,6 +74,41 @@ fun AnnotatedListText(
                         )
                     ) {
                         append(item.name)
+                    }
+                    if (index != items.lastIndex) {
+                        withStyle(style = itemsStyle) {
+                            append(", ")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Text(
+        modifier = modifier,
+        text = annotatedString
+    )
+}
+
+@Composable
+fun AnnotatedListText(
+    modifier: Modifier = Modifier,
+    titlePrefix: String? = null,
+    items: List<String>,
+    titlePrefixStyle: SpanStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.surfaceVariant).toSpanStyle(),
+    itemsStyle: SpanStyle = MaterialTheme.typography.bodyLarge.toSpanStyle()
+) {
+    val annotatedString by remember {
+        derivedStateOf {
+            buildAnnotatedString {
+                titlePrefix?.let {
+                    withStyle(style = titlePrefixStyle) {
+                        append("$titlePrefix: ")
+                    }
+                }
+                items.fastForEachIndexed { index, item ->
+                    withStyle(style = itemsStyle) {
+                        append(item)
                     }
                     if (index != items.lastIndex) {
                         withStyle(style = itemsStyle) {

@@ -10,6 +10,7 @@ import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.Genre
 import com.personal.tmdb.detail.data.models.Images
 import com.personal.tmdb.detail.data.models.Network
+import com.personal.tmdb.detail.data.models.ProductionCompany
 import com.personal.tmdb.detail.data.models.ReleaseDates
 import com.personal.tmdb.detail.data.models.Season
 import java.time.LocalDate
@@ -31,10 +32,12 @@ data class MediaDetailInfo(
     val nextEpisodeToAir: EpisodeToAirInfo?,
     val numberOfEpisodes: Int?,
     val numberOfSeasons: Int?,
+    val originCountry: List<String>?,
     val originalLanguage: String?,
     val originalName: String?,
     val overview: String?,
     val posterPath: String?,
+    val productionCompanies: List<ProductionCompany>?,
     val recommendations: MediaResponseInfo?,
     val releaseDate: LocalDate?,
     val releaseDates: ReleaseDates?,
@@ -42,6 +45,7 @@ data class MediaDetailInfo(
     val runtime: Int?,
     val seasons: List<Season>?,
     val similar: MediaResponseInfo?,
+    val status: String?,
     val tagline: String?,
     val voteAverage: Float?,
     val voteCount: Int?,

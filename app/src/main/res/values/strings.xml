@@ -180,4 +180,13 @@
     <string name="created_successfully">Created successfully</string>
     <string name="create">Create</string>
     <string name="create_list_note">TMDB sets lists to public initially. You can switch it to private after creation.</string>
+    <string name="more_details">Show more details</string>
+    <string name="original_title">Original Title</string>
+    <string name="original_language">Original Language</string>
+    <string name="status">Status</string>
+    <string name="network">Network</string>
+    <string name="networks">Networks</string>
+    <string name="no_name">No name</string>
+    <string name="production_company">Production Company</string>
+    <string name="production_companies">Production Companies</string>
 </resources>

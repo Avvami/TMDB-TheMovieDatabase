@@ -1,6 +1,7 @@
 package com.personal.tmdb.detail.data.mappers
 
 import com.personal.tmdb.core.data.mappers.toMediaResponseInfo
+import com.personal.tmdb.core.domain.util.convertStringToDate
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeToAir
 import com.personal.tmdb.detail.data.models.MediaDetailDto
@@ -12,14 +13,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 fun MediaDetailDto.toMediaDetailInfo(): MediaDetailInfo {
-    val releaseDate: LocalDate? = try {
-        val dateString = firstAirDate?.takeIf { it.isNotBlank() } ?: releaseDate?.takeIf { it.isNotBlank() }
-        dateString?.let { string ->
-            LocalDate.parse(string, DateTimeFormatter.ISO_LOCAL_DATE)
-        }
-    } catch (e: Exception) {
-        null
-    }
     return MediaDetailInfo(
         aggregateCredits = aggregateCredits,
         backdropPath = backdropPath,
@@ -37,17 +30,20 @@ fun MediaDetailDto.toMediaDetailInfo(): MediaDetailInfo {
         nextEpisodeToAir = nextEpisodeToAir?.toEpisodeToAirInfo(),
         numberOfEpisodes = numberOfEpisodes,
         numberOfSeasons = numberOfSeasons,
-        originalLanguage = originalLanguage,
+        originCountry = originCountry,
+        originalLanguage = try { Locale(originalLanguage ?: "").displayLanguage } catch (e: Exception) { null },
         originalName = originalName,
         overview = if (overview.isNullOrEmpty()) null else overview,
         posterPath = posterPath,
+        productionCompanies = productionCompanies,
         recommendations = recommendations?.toMediaResponseInfo(),
-        releaseDate = releaseDate,
+        releaseDate = convertStringToDate(firstAirDate?.takeIf { it.isNotBlank() } ?: releaseDate?.takeIf { it.isNotBlank() }),
         releaseDates = releaseDates,
         reviews = reviews?.toReviewsResponseInfo(),
         runtime = if (runtime == 0) null else runtime,
         seasons = seasons,
         similar = similar?.toMediaResponseInfo(),
+        status = status,
         tagline = if (tagline.isNullOrEmpty()) null else tagline,
         voteAverage = voteAverage?.toFloat(),
         voteCount = voteCount,
