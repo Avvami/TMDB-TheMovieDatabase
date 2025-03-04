@@ -12,6 +12,7 @@ import com.personal.tmdb.core.data.models.ListDetailsDto
 import com.personal.tmdb.core.data.models.ListsResponseDto
 import com.personal.tmdb.core.data.models.MediaResponseDto
 import com.personal.tmdb.core.domain.models.CreateListRequest
+import com.personal.tmdb.core.domain.models.LogoutRequestBody
 import com.personal.tmdb.core.domain.models.RemoveMediaRequest
 import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
 import com.personal.tmdb.detail.data.models.CollectionDto
@@ -252,4 +253,16 @@ interface TmdbApi {
         @Query("page") page: Int,
         @Query("language") language: String?
     ): MediaResponseDto
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @HTTP(method = "DELETE", path = "3/authentication/session", hasBody = true)
+    suspend fun removeAccessToken(
+        @Body request: LogoutRequestBody
+    )
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @HTTP(method = "DELETE", path = "4/auth/access_token", hasBody = true)
+    suspend fun removeSessionId(
+        @Body request: LogoutRequestBody
+    )
 }

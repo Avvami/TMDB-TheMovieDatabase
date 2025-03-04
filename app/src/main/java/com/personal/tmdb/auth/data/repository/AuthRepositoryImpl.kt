@@ -11,7 +11,9 @@ import com.personal.tmdb.auth.domain.models.UserInfo
 import com.personal.tmdb.auth.domain.repository.AuthRepository
 import com.personal.tmdb.core.data.remote.TmdbApi
 import com.personal.tmdb.core.data.remote.safeApiCall
+import com.personal.tmdb.core.domain.models.LogoutRequestBody
 import com.personal.tmdb.core.domain.util.DataError
+import com.personal.tmdb.core.domain.util.EmptyResult
 import com.personal.tmdb.core.domain.util.Result
 import javax.inject.Inject
 
@@ -39,6 +41,13 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun getUserDetails(sessionId: String): Result<UserInfo, DataError.Remote> {
         return safeApiCall {
             tmdbApi.getUserDetails(sessionId).toUserInfo()
+        }
+    }
+
+    override suspend fun logout(request: LogoutRequestBody): EmptyResult<DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.removeSessionId(request)
+            tmdbApi.removeAccessToken(request)
         }
     }
 }

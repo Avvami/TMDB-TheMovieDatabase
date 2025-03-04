@@ -9,6 +9,7 @@ import com.personal.tmdb.auth.data.models.AccessTokenBody
 import com.personal.tmdb.auth.data.models.RedirectToBody
 import com.personal.tmdb.auth.data.models.RequestTokenBody
 import com.personal.tmdb.auth.domain.repository.AuthRepository
+import com.personal.tmdb.core.domain.models.LogoutRequestBody
 import com.personal.tmdb.core.domain.models.User
 import com.personal.tmdb.core.domain.repository.LocalCache
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
@@ -73,7 +74,7 @@ class MainViewModel @Inject constructor(
             userRepository.getUser()?.let { user ->
                 _userState.update { it.copy(user = user) }
                 getUserDetails(user.sessionId ?: "")
-            }
+            } ?: _userState.update { it.copy(user = null) }
         }
     }
 
@@ -196,6 +197,36 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    private fun singOut(user: User?) {
+        viewModelScope.launch {
+            user?.let { user ->
+                val request = LogoutRequestBody(
+                    accessToken = user.accessToken ?: "",
+                    sessionId = user.sessionId ?: ""
+                )
+                authRepository.logout(request)
+                    .onError { error ->
+                        println(error.toUiText())
+                    }
+                    .onSuccess {
+                        println("Logout Success")
+                    }
+                userRepository.removeUser(user)
+                _userState.update { it.copy(user = null) }
+
+                SnackbarController.sendEvent(
+                    event = SnackbarEvent(
+                        message = UiText.StringResource(R.string.logout_successfully)
+                    )
+                )
+            } ?: SnackbarController.sendEvent(
+                event = SnackbarEvent(
+                    message = UiText.StringResource(R.string.wait_what)
+                )
+            )
+        }
+    }
+
     fun uiEvent(event: UiEvent) {
         when (event) {
             UiEvent.CreateRequestToken -> {
@@ -207,8 +238,8 @@ class MainViewModel @Inject constructor(
             UiEvent.SignInUser -> {
                 signInUser()
             }
-            UiEvent.SignOut -> {
-
+            is UiEvent.SignOut -> {
+                singOut(event.user)
             }
         }
     }

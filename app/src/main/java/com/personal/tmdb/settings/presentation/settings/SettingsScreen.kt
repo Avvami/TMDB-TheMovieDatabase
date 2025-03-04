@@ -2,8 +2,8 @@ package com.personal.tmdb.settings.presentation.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -20,6 +20,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -30,9 +31,9 @@ import com.personal.tmdb.MainActivity
 import com.personal.tmdb.R
 import com.personal.tmdb.UiEvent
 import com.personal.tmdb.UserState
+import com.personal.tmdb.core.domain.util.findActivity
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.PreferencesState
-import com.personal.tmdb.core.domain.util.findActivity
 import com.personal.tmdb.settings.presentation.settings.components.About
 import com.personal.tmdb.settings.presentation.settings.components.AppSettings
 
@@ -101,6 +102,7 @@ private fun SettingsScreen(
         LazyColumn(
             modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
             item(
@@ -125,9 +127,9 @@ private fun SettingsScreen(
                     ) {
                         TextButton(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .width(200.dp)
                                 .animateItem(),
-                            onClick = { uiEvent(UiEvent.SignOut) },
+                            onClick = { uiEvent(UiEvent.SignOut(userState().user)) },
                             colors = ButtonDefaults.textButtonColors(
                                 contentColor = MaterialTheme.colorScheme.error
                             ),

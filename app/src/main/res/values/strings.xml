@@ -189,4 +189,6 @@
     <string name="no_name">No name</string>
     <string name="production_company">Production Company</string>
     <string name="production_companies">Production Companies</string>
+    <string name="logout_successfully">Logout successful</string>
+    <string name="wait_what">Wait what??!&#129394;</string>
 </resources>
