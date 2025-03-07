@@ -130,7 +130,10 @@ private fun ReviewsScreen(
             modifier = modifier.padding(top = innerPadding.calculateTopPadding())
         ) {
             if (reviewsState().loading && reviewsState().reviews == null) {
-                ReviewsScreenShimmer(showReview = reviewsState().showSelectedReview)
+                ReviewsScreenShimmer(
+                    showReview = reviewsState().showSelectedReview,
+                    contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
+                )
             } else {
                 reviewsState().reviews?.results?.let { reviews ->
                     AnimatedContent(
@@ -149,14 +152,14 @@ private fun ReviewsScreen(
                                         )
                                     )
                                     .verticalScroll(rememberScrollState())
-                                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                                    .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
                                 review = reviews[reviewsState().selectedReviewIndex]
                             )
                         } else {
                             LazyVerticalStaggeredGrid(
                                 state = lazyGridState,
                                 columns = StaggeredGridCells.Adaptive(300.dp),
-                                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                                contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
                                 verticalItemSpacing = 16.dp,
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {

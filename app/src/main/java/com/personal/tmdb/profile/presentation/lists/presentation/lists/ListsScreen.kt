@@ -267,7 +267,7 @@ private fun ListsScreen(
         ) { innerPadding ->
             MediaGrid(
                 modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
-                contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp),
+                contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
                 columns = GridCells.Adaptive(360.dp),
                 items = {
                     if (listsState().loading && listsState().lists == null) {

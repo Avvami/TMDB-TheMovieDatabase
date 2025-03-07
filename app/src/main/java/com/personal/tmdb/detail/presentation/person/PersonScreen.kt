@@ -138,7 +138,7 @@ private fun PersonScreen(
     ) { innerPadding ->
         LazyColumn(
             modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
-            contentPadding = PaddingValues(bottom = 12.dp)
+            contentPadding = PaddingValues(top = 8.dp, bottom = 12.dp)
         ) {
             if (personState().loading) {
                 item {

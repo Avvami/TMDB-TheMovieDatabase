@@ -182,10 +182,10 @@ private fun DetailScreen(
                 )
             } else {
                 LazyColumn(
-                    modifier = modifier,
+                    modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
                     state = lazyListState,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(top = innerPadding.calculateTopPadding(), bottom = 16.dp)
+                    contentPadding = PaddingValues(top = 8.dp, bottom = 16.dp)
                 ) {
                     if (detailState().loading) {
                         item {

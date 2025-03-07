@@ -23,6 +23,7 @@ import com.personal.tmdb.core.presentation.components.MediaPosterShimmer
 @Composable
 fun ListDetailsScreenShimmer(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(16.dp),
     preferencesState: () -> PreferencesState
 ) {
     CompositionLocalProvider(
@@ -30,7 +31,7 @@ fun ListDetailsScreenShimmer(
     ) {
         MediaGrid(
             modifier = modifier,
-            contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp),
+            contentPadding = contentPadding,
             span = {
                 item(
                     span = { GridItemSpan(maxLineSpan) }

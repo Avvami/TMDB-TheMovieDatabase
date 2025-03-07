@@ -130,13 +130,14 @@ private fun CollectionScreen(
         if (collectionState().loading) {
             CollectionScreenShimmer(
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
+                contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
                 preferencesState = preferencesState
             )
         } else {
             collectionState().collectionInfo?.let { collectionInfo ->
                 MediaGrid(
                     modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
-                    contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp),
+                    contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
                     span = {
                         collectionInfo.name?.let { name ->
                             item(

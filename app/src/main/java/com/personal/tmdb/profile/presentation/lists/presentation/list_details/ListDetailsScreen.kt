@@ -307,13 +307,14 @@ private fun ListDetailsScreen(
             if (listDetailsState().loading && listDetailsState().listDetails == null) {
                 ListDetailsScreenShimmer(
                     modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
+                    contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
                     preferencesState = preferencesState
                 )
             } else {
                 listDetailsState().listDetails?.let { listDetails ->
                     MediaGrid(
                         modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
-                        contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp),
+                        contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
                         span = {
                             if (editing) {
                                 item(

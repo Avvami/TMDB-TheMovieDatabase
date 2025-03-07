@@ -121,7 +121,7 @@ private fun FavoriteScreen(
         MediaGrid(
             modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
             lazyGridState = lazyGridState,
-            contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp),
+            contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
             span = {
                 item(
                     span = { GridItemSpan(maxLineSpan) }

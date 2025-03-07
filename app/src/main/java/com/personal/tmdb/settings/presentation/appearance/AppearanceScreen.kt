@@ -1,6 +1,7 @@
 package com.personal.tmdb.settings.presentation.appearance
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -88,8 +89,9 @@ private fun AppearanceScreen(
         contentColor = MaterialTheme.colorScheme.onSurface
     ) { innerPadding ->
         LazyColumn(
-            modifier = modifier.padding(top = innerPadding.calculateTopPadding(), bottom = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(top = 8.dp, bottom = 16.dp)
         ) {
             item(
                 contentType = { "Posters appearance" }

@@ -103,7 +103,7 @@ private fun SettingsScreen(
             modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(bottom = 16.dp)
+            contentPadding = PaddingValues(top = 8.dp, bottom = 16.dp)
         ) {
             item(
                 contentType = { "App settings" }

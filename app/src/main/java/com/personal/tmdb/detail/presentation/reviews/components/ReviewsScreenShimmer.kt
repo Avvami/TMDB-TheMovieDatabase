@@ -24,11 +24,12 @@ import com.personal.tmdb.core.domain.util.shimmerEffect
 
 @Composable
 fun ReviewsScreenShimmer(
-    showReview: Boolean
+    showReview: Boolean,
+    contentPadding: PaddingValues = PaddingValues(16.dp)
 ) {
     if (showReview) {
         Column(
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            modifier = Modifier.padding(contentPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Row(
@@ -79,7 +80,7 @@ fun ReviewsScreenShimmer(
         LazyVerticalStaggeredGrid(
             userScrollEnabled = false,
             columns = StaggeredGridCells.Adaptive(300.dp),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            contentPadding = contentPadding,
             verticalItemSpacing = 16.dp,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {

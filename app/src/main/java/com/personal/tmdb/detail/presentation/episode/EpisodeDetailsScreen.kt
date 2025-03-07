@@ -143,7 +143,7 @@ private fun EpisodeDetailsScreen(
         LazyColumn(
             modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 16.dp)
+            contentPadding = PaddingValues(top = 8.dp, bottom = 16.dp)
         ) {
             if (episodeDetailsState().loading) {
                 item {
