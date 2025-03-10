@@ -17,6 +17,7 @@ interface DetailRepository {
     suspend fun getMediaDetail(
         mediaType: String,
         mediaId: Int,
+        sessionId: String?,
         language: String? = null,
         appendToResponse: String? = null,
         includeImageLanguage: String? = null

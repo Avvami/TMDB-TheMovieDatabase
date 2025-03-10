@@ -8,12 +8,14 @@ import com.personal.tmdb.detail.data.models.MediaDetailDto
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeToAirInfo
 import com.personal.tmdb.detail.domain.models.MediaDetailInfo
+import com.personal.tmdb.detail.presentation.detail.AccountState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 fun MediaDetailDto.toMediaDetailInfo(): MediaDetailInfo {
     return MediaDetailInfo(
+        accountStates = accountStates?.let { AccountState(it.favorite, it.rated, it.watchlist) },
         aggregateCredits = aggregateCredits,
         backdropPath = backdropPath,
         belongsToCollection = belongsToCollection,

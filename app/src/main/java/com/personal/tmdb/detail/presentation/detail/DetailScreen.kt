@@ -248,6 +248,7 @@ private fun DetailScreen(
                             item {
                                 DetailActionButtons(
                                     modifier = Modifier.padding(horizontal = 16.dp),
+                                    detailState = detailState,
                                     info = { info },
                                     userState = userState,
                                     detailUiEvent = detailUiEvent

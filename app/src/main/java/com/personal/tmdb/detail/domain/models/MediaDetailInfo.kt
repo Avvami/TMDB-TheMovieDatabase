@@ -13,9 +13,11 @@ import com.personal.tmdb.detail.data.models.Network
 import com.personal.tmdb.detail.data.models.ProductionCompany
 import com.personal.tmdb.detail.data.models.ReleaseDates
 import com.personal.tmdb.detail.data.models.Season
+import com.personal.tmdb.detail.presentation.detail.AccountState
 import java.time.LocalDate
 
 data class MediaDetailInfo(
+    val accountStates: AccountState?,
     val aggregateCredits: Credits?,
     val backdropPath: String?,
     val belongsToCollection: BelongsToCollection?,

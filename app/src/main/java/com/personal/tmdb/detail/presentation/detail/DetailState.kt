@@ -8,6 +8,7 @@ import com.personal.tmdb.detail.domain.models.MediaDetailInfo
 data class DetailState(
     val mediaType: MediaType,
     val mediaId: Int,
+    val accountState: AccountState? = null,
     val details: MediaDetailInfo? = null,
     val collection: CollectionInfo? = null,
     val watchCountry: String = "",

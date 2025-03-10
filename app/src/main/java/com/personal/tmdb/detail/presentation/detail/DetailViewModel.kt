@@ -7,6 +7,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.personal.tmdb.core.domain.repository.PreferencesRepository
+import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.appendToResponse
 import com.personal.tmdb.core.domain.util.convertMediaType
 import com.personal.tmdb.core.domain.util.onError
@@ -14,7 +16,6 @@ import com.personal.tmdb.core.domain.util.onSuccess
 import com.personal.tmdb.core.domain.util.toUiText
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.detail.domain.repository.DetailRepository
-import com.personal.tmdb.detail.presentation.collection.CollectionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,7 +29,9 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val detailRepository: DetailRepository
+    private val detailRepository: DetailRepository,
+    private val preferencesRepository: PreferencesRepository,
+    private val userRepository: UserRepository
 ): ViewModel() {
 
     private val routeData = savedStateHandle.toRoute<Route.Detail>()
@@ -40,9 +43,6 @@ class DetailViewModel @Inject constructor(
         )
     )
     val detailState = _detailState.asStateFlow()
-
-    var collectionState by mutableStateOf(CollectionState())
-        private set
 
     var availableState by mutableStateOf(AvailableState())
         private set
@@ -69,22 +69,28 @@ class DetailViewModel @Inject constructor(
         getMediaDetails(
             mediaType = routeData.mediaType,
             mediaId = routeData.mediaId,
-            appendToResponse = appendToResponse(routeData.mediaType),
-            includeImageLanguage = "en,null"
+            appendToResponse = appendToResponse(routeData.mediaType)
         )
     }
 
     private fun getMediaDetails(
         mediaType: String,
         mediaId: Int,
-        language: String? = null,
-        appendToResponse: String? = null,
-        includeImageLanguage: String? = null
+        appendToResponse: String? = null
     ) {
         viewModelScope.launch {
-            _detailState.update { it.copy(loading = true) }
+            _detailState.update {
+                it.copy(
+                    loading = true,
+                    errorMessage = null
+                )
+            }
 
-            detailRepository.getMediaDetail(mediaType, mediaId, language, appendToResponse, includeImageLanguage)
+            val language = preferencesRepository.getLanguage()
+            val includeImageLanguage = "$language,en,null"
+            val sessionId = userRepository.getUser()?.sessionId
+
+            detailRepository.getMediaDetail(mediaType, mediaId, sessionId, language, appendToResponse, includeImageLanguage)
                 .onError { error ->
                     _detailState.update {
                         it.copy(
@@ -105,6 +111,7 @@ class DetailViewModel @Inject constructor(
                     }
                     _detailState.update {
                         it.copy(
+                            accountState = result.accountStates,
                             details = result,
                             watchCountry = "United States",
                             loading = false

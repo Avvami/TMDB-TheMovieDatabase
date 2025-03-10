@@ -30,6 +30,7 @@ class DetailRepositoryImpl @Inject constructor(
     override suspend fun getMediaDetail(
         mediaType: String,
         mediaId: Int,
+        sessionId: String?,
         language: String?,
         appendToResponse: String?,
         includeImageLanguage: String?
@@ -38,6 +39,7 @@ class DetailRepositoryImpl @Inject constructor(
             tmdbApi.getMovieTvDetail(
                 mediaType = mediaType,
                 mediaId = mediaId,
+                sessionId = sessionId,
                 language = language,
                 appendToResponse = appendToResponse,
                 includeImageLanguage = includeImageLanguage

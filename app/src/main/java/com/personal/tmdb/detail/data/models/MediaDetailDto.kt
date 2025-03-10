@@ -7,6 +7,8 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class MediaDetailDto(
+    @Json(name = "account_states")
+    val accountStates: AccountStates?,
     @Json(name = "adult")
     val adult: Boolean?,
     @Json(name = "aggregate_credits")

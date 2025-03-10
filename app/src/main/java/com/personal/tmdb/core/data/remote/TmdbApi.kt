@@ -48,6 +48,7 @@ interface TmdbApi {
     suspend fun getMovieTvDetail(
         @Path("media_type") mediaType: String,
         @Path("media_id") mediaId: Int,
+        @Query("session_id") sessionId: String?,
         @Query("language") language: String?,
         @Query("append_to_response") appendToResponse: String?,
         @Query("include_image_language") includeImageLanguage: String?

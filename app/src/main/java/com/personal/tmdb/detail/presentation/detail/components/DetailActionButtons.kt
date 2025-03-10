@@ -31,13 +31,17 @@ import com.personal.tmdb.UserState
 import com.personal.tmdb.core.domain.util.compactDecimalFormat
 import com.personal.tmdb.core.domain.util.formatVoteAverage
 import com.personal.tmdb.core.domain.util.shimmerEffect
+import com.personal.tmdb.core.navigation.Route
+import com.personal.tmdb.detail.data.models.Rated
 import com.personal.tmdb.detail.domain.models.MediaDetailInfo
+import com.personal.tmdb.detail.presentation.detail.DetailState
 import com.personal.tmdb.detail.presentation.detail.DetailUiEvent
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailActionButtons(
     modifier: Modifier = Modifier,
+    detailState: () -> DetailState,
     info: () -> MediaDetailInfo,
     userState: () -> UserState,
     detailUiEvent: (DetailUiEvent) -> Unit
@@ -60,13 +64,47 @@ fun DetailActionButtons(
                     ),
                     shape = MaterialTheme.shapes.small
                 ) {
-                    Icon(
-                        modifier = Modifier.size(ButtonDefaults.IconSize),
-                        painter = painterResource(id = R.drawable.icon_thumbs_up_down_fill0_wght400),
-                        contentDescription = null
-                    )
-                    Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
-                    Text(text = stringResource(id = R.string.rate))
+                    when (val ratedState = detailState().accountState?.rated) {
+                        is Rated.Value -> {
+                            when (ratedState.value) {
+                                in 1..4 -> {
+                                    Icon(
+                                        modifier = Modifier.size(ButtonDefaults.IconSize),
+                                        painter = painterResource(id = R.drawable.icon_thumb_down_fill1_wght400),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                5 -> {
+                                    Icon(
+                                        modifier = Modifier.size(ButtonDefaults.IconSize),
+                                        painter = painterResource(id = R.drawable.icon_thumbs_up_down_fill1_wght400),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                else -> {
+                                    Icon(
+                                        modifier = Modifier.size(ButtonDefaults.IconSize),
+                                        painter = painterResource(id = R.drawable.icon_thumb_up_fill1_wght400),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
+                            Text(text = ratedState.value.toString())
+                        }
+                        else -> {
+                            Icon(
+                                modifier = Modifier.size(ButtonDefaults.IconSize),
+                                painter = painterResource(id = R.drawable.icon_thumbs_up_down_fill0_wght400),
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
+                            Text(text = stringResource(id = R.string.rate))
+                        }
+                    }
                 }
             }
             info().voteAverage?.let { voteAverage ->
@@ -107,7 +145,20 @@ fun DetailActionButtons(
             }
             if (!userState().user?.sessionId.isNullOrEmpty()) {
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        detailUiEvent(
+                            DetailUiEvent.OnNavigateTo(
+                                route = detailState().accountState?.let {
+                                    Route.AddToList(
+                                        mediaType = detailState().mediaType.name.lowercase(),
+                                        mediaId = detailState().mediaId,
+                                        watchlist = it.watchlist,
+                                        favorite = it.favorite
+                                    )
+                                } ?: Route.Lost
+                            )
+                        )
+                    },
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -115,13 +166,37 @@ fun DetailActionButtons(
                     ),
                     shape = MaterialTheme.shapes.small
                 ) {
-                    Icon(
-                        modifier = Modifier.size(ButtonDefaults.IconSize),
-                        imageVector = Icons.Rounded.Add,
-                        contentDescription = null
-                    )
-                    Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
-                    Text(text = stringResource(id = R.string.list))
+                    with(detailState().accountState) {
+                        when {
+                            this?.watchlist == true -> {
+                                Icon(
+                                    modifier = Modifier.size(ButtonDefaults.IconSize),
+                                    painter = painterResource(id = R.drawable.icon_bookmarks_fill1_wght400),
+                                    contentDescription = null
+                                )
+                            }
+                            this?.favorite == true -> {
+                                Icon(
+                                    modifier = Modifier.size(ButtonDefaults.IconSize),
+                                    painter = painterResource(id = R.drawable.icon_favorite_fill1_wght400),
+                                    contentDescription = null
+                                )
+                            }
+                            else -> {
+                                Icon(
+                                    modifier = Modifier.size(ButtonDefaults.IconSize),
+                                    imageVector = Icons.Rounded.Add,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
+                        if (this?.favorite == true || this?.watchlist == true) {
+                            Text(text = stringResource(id = R.string.in_list))
+                        } else {
+                            Text(text = stringResource(id = R.string.list))
+                        }
+                    }
                 }
             }
         }

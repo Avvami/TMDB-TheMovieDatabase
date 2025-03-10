@@ -11,6 +11,7 @@ import com.personal.tmdb.core.data.local.AppDatabase
 import com.personal.tmdb.core.data.remote.TmdbApi
 import com.personal.tmdb.core.domain.util.AdditionalNavigationItem
 import com.personal.tmdb.core.domain.util.C
+import com.personal.tmdb.detail.data.models.RatedAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -60,6 +61,7 @@ object AppModule {
     @Provides
     fun provideTmdbApi(): TmdbApi {
         val moshi = Moshi.Builder()
+            .add(RatedAdapter())
             .add(KotlinJsonAdapterFactory())
             .build()
         return Retrofit.Builder()
