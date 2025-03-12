@@ -3,6 +3,7 @@ package com.personal.tmdb.profile.presentation.lists.presentation.list_details
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -150,7 +151,7 @@ private fun ListDetailsScreen(
     AnimatedContent(
         targetState = listDetailsState().editing,
         label = "Edit list animation",
-        transitionSpec = { fadeIn() togetherWith fadeOut() }
+        transitionSpec = { fadeIn(animationSpec = tween(durationMillis = 150)) togetherWith fadeOut(animationSpec = tween(durationMillis = 150)) }
     ) { editing ->
         Scaffold(
             topBar = {
@@ -218,7 +219,9 @@ private fun ListDetailsScreen(
                                     ) { deleting ->
                                         if (deleting) {
                                             CircularProgressIndicator(
-                                                modifier = Modifier.size(18.dp),
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .padding(2.dp),
                                                 color = MaterialTheme.colorScheme.onSurface,
                                                 trackColor = Color.Transparent,
                                                 strokeWidth = 2.dp,
@@ -254,7 +257,9 @@ private fun ListDetailsScreen(
                                     ) { updating ->
                                         if (updating) {
                                             CircularProgressIndicator(
-                                                modifier = Modifier.size(18.dp),
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .padding(2.dp),
                                                 color = MaterialTheme.colorScheme.onSurface,
                                                 trackColor = Color.Transparent,
                                                 strokeWidth = 2.dp,

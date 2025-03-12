@@ -13,7 +13,8 @@ import com.personal.tmdb.core.data.models.ListsResponseDto
 import com.personal.tmdb.core.data.models.MediaResponseDto
 import com.personal.tmdb.core.domain.models.CreateListRequest
 import com.personal.tmdb.core.domain.models.LogoutRequestBody
-import com.personal.tmdb.core.domain.models.RemoveMediaRequest
+import com.personal.tmdb.core.domain.models.MediaRequest
+import com.personal.tmdb.core.domain.models.UpdateListMediaRequest
 import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
 import com.personal.tmdb.detail.data.models.CollectionDto
 import com.personal.tmdb.detail.data.models.Credits
@@ -189,6 +190,14 @@ interface TmdbApi {
     ): MediaResponseDto
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @POST("3/account/{account_id}/watchlist?")
+    suspend fun updateWatchlistItem(
+        @Path("account_id") accountId: Int,
+        @Query("session_id") sessionId: String,
+        @Body request: MediaRequest
+    )
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @GET("4/account/{account_object_id}/lists?")
     suspend fun getLists(
         @Path("account_object_id") accountObjectId: String,
@@ -218,7 +227,7 @@ interface TmdbApi {
     suspend fun deleteListItems(
         @Path("list_id") listId: Int,
         @Query("session_id") sessionId: String,
-        @Body request: RemoveMediaRequest
+        @Body request: UpdateListMediaRequest
     )
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
@@ -233,6 +242,14 @@ interface TmdbApi {
     suspend fun createList(
         @Query("session_id") sessionId: String,
         @Body request: CreateListRequest
+    )
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @POST("4/list/{list_id}/items?")
+    suspend fun addItemsToList(
+        @Path("list_id") listId: Int,
+        @Query("session_id") sessionId: String,
+        @Body request: UpdateListMediaRequest
     )
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
@@ -254,6 +271,14 @@ interface TmdbApi {
         @Query("page") page: Int,
         @Query("language") language: String?
     ): MediaResponseDto
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @POST("3/account/{account_id}/favorite?")
+    suspend fun updateFavoriteItem(
+        @Path("account_id") accountId: Int,
+        @Query("session_id") sessionId: String,
+        @Body request: MediaRequest
+    )
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @HTTP(method = "DELETE", path = "3/authentication/session", hasBody = true)

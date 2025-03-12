@@ -3,6 +3,7 @@ package com.personal.tmdb.profile.presentation.lists.presentation.lists
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -58,7 +59,7 @@ import com.personal.tmdb.R
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.components.ListItem
 import com.personal.tmdb.core.presentation.components.MediaGrid
-import com.personal.tmdb.profile.presentation.lists.presentation.lists.components.CreateList
+import com.personal.tmdb.core.presentation.components.CreateList
 import com.personal.tmdb.profile.presentation.lists.presentation.lists.components.ListScreenShimmer
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.launch
@@ -133,7 +134,7 @@ private fun ListsScreen(
     AnimatedContent(
         targetState = listsState().createEnabled,
         label = "Create list animation",
-        transitionSpec = { fadeIn() togetherWith fadeOut() }
+        transitionSpec = { fadeIn(animationSpec = tween(durationMillis = 150)) togetherWith fadeOut(animationSpec = tween(durationMillis = 150)) }
     ) { creating ->
         Scaffold(
             topBar = {
@@ -203,7 +204,9 @@ private fun ListsScreen(
                                 ) { deleting ->
                                     if (deleting) {
                                         CircularProgressIndicator(
-                                            modifier = Modifier.size(18.dp),
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .padding(2.dp),
                                             color = MaterialTheme.colorScheme.onSurface,
                                             trackColor = Color.Transparent,
                                             strokeWidth = 2.dp,
@@ -238,7 +241,9 @@ private fun ListsScreen(
                                 ) { creating ->
                                     if (creating) {
                                         CircularProgressIndicator(
-                                            modifier = Modifier.size(18.dp),
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .padding(2.dp),
                                             color = MaterialTheme.colorScheme.onSurface,
                                             trackColor = Color.Transparent,
                                             strokeWidth = 2.dp,
@@ -280,9 +285,10 @@ private fun ListsScreen(
                                     span = { GridItemSpan(maxLineSpan) }
                                 ) {
                                     CreateList(
-                                        modifier = Modifier.padding(vertical = 8.dp),
-                                        listsState = listsState,
-                                        listsUiEvent = listsUiEvent
+                                        name = listsState()::listName,
+                                        setName = { listsUiEvent(ListsUiEvent.SetListName(it)) },
+                                        description = listsState()::listDescription,
+                                        setDescription = { listsUiEvent(ListsUiEvent.SetListDescription(it)) }
                                     )
                                 }
                             } else {

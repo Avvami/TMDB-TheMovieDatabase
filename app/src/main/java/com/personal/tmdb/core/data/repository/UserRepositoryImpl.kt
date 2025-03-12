@@ -11,8 +11,9 @@ import com.personal.tmdb.core.data.remote.safeApiCall
 import com.personal.tmdb.core.domain.models.CreateListRequest
 import com.personal.tmdb.core.domain.models.ListDetailsInfo
 import com.personal.tmdb.core.domain.models.ListsResponseInfo
+import com.personal.tmdb.core.domain.models.MediaRequest
 import com.personal.tmdb.core.domain.models.MediaResponseInfo
-import com.personal.tmdb.core.domain.models.RemoveMediaRequest
+import com.personal.tmdb.core.domain.models.UpdateListMediaRequest
 import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
 import com.personal.tmdb.core.domain.models.User
 import com.personal.tmdb.core.domain.repository.UserRepository
@@ -50,6 +51,16 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateWatchlistItem(
+        accountId: Int,
+        sessionId: String,
+        mediaRequest: MediaRequest
+    ): EmptyResult<DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.updateWatchlistItem(accountId, sessionId, mediaRequest)
+        }
+    }
+
     override suspend fun getLists(
         accountObjectId: String,
         sessionId: String,
@@ -84,10 +95,10 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun deleteListItems(
         listId: Int,
         sessionId: String,
-        removeMediaRequest: RemoveMediaRequest
+        updateListMediaRequest: UpdateListMediaRequest
     ): EmptyResult<DataError.Remote> {
         return safeApiCall {
-            tmdbApi.deleteListItems(listId, sessionId, removeMediaRequest)
+            tmdbApi.deleteListItems(listId, sessionId, updateListMediaRequest)
         }
     }
 
@@ -103,6 +114,16 @@ class UserRepositoryImpl @Inject constructor(
     ): EmptyResult<DataError.Remote> {
         return safeApiCall {
             tmdbApi.createList(sessionId, createListRequest)
+        }
+    }
+
+    override suspend fun addItemsToList(
+        listId: Int,
+        sessionId: String,
+        updateListMediaRequest: UpdateListMediaRequest
+    ): EmptyResult<DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.addItemsToList(listId, sessionId, updateListMediaRequest)
         }
     }
 
@@ -139,6 +160,16 @@ class UserRepositoryImpl @Inject constructor(
                 page = page,
                 language = language
             ).toMediaResponseInfo()
+        }
+    }
+
+    override suspend fun updateFavoriteItem(
+        accountId: Int,
+        sessionId: String,
+        mediaRequest: MediaRequest
+    ): EmptyResult<DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.updateFavoriteItem(accountId, sessionId, mediaRequest)
         }
     }
 }

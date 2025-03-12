@@ -1,5 +1,8 @@
 package com.personal.tmdb.core.navigation
 
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -10,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
@@ -18,6 +22,7 @@ import com.personal.tmdb.UserState
 import com.personal.tmdb.core.domain.util.AdditionalNavigationItem
 import com.personal.tmdb.core.domain.util.C
 import com.personal.tmdb.core.presentation.PreferencesState
+import com.personal.tmdb.core.presentation.add_to_list.AddToListScreenRoot
 import com.personal.tmdb.core.presentation.components.animatedComposable
 import com.personal.tmdb.core.presentation.components.staticComposable
 import com.personal.tmdb.detail.presentation.cast.CastScreenRoot
@@ -220,6 +225,16 @@ fun RootNavHost(
                 preferencesState = preferencesState
             )
         }
+        composable<Route.AddToList>(
+            enterTransition = { fadeIn(animationSpec = tween(durationMillis = 200)) },
+            exitTransition = { ExitTransition.None },
+            popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 200)) },
+            popExitTransition = { ExitTransition.None },
+        ) {
+            AddToListScreenRoot(
+                onNavigateBack = onNavigateBack
+            )
+        }
     }
 }
 
@@ -238,9 +253,9 @@ fun ChildNavHost(
         navController.navigateUp()
     }
     val onNavigateTo: (route: Route) -> Unit = { route ->
-        val controller = if (route is Route.Image) rootNavController else navController
+        val controller = if (route is Route.Image || route is Route.AddToList) rootNavController else navController
         controller.navigate(route = route) {
-            launchSingleTop = if (route is Route.Image) true else route !is Route.Detail
+            launchSingleTop = if (route is Route.Image || route is Route.AddToList) true else route !is Route.Detail
         }
     }
     NavHost(

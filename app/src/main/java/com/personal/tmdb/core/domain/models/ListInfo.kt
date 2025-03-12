@@ -21,5 +21,6 @@ data class ListInfo(
     val revenue: Int?,
     val runtime: Int?,
     val sortBy: Int?,
-    val updatedAt: LocalDateTime?
+    val updatedAt: LocalDateTime?,
+    val loadingProgress: LoadingProgress = LoadingProgress.STILL
 )

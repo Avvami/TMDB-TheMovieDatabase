@@ -1,4 +1,4 @@
-package com.personal.tmdb.profile.presentation.lists.presentation.lists.components
+package com.personal.tmdb.core.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,14 +24,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.personal.tmdb.R
-import com.personal.tmdb.profile.presentation.lists.presentation.lists.ListsState
-import com.personal.tmdb.profile.presentation.lists.presentation.lists.ListsUiEvent
 
 @Composable
 fun CreateList(
     modifier: Modifier = Modifier,
-    listsState: () -> ListsState,
-    listsUiEvent: (ListsUiEvent) -> Unit
+    name: () -> String,
+    setName: (name: String) -> Unit,
+    description: () -> String,
+    setDescription: (description: String) -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -61,10 +61,8 @@ fun CreateList(
         }
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = listsState().listName,
-            onValueChange = {
-                listsUiEvent(ListsUiEvent.SetListName(it))
-            },
+            value = name(),
+            onValueChange = { setName(it) },
             placeholder = {
                 Text(text = stringResource(id = R.string.list_name_placeholder))
             },
@@ -84,10 +82,8 @@ fun CreateList(
         )
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = listsState().listDescription,
-            onValueChange = {
-                listsUiEvent(ListsUiEvent.SetListDescription(it))
-            },
+            value = description(),
+            onValueChange = { setDescription(it) },
             placeholder = {
                 Text(text = stringResource(id = R.string.list_description_placeholder))
             },

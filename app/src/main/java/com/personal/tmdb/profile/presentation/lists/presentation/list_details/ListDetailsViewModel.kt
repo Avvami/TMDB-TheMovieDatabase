@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.models.MediaInfo
-import com.personal.tmdb.core.domain.models.RemoveMedia
-import com.personal.tmdb.core.domain.models.RemoveMediaRequest
+import com.personal.tmdb.core.domain.models.MediaRequest
+import com.personal.tmdb.core.domain.models.UpdateListMediaRequest
 import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.repository.UserRepository
@@ -87,8 +87,8 @@ class ListDetailsViewModel @Inject constructor(
             _listDetailsState.update { it.copy(deleting = true) }
 
             val sessionId = userRepository.getUser()?.sessionId ?: ""
-            val request = RemoveMediaRequest(
-                items = items.map { RemoveMedia(
+            val request = UpdateListMediaRequest(
+                items = items.map { MediaRequest(
                     mediaType = it.mediaType?.name?.lowercase() ?: MediaType.UNKNOWN.name.lowercase(),
                     mediaId = it.id
                 ) }
