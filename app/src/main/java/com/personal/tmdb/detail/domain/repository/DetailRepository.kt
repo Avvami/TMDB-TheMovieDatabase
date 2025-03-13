@@ -11,6 +11,7 @@ import com.personal.tmdb.detail.domain.models.MediaDetailInfo
 import com.personal.tmdb.detail.domain.models.PersonInfo
 import com.personal.tmdb.detail.domain.models.ReviewsResponseInfo
 import com.personal.tmdb.detail.domain.models.SeasonInfo
+import com.personal.tmdb.detail.domain.models.AccountState
 
 interface DetailRepository {
 
@@ -22,6 +23,8 @@ interface DetailRepository {
         appendToResponse: String? = null,
         includeImageLanguage: String? = null
     ): Result<MediaDetailInfo, DataError.Remote>
+
+    suspend fun getAccountStates(mediaType: String, mediaId: Int, sessionId: String?): Result<AccountState, DataError.Remote>
 
     suspend fun getCollection(collectionId: Int, language: String? = null): Result<CollectionInfo, DataError.Remote>
 

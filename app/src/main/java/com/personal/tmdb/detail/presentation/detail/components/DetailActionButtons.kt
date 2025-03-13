@@ -1,9 +1,11 @@
 package com.personal.tmdb.detail.presentation.detail.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -166,35 +168,40 @@ fun DetailActionButtons(
                     ),
                     shape = MaterialTheme.shapes.small
                 ) {
-                    with(detailState().accountState) {
-                        when {
-                            this?.watchlist == true -> {
-                                Icon(
-                                    modifier = Modifier.size(ButtonDefaults.IconSize),
-                                    painter = painterResource(id = R.drawable.icon_bookmarks_fill1_wght400),
-                                    contentDescription = null
-                                )
+                    AnimatedContent(
+                        targetState = detailState().accountState,
+                        label = "In list animation"
+                    ) { accountState ->
+                        Row {
+                            when {
+                                accountState?.watchlist == true -> {
+                                    Icon(
+                                        modifier = Modifier.size(ButtonDefaults.IconSize),
+                                        painter = painterResource(id = R.drawable.icon_bookmarks_fill1_wght400),
+                                        contentDescription = null
+                                    )
+                                }
+                                accountState?.favorite == true -> {
+                                    Icon(
+                                        modifier = Modifier.size(ButtonDefaults.IconSize),
+                                        painter = painterResource(id = R.drawable.icon_favorite_fill1_wght400),
+                                        contentDescription = null
+                                    )
+                                }
+                                else -> {
+                                    Icon(
+                                        modifier = Modifier.size(ButtonDefaults.IconSize),
+                                        imageVector = Icons.Rounded.Add,
+                                        contentDescription = null
+                                    )
+                                }
                             }
-                            this?.favorite == true -> {
-                                Icon(
-                                    modifier = Modifier.size(ButtonDefaults.IconSize),
-                                    painter = painterResource(id = R.drawable.icon_favorite_fill1_wght400),
-                                    contentDescription = null
-                                )
+                            Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
+                            if (accountState?.favorite == true || accountState?.watchlist == true) {
+                                Text(text = stringResource(id = R.string.in_list))
+                            } else {
+                                Text(text = stringResource(id = R.string.list))
                             }
-                            else -> {
-                                Icon(
-                                    modifier = Modifier.size(ButtonDefaults.IconSize),
-                                    imageVector = Icons.Rounded.Add,
-                                    contentDescription = null
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
-                        if (this?.favorite == true || this?.watchlist == true) {
-                            Text(text = stringResource(id = R.string.in_list))
-                        } else {
-                            Text(text = stringResource(id = R.string.list))
                         }
                     }
                 }

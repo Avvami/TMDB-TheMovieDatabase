@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.repository.UserRepository
+import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.appendToResponse
 import com.personal.tmdb.core.domain.util.convertMediaType
 import com.personal.tmdb.core.domain.util.onError
@@ -133,6 +134,22 @@ class DetailViewModel @Inject constructor(
         }
     }
 
+    private fun getAccountState(mediaType: MediaType, mediaId: Int) {
+        viewModelScope.launch {
+            val sessionId = userRepository.getUser()?.sessionId
+
+            detailRepository.getAccountStates(
+                mediaType = mediaType.name.lowercase(),
+                mediaId = mediaId,
+                sessionId = sessionId
+            ).onError { error ->
+                println(error.toUiText())
+            }.onSuccess { result ->
+                _detailState.update { it.copy(accountState = result) }
+            }
+        }
+    }
+
     fun detailUiEvent(event: DetailUiEvent) {
         when (event) {
             DetailUiEvent.OnNavigateBack -> Unit
@@ -159,6 +176,12 @@ class DetailViewModel @Inject constructor(
             }
             is DetailUiEvent.ShowMoreDetails -> {
                 _detailState.update { it.copy(showMoreDetails = event.state) }
+            }
+            is DetailUiEvent.GetAccountState -> {
+                getAccountState(
+                    mediaType = event.mediaType,
+                    mediaId = event.mediaId
+                )
             }
         }
     }

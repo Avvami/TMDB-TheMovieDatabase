@@ -1,4 +1,4 @@
-package com.personal.tmdb.detail.presentation.detail
+package com.personal.tmdb.detail.domain.models
 
 import com.personal.tmdb.detail.data.models.Rated
 

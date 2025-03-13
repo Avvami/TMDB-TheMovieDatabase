@@ -4,6 +4,7 @@ import com.personal.tmdb.core.data.remote.TmdbApi
 import com.personal.tmdb.core.data.remote.safeApiCall
 import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.Result
+import com.personal.tmdb.detail.data.mappers.toAccountState
 import com.personal.tmdb.detail.data.mappers.toCollectionInfo
 import com.personal.tmdb.detail.data.mappers.toCreditsInfo
 import com.personal.tmdb.detail.data.mappers.toEpisodeDetailsInfo
@@ -13,6 +14,7 @@ import com.personal.tmdb.detail.data.mappers.toPersonInfo
 import com.personal.tmdb.detail.data.mappers.toReviewsResponseInfo
 import com.personal.tmdb.detail.data.mappers.toSeasonInfo
 import com.personal.tmdb.detail.data.models.Images
+import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.CollectionInfo
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeDetailsInfo
@@ -44,6 +46,20 @@ class DetailRepositoryImpl @Inject constructor(
                 appendToResponse = appendToResponse,
                 includeImageLanguage = includeImageLanguage
             ).toMediaDetailInfo()
+        }
+    }
+
+    override suspend fun getAccountStates(
+        mediaType: String,
+        mediaId: Int,
+        sessionId: String?
+    ): Result<AccountState, DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.getAccountStates(
+                mediaType = mediaType,
+                mediaId = mediaId,
+                sessionId = sessionId
+            ).toAccountState()
         }
     }
 

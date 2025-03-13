@@ -2,20 +2,21 @@ package com.personal.tmdb.detail.data.mappers
 
 import com.personal.tmdb.core.data.mappers.toMediaResponseInfo
 import com.personal.tmdb.core.domain.util.convertStringToDate
+import com.personal.tmdb.detail.data.models.AccountStates
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeToAir
 import com.personal.tmdb.detail.data.models.MediaDetailDto
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeToAirInfo
 import com.personal.tmdb.detail.domain.models.MediaDetailInfo
-import com.personal.tmdb.detail.presentation.detail.AccountState
+import com.personal.tmdb.detail.domain.models.AccountState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 fun MediaDetailDto.toMediaDetailInfo(): MediaDetailInfo {
     return MediaDetailInfo(
-        accountStates = accountStates?.let { AccountState(it.favorite, it.rated, it.watchlist) },
+        accountStates = accountStates?.toAccountState(),
         aggregateCredits = aggregateCredits,
         backdropPath = backdropPath,
         belongsToCollection = belongsToCollection,
@@ -51,6 +52,10 @@ fun MediaDetailDto.toMediaDetailInfo(): MediaDetailInfo {
         voteCount = voteCount,
         watchProviders = watchProviders?.watchProvidersResults?.mapKeys { (key, _) -> Locale("", key).displayCountry}
     )
+}
+
+fun AccountStates.toAccountState(): AccountState {
+    return AccountState(favorite, rated, watchlist)
 }
 
 fun Credits.toCreditsInfo(): CreditsInfo {

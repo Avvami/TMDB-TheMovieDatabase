@@ -1,5 +1,6 @@
 package com.personal.tmdb.detail.presentation.detail
 
+import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.navigation.Route
 
 sealed interface DetailUiEvent {
@@ -10,4 +11,5 @@ sealed interface DetailUiEvent {
     data object ChangeAvailableSearchState: DetailUiEvent
     data object ChangeAvailableDialogState: DetailUiEvent
     data class ShowMoreDetails(val state: Boolean): DetailUiEvent
+    data class GetAccountState(val mediaType: MediaType, val mediaId: Int): DetailUiEvent
 }

@@ -16,6 +16,7 @@ import com.personal.tmdb.core.domain.models.LogoutRequestBody
 import com.personal.tmdb.core.domain.models.MediaRequest
 import com.personal.tmdb.core.domain.models.UpdateListMediaRequest
 import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
+import com.personal.tmdb.detail.data.models.AccountStates
 import com.personal.tmdb.detail.data.models.CollectionDto
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeDetailsDto
@@ -54,6 +55,14 @@ interface TmdbApi {
         @Query("append_to_response") appendToResponse: String?,
         @Query("include_image_language") includeImageLanguage: String?
     ): MediaDetailDto
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @GET("3/{media_type}/{media_id}}/account_states?")
+    suspend fun getAccountStates(
+        @Path("media_type") mediaType: String,
+        @Path("media_id") mediaId: Int,
+        @Query("session_id") sessionId: String?
+    ): AccountStates
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @GET("3/search/{search_type}?")

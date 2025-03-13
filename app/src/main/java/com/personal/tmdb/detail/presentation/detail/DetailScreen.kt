@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -100,6 +101,16 @@ private fun DetailScreen(
     val showTitle by remember {
         derivedStateOf {
             lazyListState.firstVisibleItemIndex >= 1
+        }
+    }
+    LaunchedEffect(true) {
+        if (!userState().user?.sessionId.isNullOrEmpty() && detailState().details != null) {
+            detailUiEvent(
+                DetailUiEvent.GetAccountState(
+                    mediaType = detailState().mediaType,
+                    mediaId = detailState().mediaId
+                )
+            )
         }
     }
     BackHandler {

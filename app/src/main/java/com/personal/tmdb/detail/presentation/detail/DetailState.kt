@@ -2,6 +2,7 @@ package com.personal.tmdb.detail.presentation.detail
 
 import com.personal.tmdb.core.domain.util.UiText
 import com.personal.tmdb.core.domain.util.MediaType
+import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.CollectionInfo
 import com.personal.tmdb.detail.domain.models.MediaDetailInfo
 
