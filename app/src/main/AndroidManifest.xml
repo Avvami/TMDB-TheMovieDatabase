@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".TmdbApplication"
@@ -14,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TMDB"
-        tools:targetApi="31">
+        android:allowCrossUidActivitySwitchFromBelow="false"
+        tools:targetApi="35">
         <activity
             android:name=".MainActivity"
             android:exported="true"

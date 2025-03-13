@@ -11,7 +11,7 @@ sealed interface Route {
     data object Search: Route
 
     @Serializable
-    data class Profile(val approved: Boolean?): Route
+    data object Profile: Route
 
     @Serializable
     data class Detail(val mediaType: String, val mediaId: Int): Route
@@ -63,4 +63,7 @@ sealed interface Route {
 
     @Serializable
     data class AddToList(val mediaType: String, val mediaId: Int, val watchlist: Boolean, val favorite: Boolean): Route
+
+    @Serializable
+    data object WelcomeBack: Route
 }

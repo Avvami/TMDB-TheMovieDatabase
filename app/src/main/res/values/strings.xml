@@ -194,4 +194,12 @@
     <string name="add_to_list">Add to List</string>
     <string name="in_list">In List</string>
     <string name="done">Done</string>
+    <string name="welcome_back">Welcome back</string>
+    <string name="now_you_can">Now you can:</string>
+    <string name="rate_feature">Rate movies and shows</string>
+    <string name="lists_feature">Manage your lists</string>
+    <string name="recommendations_feature">Get personal recommendations</string>
+    <string name="cool">Cool!</string>
+    <string name="logging_out">Logging out…</string>
+    <string name="take_me_back">Take me back</string>
 </resources>

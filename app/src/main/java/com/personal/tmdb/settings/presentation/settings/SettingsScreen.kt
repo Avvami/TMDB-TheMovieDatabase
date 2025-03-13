@@ -1,5 +1,6 @@
 package com.personal.tmdb.settings.presentation.settings
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -135,7 +136,16 @@ private fun SettingsScreen(
                             ),
                             shape = MaterialTheme.shapes.small
                         ) {
-                            Text(text = stringResource(id = R.string.logout))
+                            AnimatedContent(
+                                targetState = userState().loading,
+                                label = "Logging out animation"
+                            ) { loggingOut ->
+                                if (loggingOut) {
+                                    Text(text = stringResource(id = R.string.logging_out))
+                                } else {
+                                    Text(text = stringResource(id = R.string.logout))
+                                }
+                            }
                         }
                     }
                 }

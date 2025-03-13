@@ -82,7 +82,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             _userState.update { it.copy(loading = true) }
 
-            authRepository.createRequestToken(RedirectToBody("${C.REDIRECT_URL}/true"))
+            authRepository.createRequestToken(RedirectToBody(C.REDIRECT_URL))
                 .onError { error ->
                     _userState.update {
                         it.copy(
@@ -114,6 +114,7 @@ class MainViewModel @Inject constructor(
 
     private fun signInUser() {
         viewModelScope.launch {
+            _userState.update { it.copy(loading = true) }
             authRepository.createAccessToken(RequestTokenBody(localCache.getRequestToken()))
                 .onError { error ->
                     _userState.update { it.copy(errorMessage = error.toUiText()) }
@@ -122,6 +123,7 @@ class MainViewModel @Inject constructor(
                     if (accessToken.success && accessToken.accessToken != null && accessToken.accountId != null) {
                         authRepository.createSession(AccessTokenBody(accessToken.accessToken))
                             .onError { error ->
+                                _userState.update { it.copy(loading = false) }
                                 SnackbarController.sendEvent(
                                     event = SnackbarEvent(
                                         message = error.toUiText()
@@ -168,11 +170,10 @@ class MainViewModel @Inject constructor(
     private fun getUserDetails(sessionId: String) {
         if (sessionId.isBlank()) return
         viewModelScope.launch {
-            _userState.update { it.copy(loading = true) }
-
             authRepository.getUserDetails(sessionId)
                 .onError { error ->
                     println(error.toUiText())
+                    _userState.update { it.copy(loading = false) }
                     _userState.value.user?.let { userRepository.saveUser(it) }
                 }
                 .onSuccess { result ->
@@ -200,6 +201,7 @@ class MainViewModel @Inject constructor(
     private fun singOut(user: User?) {
         viewModelScope.launch {
             user?.let { user ->
+                _userState.update { it.copy(loading = true) }
                 val request = LogoutRequestBody(
                     accessToken = user.accessToken ?: "",
                     sessionId = user.sessionId ?: ""
@@ -207,9 +209,11 @@ class MainViewModel @Inject constructor(
                 authRepository.logout(request)
                     .onError { error ->
                         println(error.toUiText())
+                        _userState.update { it.copy(loading = false) }
                     }
                     .onSuccess {
                         println("Logout Success")
+                        _userState.update { it.copy(loading = false) }
                     }
                 userRepository.removeUser(user)
                 _userState.update { it.copy(user = null) }

@@ -227,7 +227,7 @@ fun rememberNavigationItems(preferencesState: () -> PreferencesState, userState:
                     selectedIcon = {
                         ProfileIcon(isSelected = true, userState = userState)
                     },
-                    route = Route.Profile(null)
+                    route = Route.Profile
                 )
             )
         }
@@ -281,6 +281,7 @@ fun bottomBarVisibility(
     when {
         currentDestination?.hasRoute(Route.Image::class) == true -> bottomBarVisibilityState.value = false
         currentDestination?.hasRoute(Route.AddToList::class) == true -> bottomBarVisibilityState.value = false
+        currentDestination?.hasRoute(Route.WelcomeBack::class) == true -> bottomBarVisibilityState.value = false
         else -> bottomBarVisibilityState.value = true
     }
 

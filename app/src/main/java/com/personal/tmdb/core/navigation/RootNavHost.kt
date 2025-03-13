@@ -16,7 +16,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
-import androidx.navigation.toRoute
 import com.personal.tmdb.UiEvent
 import com.personal.tmdb.UserState
 import com.personal.tmdb.core.domain.util.AdditionalNavigationItem
@@ -25,6 +24,7 @@ import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.add_to_list.AddToListScreenRoot
 import com.personal.tmdb.core.presentation.components.animatedComposable
 import com.personal.tmdb.core.presentation.components.staticComposable
+import com.personal.tmdb.core.presentation.welcome_back.WelcomeBackScreenRoot
 import com.personal.tmdb.detail.presentation.cast.CastScreenRoot
 import com.personal.tmdb.detail.presentation.collection.CollectionScreenRoot
 import com.personal.tmdb.detail.presentation.detail.DetailScreenRoot
@@ -187,14 +187,7 @@ fun RootNavHost(
                 uiEvent = uiEvent
             )
         }
-        staticComposable<Route.Profile>(
-            deepLinks = listOf(
-                navDeepLink<Route.Profile>(
-                    basePath = C.REDIRECT_URL
-                )
-            )
-        ) {
-            val approved = it.toRoute<Route.Profile>().approved
+        staticComposable<Route.Profile> {
             val lazyListState = rememberLazyListState()
             val navController = rememberNavController()
             navBarItemReselect {
@@ -212,7 +205,7 @@ fun RootNavHost(
                 rootNavController = rootNavController,
                 navController = navController,
                 scrollState = lazyListState,
-                startDestination = Route.Profile(approved),
+                startDestination = Route.Profile,
                 bottomBarPadding = bottomBarPadding,
                 preferencesState = preferencesState,
                 userState = userState,
@@ -233,6 +226,23 @@ fun RootNavHost(
         ) {
             AddToListScreenRoot(
                 onNavigateBack = onNavigateBack
+            )
+        }
+        staticComposable<Route.WelcomeBack>(
+            deepLinks = listOf(
+                navDeepLink<Route.WelcomeBack>(
+                    basePath = C.REDIRECT_URL
+                )
+            )
+        ) {
+            LaunchedEffect(true) {
+                if (userState().user?.sessionId.isNullOrEmpty()) {
+                    uiEvent(UiEvent.SignInUser)
+                }
+            }
+            WelcomeBackScreenRoot(
+                onNavigateBack = onNavigateBack,
+                userState = userState
             )
         }
     }
@@ -260,7 +270,7 @@ fun ChildNavHost(
     }
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination::class
     ) {
         animatedComposable<Route.Home> {
             HomeScreenRoot(
@@ -308,12 +318,6 @@ fun ChildNavHost(
             )
         }
         animatedComposable<Route.Profile> {
-            val approved = it.toRoute<Route.Profile>().approved
-            LaunchedEffect(key1 = true) {
-                if (approved == true) {
-                    uiEvent(UiEvent.SignInUser)
-                }
-            }
             ProfileScreenRoot(
                 bottomPadding = bottomBarPadding,
                 lazyListState = scrollState as LazyListState,
@@ -323,7 +327,6 @@ fun ChildNavHost(
                 uiEvent = uiEvent
             )
         }
-
         animatedComposable<Route.Detail> {
             DetailScreenRoot(
                 bottomPadding = bottomBarPadding,
