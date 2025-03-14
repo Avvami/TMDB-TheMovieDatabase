@@ -35,6 +35,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,7 +55,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.util.C
+import com.personal.tmdb.core.domain.util.DialogAction
+import com.personal.tmdb.core.domain.util.DialogController
+import com.personal.tmdb.core.domain.util.DialogEvent
 import com.personal.tmdb.core.domain.util.ObserveAsEvents
+import com.personal.tmdb.core.domain.util.UiText
 import com.personal.tmdb.core.domain.util.shareText
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.PreferencesState
@@ -65,6 +70,7 @@ import com.personal.tmdb.profile.presentation.lists.presentation.list_details.co
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.components.ListDescription
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.components.ListDetailsScreenShimmer
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.components.ListMetadata
+import kotlinx.coroutines.launch
 
 @Composable
 fun ListDetailsScreenRoot(
@@ -104,9 +110,35 @@ private fun ListDetailsScreen(
     listDetailsUiEvent: (ListDetailsUiEvent) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
+    val errorColor = MaterialTheme.colorScheme.error
     BackHandler {
         when {
-            listDetailsState().editing -> listDetailsUiEvent(ListDetailsUiEvent.SetEditingState(false))
+            listDetailsState().editing -> {
+                if (listDetailsState().listName.trim() != listDetailsState().listDetails?.name
+                    || listDetailsState().listDescription.takeIf { it.isNotBlank() }?.trim() != listDetailsState().listDetails?.description
+                    || listDetailsState().publicList != listDetailsState().listDetails?.public) {
+                    scope.launch {
+                        DialogController.sendEvent(
+                            event = DialogEvent(
+                                title = UiText.StringResource(R.string.discard_edit),
+                                message = UiText.StringResource(R.string.edit_list_warning),
+                                dismissAction = DialogAction(
+                                    name = UiText.StringResource(R.string.cancel),
+                                    action = {}
+                                ),
+                                confirmAction = DialogAction(
+                                    name = UiText.StringResource(R.string.discard),
+                                    action = { listDetailsUiEvent(ListDetailsUiEvent.SetEditingState(false)) },
+                                    color = errorColor
+                                )
+                            )
+                        )
+                    }
+                } else {
+                    listDetailsUiEvent(ListDetailsUiEvent.SetEditingState(false))
+                }
+            }
             listDetailsState().selectEnabled -> listDetailsUiEvent(ListDetailsUiEvent.SetSelectEnabled(false))
             else -> listDetailsUiEvent(ListDetailsUiEvent.OnNavigateBack)
         }
@@ -177,7 +209,31 @@ private fun ListDetailsScreen(
                             IconButton(
                                 onClick = {
                                     when {
-                                        editing -> listDetailsUiEvent(ListDetailsUiEvent.SetEditingState(false))
+                                        editing -> {
+                                            if (listDetailsState().listName.trim() != listDetailsState().listDetails?.name
+                                                || listDetailsState().listDescription.takeIf { it.isNotBlank() }?.trim() != listDetailsState().listDetails?.description
+                                                || listDetailsState().publicList != listDetailsState().listDetails?.public) {
+                                                scope.launch {
+                                                    DialogController.sendEvent(
+                                                        event = DialogEvent(
+                                                            title = UiText.StringResource(R.string.discard_edit),
+                                                            message = UiText.StringResource(R.string.edit_list_warning),
+                                                            dismissAction = DialogAction(
+                                                                name = UiText.StringResource(R.string.cancel),
+                                                                action = {}
+                                                            ),
+                                                            confirmAction = DialogAction(
+                                                                name = UiText.StringResource(R.string.discard),
+                                                                action = { listDetailsUiEvent(ListDetailsUiEvent.SetEditingState(false)) },
+                                                                color = errorColor
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            } else {
+                                                listDetailsUiEvent(ListDetailsUiEvent.SetEditingState(false))
+                                            }
+                                        }
                                         listDetailsState().selectEnabled -> listDetailsUiEvent(ListDetailsUiEvent.SetSelectEnabled(false))
                                     }
                                 }
@@ -204,12 +260,30 @@ private fun ListDetailsScreen(
                                 IconButton(
                                     onClick = {
                                         focusManager.clearFocus()
-                                        listDetailsUiEvent(
-                                            ListDetailsUiEvent.DeleteSelectedItems(
-                                                listId = listDetailsState().listId,
-                                                items = listDetailsState().selectedItems
+                                        scope.launch {
+                                            DialogController.sendEvent(
+                                                event = DialogEvent(
+                                                    title = UiText.StringResource(R.string.delete_selection),
+                                                    message = UiText.StringResource(R.string.delete_items_warning),
+                                                    dismissAction = DialogAction(
+                                                        name = UiText.StringResource(R.string.cancel),
+                                                        action = {}
+                                                    ),
+                                                    confirmAction = DialogAction(
+                                                        name = UiText.StringResource(R.string.delete),
+                                                        action = {
+                                                            listDetailsUiEvent(
+                                                                ListDetailsUiEvent.DeleteSelectedItems(
+                                                                    listId = listDetailsState().listId,
+                                                                    items = listDetailsState().selectedItems
+                                                                )
+                                                            )
+                                                        },
+                                                        color = errorColor
+                                                    )
+                                                )
                                             )
-                                        )
+                                        }
                                     },
                                     enabled = !listDetailsState().deleting
                                 ) {

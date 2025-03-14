@@ -18,6 +18,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,9 +28,14 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.personal.tmdb.R
+import com.personal.tmdb.core.domain.util.DialogAction
+import com.personal.tmdb.core.domain.util.DialogController
+import com.personal.tmdb.core.domain.util.DialogEvent
+import com.personal.tmdb.core.domain.util.UiText
 import com.personal.tmdb.core.presentation.components.CustomListItem
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.ListDetailsState
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.ListDetailsUiEvent
+import kotlinx.coroutines.launch
 
 @Composable
 fun EditList(
@@ -122,9 +128,31 @@ fun EditList(
         CompositionLocalProvider(
             LocalMinimumInteractiveComponentSize provides Dp.Unspecified
         ) {
+            val scope = rememberCoroutineScope()
+            val errorColor = MaterialTheme.colorScheme.error
             TextButton(
                 modifier = Modifier.width(200.dp),
-                onClick = { listDetailsUiEvent(ListDetailsUiEvent.DeleteList(listDetailsState().listId)) },
+                onClick = {
+                    scope.launch {
+                        DialogController.sendEvent(
+                            event = DialogEvent(
+                                title = UiText.StringResource(R.string.delete_list_lowercase),
+                                message = UiText.StringResource(R.string.delete_list_warning),
+                                dismissAction = DialogAction(
+                                    name = UiText.StringResource(R.string.cancel),
+                                    action = {}
+                                ),
+                                confirmAction = DialogAction(
+                                    name = UiText.StringResource(R.string.delete),
+                                    action = {
+                                        listDetailsUiEvent(ListDetailsUiEvent.DeleteList(listDetailsState().listId))
+                                    },
+                                    color = errorColor
+                                )
+                            )
+                        )
+                    }
+                },
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.error
                 ),

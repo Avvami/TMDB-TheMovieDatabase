@@ -25,10 +25,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.personal.tmdb.core.domain.util.DialogController
+import com.personal.tmdb.core.domain.util.DialogEvent
 import com.personal.tmdb.core.domain.util.ObserveAsEvents
 import com.personal.tmdb.core.domain.util.SnackbarController
 import com.personal.tmdb.core.navigation.RootNavHost
 import com.personal.tmdb.core.presentation.components.BottomBar
+import com.personal.tmdb.core.presentation.components.CustomDialog
 import com.personal.tmdb.ui.theme.TMDBTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -47,6 +50,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val preferencesState by mainViewModel.preferencesState.collectAsStateWithLifecycle()
             val userState by mainViewModel.userState.collectAsStateWithLifecycle()
+            val dialogState by mainViewModel.dialogState.collectAsStateWithLifecycle()
             TMDBTheme(
                 darkTheme = preferencesState.darkTheme ?: isSystemInDarkTheme()
             ) {
@@ -69,6 +73,20 @@ class MainActivity : ComponentActivity() {
                             event.action?.action?.invoke()
                         }
                     }
+                }
+                ObserveAsEvents(flow = DialogController.events) { event ->
+                    mainViewModel.uiEvent(
+                        UiEvent.ShowDialog(
+                            show = true,
+                            content = DialogEvent(
+                                iconRes = event.iconRes,
+                                title = event.title,
+                                message = event.message,
+                                dismissAction = event.dismissAction,
+                                confirmAction = event.confirmAction
+                            )
+                        )
+                    )
                 }
 
                 Scaffold(
@@ -107,6 +125,12 @@ class MainActivity : ComponentActivity() {
                         uiEvent = mainViewModel::uiEvent
                     )
                 }
+
+                CustomDialog(
+                    dialogState = dialogState,
+                    onDismissRequest = { mainViewModel.uiEvent(UiEvent.ShowDialog(false)) },
+                    showDialog = mainViewModel.showDialog
+                )
             }
         }
     }

@@ -191,7 +191,15 @@ class ListDetailsViewModel @Inject constructor(
                 if (event.editing) {
                     _listDetailsState.update { it.copy(editing = true) }
                 } else {
-                    _listDetailsState.update { it.copy(editing = false, selectedItems = emptyList()) }
+                    _listDetailsState.update {
+                        it.copy(
+                            editing = false,
+                            listName = it.listDetails?.name ?: "",
+                            listDescription = it.listDetails?.description ?: "",
+                            publicList = it.listDetails?.public ?: it.publicList,
+                            selectedItems = emptyList()
+                        )
+                    }
                 }
             }
             is ListDetailsUiEvent.SetListVisibility -> {

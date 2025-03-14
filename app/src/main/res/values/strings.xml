@@ -202,4 +202,16 @@
     <string name="cool">Cool!</string>
     <string name="logging_out">Logging out…</string>
     <string name="take_me_back">Take me back</string>
+    <string name="ok">OK</string>
+    <string name="logout_warning">Are you sure you want to logout?</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit_list_warning">Do you want to close the edit view?</string>
+    <string name="discard_edit">Discard edit</string>
+    <string name="discard">Discard</string>
+    <string name="delete">Delete</string>
+    <string name="delete_items_warning">Are you sure you want to delete selected items?</string>
+    <string name="delete_item_warning">Are you sure you want to delete selected item?</string>
+    <string name="delete_selection">Delete selection</string>
+    <string name="delete_list_warning">Are you sure you want to delete this list? You won\'t be able to restore it</string>
+    <string name="delete_list_lowercase">Delete list</string>
 </resources>

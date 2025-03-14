@@ -15,6 +15,8 @@ import com.personal.tmdb.core.domain.repository.LocalCache
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.C
+import com.personal.tmdb.core.domain.util.DialogAction
+import com.personal.tmdb.core.domain.util.DialogEvent
 import com.personal.tmdb.core.domain.util.SnackbarController
 import com.personal.tmdb.core.domain.util.SnackbarEvent
 import com.personal.tmdb.core.domain.util.UiText
@@ -46,6 +48,20 @@ class MainViewModel @Inject constructor(
 
     private val _userState = MutableStateFlow(UserState())
     val userState: StateFlow<UserState> = _userState.asStateFlow()
+
+    var showDialog by mutableStateOf(false)
+        private set
+
+    private val _dialogState = MutableStateFlow(
+        DialogEvent(
+            message = UiText.StringResource(R.string.empty),
+            confirmAction = DialogAction(
+                name = UiText.StringResource(R.string.ok),
+                action = { showDialog = false}
+            )
+        )
+    )
+    val dialogState = _dialogState.asStateFlow()
 
     init {
         observePreferences()
@@ -143,11 +159,6 @@ class MainViewModel @Inject constructor(
                                     }
                                     getUserDetails(session.sessionId)
                                     localCache.clearRequestToken()
-                                    SnackbarController.sendEvent(
-                                        event = SnackbarEvent(
-                                            message = UiText.StringResource(R.string.signed_in_successfully)
-                                        )
-                                    )
                                 } else {
                                     SnackbarController.sendEvent(
                                         event = SnackbarEvent(
@@ -244,6 +255,12 @@ class MainViewModel @Inject constructor(
             }
             is UiEvent.SignOut -> {
                 singOut(event.user)
+            }
+            is UiEvent.ShowDialog -> {
+                showDialog = event.show
+                event.content?.let { content ->
+                    _dialogState.value = content
+                }
             }
         }
     }

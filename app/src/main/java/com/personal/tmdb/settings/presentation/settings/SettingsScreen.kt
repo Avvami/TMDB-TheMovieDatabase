@@ -21,6 +21,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,11 +33,16 @@ import com.personal.tmdb.MainActivity
 import com.personal.tmdb.R
 import com.personal.tmdb.UiEvent
 import com.personal.tmdb.UserState
+import com.personal.tmdb.core.domain.util.DialogAction
+import com.personal.tmdb.core.domain.util.DialogController
+import com.personal.tmdb.core.domain.util.DialogEvent
+import com.personal.tmdb.core.domain.util.UiText
 import com.personal.tmdb.core.domain.util.findActivity
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.settings.presentation.settings.components.About
 import com.personal.tmdb.settings.presentation.settings.components.AppSettings
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreenRoot(
@@ -123,14 +129,34 @@ private fun SettingsScreen(
                 item(
                     contentType = { "SignOut" }
                 ) {
+                    val scope = rememberCoroutineScope()
                     CompositionLocalProvider(
                         LocalMinimumInteractiveComponentSize provides Dp.Unspecified
                     ) {
+                        val logoutBtnColor = MaterialTheme.colorScheme.error
                         TextButton(
                             modifier = Modifier
                                 .width(200.dp)
                                 .animateItem(),
-                            onClick = { uiEvent(UiEvent.SignOut(userState().user)) },
+                            onClick = {
+                                scope.launch {
+                                    DialogController.sendEvent(
+                                        event = DialogEvent(
+                                            title = UiText.StringResource(R.string.logout),
+                                            message = UiText.StringResource(R.string.logout_warning),
+                                            dismissAction = DialogAction(
+                                                name = UiText.StringResource(R.string.cancel),
+                                                action = {}
+                                            ),
+                                            confirmAction = DialogAction(
+                                                name = UiText.StringResource(R.string.logout),
+                                                action = { uiEvent(UiEvent.SignOut(userState().user)) },
+                                                color = logoutBtnColor
+                                            )
+                                        )
+                                    )
+                                }
+                            },
                             colors = ButtonDefaults.textButtonColors(
                                 contentColor = MaterialTheme.colorScheme.error
                             ),

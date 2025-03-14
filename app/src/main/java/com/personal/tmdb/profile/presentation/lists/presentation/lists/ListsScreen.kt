@@ -56,10 +56,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.personal.tmdb.R
+import com.personal.tmdb.core.domain.util.DialogAction
+import com.personal.tmdb.core.domain.util.DialogController
+import com.personal.tmdb.core.domain.util.DialogEvent
+import com.personal.tmdb.core.domain.util.UiText
 import com.personal.tmdb.core.navigation.Route
+import com.personal.tmdb.core.presentation.components.CreateList
 import com.personal.tmdb.core.presentation.components.ListItem
 import com.personal.tmdb.core.presentation.components.MediaGrid
-import com.personal.tmdb.core.presentation.components.CreateList
 import com.personal.tmdb.profile.presentation.lists.presentation.lists.components.ListScreenShimmer
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.launch
@@ -108,11 +112,31 @@ private fun ListsScreen(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var backPressHandled by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val errorColor = MaterialTheme.colorScheme.error
     BackHandler(enabled = !backPressHandled) {
         when {
             listsState().createEnabled -> {
-                /*TODO: Show warning dialog*/
-                listsUiEvent(ListsUiEvent.CreateMode(false))
+                if (listsState().listName.isNotBlank() || listsState().listDescription.isNotBlank()) {
+                    scope.launch {
+                        DialogController.sendEvent(
+                            event = DialogEvent(
+                                title = UiText.StringResource(R.string.discard_edit),
+                                message = UiText.StringResource(R.string.edit_list_warning),
+                                dismissAction = DialogAction(
+                                    name = UiText.StringResource(R.string.cancel),
+                                    action = {}
+                                ),
+                                confirmAction = DialogAction(
+                                    name = UiText.StringResource(R.string.discard),
+                                    action = { listsUiEvent(ListsUiEvent.CreateMode(false)) },
+                                    color = errorColor
+                                )
+                            )
+                        )
+                    }
+                } else {
+                    listsUiEvent(ListsUiEvent.CreateMode(false))
+                }
             }
             listsState().selectEnabled -> listsUiEvent(ListsUiEvent.SetSelectEnabled(false))
             else -> {
@@ -135,13 +159,13 @@ private fun ListsScreen(
         targetState = listsState().createEnabled,
         label = "Create list animation",
         transitionSpec = { fadeIn(animationSpec = tween(durationMillis = 150)) togetherWith fadeOut(animationSpec = tween(durationMillis = 150)) }
-    ) { creating ->
+    ) { createEnabled ->
         Scaffold(
             topBar = {
                 TopAppBar(
                     title = {
                         when {
-                            creating -> {
+                            createEnabled -> {
                                 Text(
                                     text = stringResource(id = R.string.create),
                                     fontWeight = FontWeight.Medium
@@ -163,11 +187,33 @@ private fun ListsScreen(
                     },
                     navigationIcon = {
                         when {
-                            creating || listsState().selectEnabled -> {
+                            createEnabled || listsState().selectEnabled -> {
                                 IconButton(
                                     onClick = {
                                         when {
-                                            creating -> listsUiEvent(ListsUiEvent.CreateMode(false))
+                                            createEnabled -> {
+                                                if (listsState().listName.isNotBlank() || listsState().listDescription.isNotBlank()) {
+                                                    scope.launch {
+                                                        DialogController.sendEvent(
+                                                            event = DialogEvent(
+                                                                title = UiText.StringResource(R.string.discard_edit),
+                                                                message = UiText.StringResource(R.string.edit_list_warning),
+                                                                dismissAction = DialogAction(
+                                                                    name = UiText.StringResource(R.string.cancel),
+                                                                    action = {}
+                                                                ),
+                                                                confirmAction = DialogAction(
+                                                                    name = UiText.StringResource(R.string.discard),
+                                                                    action = { listsUiEvent(ListsUiEvent.CreateMode(false)) },
+                                                                    color = errorColor
+                                                                )
+                                                            )
+                                                        )
+                                                    }
+                                                } else {
+                                                    listsUiEvent(ListsUiEvent.CreateMode(false))
+                                                }
+                                            }
                                             listsState().selectEnabled -> listsUiEvent(ListsUiEvent.SetSelectEnabled(false))
                                         }
                                     }
@@ -194,7 +240,25 @@ private fun ListsScreen(
                         if (listsState().selectedItems.isNotEmpty()) {
                             IconButton(
                                 onClick = {
-                                    listsUiEvent(ListsUiEvent.DeleteSelectedLists(listsState().selectedItems))
+                                    scope.launch {
+                                        DialogController.sendEvent(
+                                            event = DialogEvent(
+                                                title = UiText.StringResource(R.string.delete_selection),
+                                                message = UiText.StringResource(R.string.delete_item_warning),
+                                                dismissAction = DialogAction(
+                                                    name = UiText.StringResource(R.string.cancel),
+                                                    action = {}
+                                                ),
+                                                confirmAction = DialogAction(
+                                                    name = UiText.StringResource(R.string.delete),
+                                                    action = {
+                                                        listsUiEvent(ListsUiEvent.DeleteSelectedLists(listsState().selectedItems))
+                                                    },
+                                                    color = errorColor
+                                                )
+                                            )
+                                        )
+                                    }
                                 },
                                 enabled = !listsState().deleting
                             ) {
@@ -221,7 +285,7 @@ private fun ListsScreen(
                                 }
                             }
                         }
-                        if (creating) {
+                        if (createEnabled) {
                             IconButton(
                                 onClick = {
                                     focusManager.clearFocus()
@@ -260,7 +324,7 @@ private fun ListsScreen(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = if (creating || listsState().selectEnabled) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surface,
+                        containerColor = if (createEnabled || listsState().selectEnabled) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surface,
                         titleContentColor = MaterialTheme.colorScheme.onSurface,
                         navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                         actionIconContentColor = MaterialTheme.colorScheme.onSurface
@@ -280,7 +344,7 @@ private fun ListsScreen(
                     } else {
                         listsState().errorMessage?.let {  }
                         listsState().lists?.results?.let { lists ->
-                            if (creating) {
+                            if (createEnabled) {
                                 item(
                                     span = { GridItemSpan(maxLineSpan) }
                                 ) {
