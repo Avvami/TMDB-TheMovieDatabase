@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
@@ -43,7 +44,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -102,6 +106,26 @@ private fun AddToListScreen(
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val errorColor = MaterialTheme.colorScheme.error
+    val lazyListState = rememberLazyListState()
+    val reachingEnd by remember {
+        derivedStateOf {
+            val visibleItems = lazyListState.layoutInfo.visibleItemsInfo
+            if (visibleItems.isNotEmpty()) {
+                val lastVisibleItemIndex = visibleItems.last().index
+                val totalItemsCount = lazyListState.layoutInfo.totalItemsCount
+                lastVisibleItemIndex >= totalItemsCount - 10
+            } else {
+                false
+            }
+        }
+    }
+    LaunchedEffect(key1 = reachingEnd) {
+        if (reachingEnd) {
+            addToListState().lists?.let { lists ->
+                addToListUiEvent(AddToListUiEvent.GetLists(lists.page + 1))
+            }
+        }
+    }
     BackHandler {
         if (addToListState().createEnabled) {
             if (addToListState().listName.isNotBlank() || addToListState().listDescription.isNotBlank()) {

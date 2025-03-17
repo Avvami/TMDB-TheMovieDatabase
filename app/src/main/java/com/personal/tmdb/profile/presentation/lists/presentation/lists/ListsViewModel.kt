@@ -28,6 +28,12 @@ class ListsViewModel @Inject constructor(
     val listsState = _listsState.asStateFlow()
 
     private fun getLists(page: Int) {
+        listsState.value.lists?.let { listsResponse ->
+            if (listsResponse.totalPages < page || listsState.value.paging) {
+                return
+            }
+            if (listsResponse.page != page) _listsState.update { it.copy(paging = true) }
+        }
         viewModelScope.launch {
             _listsState.update {
                 it.copy(
@@ -42,16 +48,32 @@ class ListsViewModel @Inject constructor(
                     _listsState.update {
                         it.copy(
                             loading = false,
+                            paging = false,
                             errorMessage = error.toUiText()
                         )
                     }
                 }
                 .onSuccess { result ->
-                    _listsState.update {
-                        it.copy(
-                            loading = false,
-                            lists = result
-                        )
+                    _listsState.update { state ->
+                        val lists = state.lists
+                        if (lists == null || page == 1) {
+                            state.copy(
+                                loading = false,
+                                paging = false,
+                                lists = result
+                            )
+                        } else {
+                            val mergedLists = lists.results + result.results
+                            val updatedLists = lists.copy(
+                                results = mergedLists,
+                                page = result.page
+                            )
+                            state.copy(
+                                loading = false,
+                                paging = false,
+                                lists = updatedLists
+                            )
+                        }
                     }
                 }
         }
@@ -115,13 +137,18 @@ class ListsViewModel @Inject constructor(
                     )
                 }
                 .onSuccess {
-                    _listsState.update {
-                        it.copy(
+                    _listsState.update { state ->
+                        val results = state.lists?.results.orEmpty() - listInfo
+                        val updatedSelectedItems = state.selectedItems - listInfo
+                        val updatedLists = state.lists?.copy(
+                            results = results
+                        )
+                        state.copy(
+                            lists = updatedLists,
                             deleting = false,
-                            selectedItems = it.selectedItems - listInfo
+                            selectedItems = updatedSelectedItems
                         )
                     }
-                    getLists(page = 1)
                     SnackbarController.sendEvent(
                         event = SnackbarEvent(
                             message = UiText.StringResource(R.string.deleted_successfully)

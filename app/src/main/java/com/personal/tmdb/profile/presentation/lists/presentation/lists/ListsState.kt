@@ -6,6 +6,7 @@ import com.personal.tmdb.core.domain.util.UiText
 
 data class ListsState(
     val loading: Boolean = false,
+    val paging: Boolean = false,
     val lists: ListsResponseInfo? = null,
     val createEnabled: Boolean = false,
     val listName: String = "",

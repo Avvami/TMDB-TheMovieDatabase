@@ -63,6 +63,7 @@ import com.personal.tmdb.core.domain.util.UiText
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.components.CreateList
 import com.personal.tmdb.core.presentation.components.ListItem
+import com.personal.tmdb.core.presentation.components.ListItemShimmer
 import com.personal.tmdb.core.presentation.components.MediaGrid
 import com.personal.tmdb.profile.presentation.lists.presentation.lists.components.ListScreenShimmer
 import kotlinx.coroutines.android.awaitFrame
@@ -338,6 +339,11 @@ private fun ListsScreen(
                 modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
                 contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
                 columns = GridCells.Adaptive(360.dp),
+                loadMoreItems = {
+                    listsState().lists?.let { lists ->
+                        listsUiEvent(ListsUiEvent.GetLists(lists.page + 1))
+                    }
+                },
                 items = {
                     if (listsState().loading && listsState().lists == null) {
                         ListScreenShimmer()
@@ -433,6 +439,13 @@ private fun ListsScreen(
                                             listInfo = listInfo,
                                             height = Dp.Unspecified
                                         )
+                                    }
+                                    if (listsState().paging) {
+                                        items(
+                                            count = 4
+                                        ) {
+                                            ListItemShimmer()
+                                        }
                                     }
                                 }
                             }
