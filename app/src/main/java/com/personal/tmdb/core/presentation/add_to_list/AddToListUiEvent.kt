@@ -9,4 +9,5 @@ sealed interface AddToListUiEvent {
     data class SetListName(val text: String): AddToListUiEvent
     data class SetListDescription(val text: String): AddToListUiEvent
     data class CreateList(val name: String, val description: String, val public: Boolean): AddToListUiEvent
+    data class GetLists(val page: Int): AddToListUiEvent
 }

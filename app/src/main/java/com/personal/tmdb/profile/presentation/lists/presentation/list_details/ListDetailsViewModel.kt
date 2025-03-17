@@ -49,9 +49,10 @@ class ListDetailsViewModel @Inject constructor(
 
     private fun getListDetails(listId: Int, page: Int) {
         listDetailsState.value.listDetails?.let { details ->
-            if (details.totalPages < page || listDetailsState.value.loading) {
+            if (details.totalPages < page || listDetailsState.value.paging) {
                 return
             }
+            if (details.page != page) _listDetailsState.update { it.copy(paging = true) }
         }
         viewModelScope.launch {
             _listDetailsState.update {
@@ -69,6 +70,7 @@ class ListDetailsViewModel @Inject constructor(
                     _listDetailsState.update {
                         it.copy(
                             loading = false,
+                            paging = false,
                             errorMessage = error.toUiText()
                         )
                     }
@@ -79,6 +81,7 @@ class ListDetailsViewModel @Inject constructor(
                         if (details == null || page == 1) {
                             state.copy(
                                 loading = false,
+                                paging = false,
                                 listDetails = result,
                                 listName = result.name ?: "",
                                 listDescription = result.description ?: "",
@@ -92,6 +95,7 @@ class ListDetailsViewModel @Inject constructor(
                             )
                             state.copy(
                                 loading = false,
+                                paging = false,
                                 listDetails = updatedDetails
                             )
                         }

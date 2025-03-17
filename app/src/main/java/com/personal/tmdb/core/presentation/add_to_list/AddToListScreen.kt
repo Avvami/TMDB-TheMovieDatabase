@@ -10,7 +10,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,6 +44,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,10 +65,14 @@ import coil3.compose.AsyncImage
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.models.LoadingProgress
 import com.personal.tmdb.core.domain.util.C
-import com.personal.tmdb.core.domain.util.formatNumberOfItems
+import com.personal.tmdb.core.domain.util.DialogAction
+import com.personal.tmdb.core.domain.util.DialogController
+import com.personal.tmdb.core.domain.util.DialogEvent
+import com.personal.tmdb.core.domain.util.UiText
 import com.personal.tmdb.core.domain.util.shimmerEffect
 import com.personal.tmdb.core.presentation.components.CreateList
 import com.personal.tmdb.core.presentation.components.CustomListItem
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddToListScreenRoot(
@@ -96,9 +100,31 @@ private fun AddToListScreen(
     addToListUiEvent: (AddToListUiEvent) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
+    val errorColor = MaterialTheme.colorScheme.error
     BackHandler {
         if (addToListState().createEnabled) {
-            addToListUiEvent(AddToListUiEvent.CreateMode(false))
+            if (addToListState().listName.isNotBlank() || addToListState().listDescription.isNotBlank()) {
+                scope.launch {
+                    DialogController.sendEvent(
+                        event = DialogEvent(
+                            title = UiText.StringResource(R.string.discard_edit),
+                            message = UiText.StringResource(R.string.edit_list_warning),
+                            dismissAction = DialogAction(
+                                name = UiText.StringResource(R.string.cancel),
+                                action = {}
+                            ),
+                            confirmAction = DialogAction(
+                                name = UiText.StringResource(R.string.discard),
+                                action = { addToListUiEvent(AddToListUiEvent.CreateMode(false)) },
+                                color = errorColor
+                            )
+                        )
+                    )
+                }
+            } else {
+                addToListUiEvent(AddToListUiEvent.CreateMode(false))
+            }
         } else {
             addToListUiEvent(AddToListUiEvent.OnNavigateBack)
         }
@@ -132,7 +158,29 @@ private fun AddToListScreen(
                     navigationIcon = {
                         if (createEnabled) {
                             IconButton(
-                                onClick = { addToListUiEvent(AddToListUiEvent.CreateMode(false)) }
+                                onClick = {
+                                    if (addToListState().listName.isNotBlank() || addToListState().listDescription.isNotBlank()) {
+                                        scope.launch {
+                                            DialogController.sendEvent(
+                                                event = DialogEvent(
+                                                    title = UiText.StringResource(R.string.discard_edit),
+                                                    message = UiText.StringResource(R.string.edit_list_warning),
+                                                    dismissAction = DialogAction(
+                                                        name = UiText.StringResource(R.string.cancel),
+                                                        action = {}
+                                                    ),
+                                                    confirmAction = DialogAction(
+                                                        name = UiText.StringResource(R.string.discard),
+                                                        action = { addToListUiEvent(AddToListUiEvent.CreateMode(false)) },
+                                                        color = errorColor
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    } else {
+                                        addToListUiEvent(AddToListUiEvent.CreateMode(false))
+                                    }
+                                }
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Close,
@@ -348,44 +396,7 @@ private fun AddToListScreen(
                         items(
                             count = 10
                         ) {
-                            CustomListItem(
-                                onClick = {},
-                                enabled = false,
-                                headlineContent = {
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .height(48.dp)
-                                                .aspectRatio(1 / 1f)
-                                                .clip(MaterialTheme.shapes.extraSmall)
-                                                .shimmerEffect(),
-                                        )
-                                        Column(
-                                            verticalArrangement = Arrangement.spacedBy(2.dp)
-                                        ) {
-                                            Text(
-                                                modifier = Modifier
-                                                    .clip(MaterialTheme.shapes.extraSmall)
-                                                    .shimmerEffect(),
-                                                text = "Your (Elon's) personal list",
-                                                style = MaterialTheme.typography.titleMedium,
-                                                color = Color.Transparent
-                                            )
-                                            Text(
-                                                modifier = Modifier
-                                                    .clip(MaterialTheme.shapes.extraSmall)
-                                                    .shimmerEffect(),
-                                                text = "100 items",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = Color.Transparent
-                                            )
-                                        }
-                                    }
-                                }
-                            )
+                            CustomListItemShimmer()
                         }
                     } else {
                         addToListState().errorMessage?.let {  }
@@ -429,19 +440,12 @@ private fun AddToListScreen(
                                                     contentDescription = "Poster",
                                                     contentScale = ContentScale.Crop
                                                 )
-                                                Column {
-                                                    Text(
-                                                        text = listInfo.name ?: stringResource(id = R.string.empty),
-                                                        style = MaterialTheme.typography.titleMedium,
-                                                        maxLines = 1,
-                                                        overflow = TextOverflow.Ellipsis
-                                                    )
-                                                    Text(
-                                                        text = formatNumberOfItems(listInfo.numberOfItems),
-                                                        style = MaterialTheme.typography.bodySmall,
-                                                        color = MaterialTheme.colorScheme.surfaceVariant
-                                                    )
-                                                }
+                                                Text(
+                                                    text = listInfo.name ?: stringResource(id = R.string.empty),
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    maxLines = 2,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
                                             }
                                         },
                                         trailingContent = {
@@ -483,6 +487,13 @@ private fun AddToListScreen(
                                         }
                                     )
                                 }
+                                if (addToListState().paging) {
+                                    items(
+                                        count = 4
+                                    ) {
+                                        CustomListItemShimmer()
+                                    }
+                                }
                             }
                         }
                     }
@@ -497,4 +508,37 @@ private fun AddToListScreen(
             }
         }
     }
+}
+
+@Composable
+private fun CustomListItemShimmer(
+    modifier: Modifier = Modifier
+) {
+    CustomListItem(
+        modifier = modifier,
+        onClick = {},
+        enabled = false,
+        headlineContent = {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .height(48.dp)
+                        .aspectRatio(1 / 1f)
+                        .clip(MaterialTheme.shapes.extraSmall)
+                        .shimmerEffect(),
+                )
+                Text(
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.extraSmall)
+                        .shimmerEffect(),
+                    text = "Your (Elon's) personal list",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Transparent
+                )
+            }
+        }
+    )
 }

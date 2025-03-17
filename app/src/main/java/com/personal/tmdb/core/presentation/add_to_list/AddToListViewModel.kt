@@ -18,7 +18,6 @@ import com.personal.tmdb.core.domain.util.onSuccess
 import com.personal.tmdb.core.domain.util.toUiText
 import com.personal.tmdb.core.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,7 +32,6 @@ class AddToListViewModel @Inject constructor(
 ): ViewModel() {
 
     private val routeData = savedStateHandle.toRoute<Route.AddToList>()
-    private var updateListsJob: Job? = null
 
     private val _addToListState = MutableStateFlow(
         AddToListState(
@@ -48,6 +46,12 @@ class AddToListViewModel @Inject constructor(
     }
 
     private fun getLists(page: Int) {
+        addToListState.value.lists?.let { listsResponse ->
+            if (listsResponse.totalPages < page || addToListState.value.paging) {
+                return
+            }
+            if (listsResponse.page != page) _addToListState.update { it.copy(paging = true) }
+        }
         viewModelScope.launch {
             _addToListState.update {
                 it.copy(
@@ -62,16 +66,32 @@ class AddToListViewModel @Inject constructor(
                     _addToListState.update {
                         it.copy(
                             loadingLists = false,
+                            paging = false,
                             errorMessage = error.toUiText()
                         )
                     }
                 }
                 .onSuccess { result ->
-                    _addToListState.update {
-                        it.copy(
-                            loadingLists = false,
-                            lists = result
-                        )
+                    _addToListState.update { state ->
+                        val lists = state.lists
+                        if (lists == null || page == 1) {
+                            state.copy(
+                                loadingLists = false,
+                                paging = false,
+                                lists = result
+                            )
+                        } else {
+                            val mergedLists = lists.results + result.results
+                            val updatedLists = lists.copy(
+                                results = mergedLists,
+                                page = result.page
+                            )
+                            state.copy(
+                                loadingLists = false,
+                                paging = false,
+                                lists = updatedLists
+                            )
+                        }
                     }
                 }
         }
@@ -100,14 +120,9 @@ class AddToListViewModel @Inject constructor(
                     updateLoadingProgress(listId, LoadingProgress.STILL)
                 }
                 .onSuccess {
-                    updateListsJob?.cancel()
                     updateLoadingProgress(listId, LoadingProgress.SUCCESS)
                     delay(1500L)
                     updateLoadingProgress(listId, LoadingProgress.STILL)
-                    updateListsJob = viewModelScope.launch {
-                        delay(300L)
-                        getLists(1)
-                    }
                 }
         }
     }
@@ -231,7 +246,13 @@ class AddToListViewModel @Inject constructor(
                 updateList(event.watchlist, event.favorite)
             }
             is AddToListUiEvent.CreateMode -> {
-                _addToListState.update { it.copy(createEnabled = event.creating) }
+                _addToListState.update {
+                    it.copy(
+                        createEnabled = event.creating,
+                        listName = "",
+                        listDescription = ""
+                    )
+                }
             }
             is AddToListUiEvent.CreateList -> {
                 createList(event.name, event.description, event.public)
@@ -244,6 +265,9 @@ class AddToListViewModel @Inject constructor(
             }
             is AddToListUiEvent.SetListVisibility -> {
                 _addToListState.update { it.copy(publicList = event.public) }
+            }
+            is AddToListUiEvent.GetLists -> {
+                getLists(event.page)
             }
         }
     }

@@ -506,7 +506,7 @@ private fun ListDetailsScreen(
                                 )
                             }
                         }
-                        if (listDetailsState().loading) {
+                        if (listDetailsState().paging) {
                             items(
                                 count = 4
                             ) {

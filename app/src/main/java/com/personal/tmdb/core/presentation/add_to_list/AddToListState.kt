@@ -10,6 +10,7 @@ data class AddToListState(
     val watchlistLoading: Boolean = false,
     val lists: ListsResponseInfo? = null,
     val loadingLists: Boolean = false,
+    val paging: Boolean = false,
     val createEnabled: Boolean = false,
     val listName: String = "",
     val listDescription: String = "",
