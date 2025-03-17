@@ -16,4 +16,5 @@ sealed interface ListDetailsUiEvent {
     data class SetSelectEnabled(val enabled: Boolean): ListDetailsUiEvent
     data class AddSelectedItem(val mediaInfo: MediaInfo): ListDetailsUiEvent
     data class RemoveSelectedItem(val mediaInfo: MediaInfo): ListDetailsUiEvent
+    data class GetListDetails(val listId: Int, val page: Int): ListDetailsUiEvent
 }

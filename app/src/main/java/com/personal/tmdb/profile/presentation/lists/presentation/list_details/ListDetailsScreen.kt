@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Check
@@ -34,7 +35,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +50,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -65,6 +69,7 @@ import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.components.MediaGrid
 import com.personal.tmdb.core.presentation.components.MediaPoster
+import com.personal.tmdb.core.presentation.components.MediaPosterShimmer
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.components.EditList
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.components.ListCreator
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.components.ListDescription
@@ -112,6 +117,12 @@ private fun ListDetailsScreen(
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val errorColor = MaterialTheme.colorScheme.error
+    val lazyGridState = rememberLazyGridState()
+    val showTitle by remember {
+        derivedStateOf {
+            lazyGridState.firstVisibleItemIndex >= 1
+        }
+    }
     BackHandler {
         when {
             listDetailsState().editing -> {
@@ -200,6 +211,14 @@ private fun ListDetailsScreen(
                                 Text(
                                     text = listDetailsState().selectedItems.size.toString(),
                                     fontWeight = FontWeight.Medium
+                                )
+                            }
+                            showTitle -> {
+                                Text(
+                                    text = listDetailsState().listDetails?.name ?: "",
+                                    fontWeight = FontWeight.Medium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
@@ -393,7 +412,18 @@ private fun ListDetailsScreen(
                 listDetailsState().listDetails?.let { listDetails ->
                     MediaGrid(
                         modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
+                        lazyGridState = lazyGridState,
                         contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
+                        loadMoreItems = {
+                            listDetailsState().listDetails?.let { details ->
+                                listDetailsUiEvent(
+                                    ListDetailsUiEvent.GetListDetails(
+                                        listId = listDetailsState().listId,
+                                        page = details.page + 1
+                                    )
+                                )
+                            }
+                        },
                         span = {
                             if (editing) {
                                 item(
@@ -473,6 +503,19 @@ private fun ListDetailsScreen(
                                     mediaType = mediaInfo.mediaType,
                                     showTitle = preferencesState().showTitle,
                                     showVoteAverage = preferencesState().showVoteAverage
+                                )
+                            }
+                        }
+                        if (listDetailsState().loading) {
+                            items(
+                                count = 4
+                            ) {
+                                MediaPosterShimmer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .animateItem(),
+                                    height = Dp.Unspecified,
+                                    showTitle = preferencesState().showTitle,
                                 )
                             }
                         }

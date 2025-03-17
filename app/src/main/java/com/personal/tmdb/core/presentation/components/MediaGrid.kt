@@ -8,6 +8,10 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -17,9 +21,27 @@ fun MediaGrid(
     lazyGridState: LazyGridState = rememberLazyGridState(),
     contentPadding: PaddingValues = PaddingValues(16.dp),
     columns: GridCells = GridCells.Adaptive(100.dp),
+    loadMoreItems: () -> Unit = {},
     span: (LazyGridScope.() -> Unit)? = null,
     items: LazyGridScope.() -> Unit
 ) {
+    val reachingEnd by remember {
+        derivedStateOf {
+            val visibleItems = lazyGridState.layoutInfo.visibleItemsInfo
+            if (visibleItems.isNotEmpty()) {
+                val lastVisibleItemIndex = visibleItems.last().index
+                val totalItemsCount = lazyGridState.layoutInfo.totalItemsCount
+                lastVisibleItemIndex >= totalItemsCount - 10
+            } else {
+                false
+            }
+        }
+    }
+    LaunchedEffect(key1 = reachingEnd) {
+        if (reachingEnd) {
+            loadMoreItems()
+        }
+    }
     LazyVerticalGrid(
         modifier = modifier,
         columns = columns,

@@ -46,7 +46,7 @@ data class ListResult(
     @Json(name = "public")
     val public: Int?,
     @Json(name = "revenue")
-    val revenue: Int?,
+    val revenue: Long?,
     @Json(name = "runtime")
     val runtime: String?,
     @Json(name = "sort_by")

@@ -48,6 +48,11 @@ class ListDetailsViewModel @Inject constructor(
     }
 
     private fun getListDetails(listId: Int, page: Int) {
+        listDetailsState.value.listDetails?.let { details ->
+            if (details.totalPages < page || listDetailsState.value.loading) {
+                return
+            }
+        }
         viewModelScope.launch {
             _listDetailsState.update {
                 it.copy(
@@ -69,14 +74,27 @@ class ListDetailsViewModel @Inject constructor(
                     }
                 }
                 .onSuccess { result ->
-                    _listDetailsState.update {
-                        it.copy(
-                            loading = false,
-                            listDetails = result,
-                            listName = result.name ?: "",
-                            listDescription = result.description ?: "",
-                            publicList = result.public
-                        )
+                    _listDetailsState.update { state ->
+                        val details = state.listDetails
+                        if (details == null || page == 1) {
+                            state.copy(
+                                loading = false,
+                                listDetails = result,
+                                listName = result.name ?: "",
+                                listDescription = result.description ?: "",
+                                publicList = result.public
+                            )
+                        } else {
+                            val mergedResults = details.results.orEmpty() + result.results.orEmpty()
+                            val updatedDetails = details.copy(
+                                results = mergedResults,
+                                page = result.page
+                            )
+                            state.copy(
+                                loading = false,
+                                listDetails = updatedDetails
+                            )
+                        }
                     }
                 }
         }
@@ -88,10 +106,12 @@ class ListDetailsViewModel @Inject constructor(
 
             val sessionId = userRepository.getUser()?.sessionId ?: ""
             val request = UpdateListMediaRequest(
-                items = items.map { MediaRequest(
-                    mediaType = it.mediaType?.name?.lowercase() ?: MediaType.UNKNOWN.name.lowercase(),
-                    mediaId = it.id
-                ) }
+                items = items.map {
+                    MediaRequest(
+                        mediaType = it.mediaType?.name?.lowercase() ?: MediaType.UNKNOWN.name.lowercase(),
+                        mediaId = it.id
+                    )
+                }
             )
 
             userRepository.deleteListItems(listId, sessionId, request)
@@ -104,13 +124,20 @@ class ListDetailsViewModel @Inject constructor(
                     )
                 }
                 .onSuccess {
-                    _listDetailsState.update {
-                        it.copy(
-                            selectedItems = it.selectedItems - items.toSet(),
+                    _listDetailsState.update { state ->
+                        val details = state.listDetails
+                        val updatedItems = details?.results.orEmpty() - items.toSet()
+                        val updatedDetails = details?.copy(
+                            results = updatedItems,
+                            itemCount = details.itemCount - items.size
+                        )
+                        val updatedSelectedItems = state.selectedItems - items.toSet()
+                        state.copy(
+                            listDetails = updatedDetails,
+                            selectedItems = updatedSelectedItems,
                             deleting = false
                         )
                     }
-                    getListDetails(listId = listId, page = 1)
                     SnackbarController.sendEvent(
                         event = SnackbarEvent(
                             message = UiText.StringResource(R.string.deleted_successfully)
@@ -232,6 +259,9 @@ class ListDetailsViewModel @Inject constructor(
                 } else {
                     _listDetailsState.update { it.copy(selectEnabled = false, selectedItems = emptyList()) }
                 }
+            }
+            is ListDetailsUiEvent.GetListDetails -> {
+                getListDetails(event.listId, event.page)
             }
         }
     }

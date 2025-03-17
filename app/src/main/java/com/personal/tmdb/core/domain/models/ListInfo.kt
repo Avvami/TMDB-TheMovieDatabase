@@ -18,7 +18,7 @@ data class ListInfo(
     val numberOfItems: Int,
     val posterPath: String?,
     val public: Boolean,
-    val revenue: Int?,
+    val revenue: Long?,
     val runtime: Int?,
     val sortBy: Int?,
     val updatedAt: LocalDateTime?,

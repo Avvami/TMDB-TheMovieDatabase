@@ -32,7 +32,7 @@ data class ListDetailsDto(
     @Json(name = "results")
     val results: List<Result>,
     @Json(name = "revenue")
-    val revenue: Int?,
+    val revenue: Long?,
     @Json(name = "runtime")
     val runtime: Int?,
     @Json(name = "sort_by")

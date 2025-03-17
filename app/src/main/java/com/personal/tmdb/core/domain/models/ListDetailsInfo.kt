@@ -16,7 +16,7 @@ data class ListDetailsInfo(
     val posterPath: String?,
     val public: Boolean,
     val results: List<MediaInfo>?,
-    val revenue: Int?,
+    val revenue: Long?,
     val runtime: Int?,
     val sortBy: String?,
     val totalPages: Int,
