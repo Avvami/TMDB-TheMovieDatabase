@@ -289,7 +289,8 @@ private fun AddToListScreen(
             contentColor = MaterialTheme.colorScheme.onSurface
         ) { innerPadding ->
             LazyColumn(
-                modifier = modifier.padding(innerPadding)
+                modifier = modifier.padding(innerPadding),
+                state = lazyListState
             ) {
                 if (createEnabled) {
                     item {

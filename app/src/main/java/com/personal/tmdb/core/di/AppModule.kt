@@ -11,6 +11,7 @@ import com.personal.tmdb.core.data.local.AppDatabase
 import com.personal.tmdb.core.data.remote.TmdbApi
 import com.personal.tmdb.core.domain.util.AdditionalNavigationItem
 import com.personal.tmdb.core.domain.util.C
+import com.personal.tmdb.core.domain.util.CustomDns
 import com.personal.tmdb.detail.data.models.RatedAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -19,6 +20,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
@@ -60,12 +62,17 @@ object AppModule {
     @Singleton
     @Provides
     fun provideTmdbApi(): TmdbApi {
+        val okHttpClient = OkHttpClient.Builder()
+            .dns(CustomDns())
+            .build()
+
         val moshi = Moshi.Builder()
             .add(RatedAdapter())
             .add(KotlinJsonAdapterFactory())
             .build()
         return Retrofit.Builder()
             .baseUrl(C.TMDB_BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create(TmdbApi::class.java)

@@ -89,6 +89,7 @@ dependencies {
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.8.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
@@ -119,10 +120,8 @@ dependencies {
     // Zoomable (https://github.com/usuiat/Zoomable)
     implementation("net.engawapg.lib:zoomable:1.6.2")
 
-    // Blur (https://chrisbanes.github.io/haze)
-    implementation("dev.chrisbanes.haze:haze:0.9.0-beta01")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+    // Dns-over-https
+    implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:4.12.0")
 }
 
 kapt {
