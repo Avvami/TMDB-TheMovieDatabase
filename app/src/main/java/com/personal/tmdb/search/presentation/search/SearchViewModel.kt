@@ -1,120 +1,159 @@
 package com.personal.tmdb.search.presentation.search
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.TimeWindow
 import com.personal.tmdb.core.domain.util.onError
 import com.personal.tmdb.core.domain.util.onSuccess
 import com.personal.tmdb.core.domain.util.toUiText
-import com.personal.tmdb.core.presentation.MediaState
 import com.personal.tmdb.search.domain.repository.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchRepository: SearchRepository
+    private val searchRepository: SearchRepository,
+    private val preferencesRepository: PreferencesRepository
 ): ViewModel() {
 
-    var searchQuery by mutableStateOf("")
-        private set
-
-    var searchType by mutableStateOf(MediaType.MULTI.name.lowercase())
-        private set
-
-    var searchState by mutableStateOf(MediaState())
-        private set
-
-    var trendingState by mutableStateOf(MediaState())
-        private set
-
-    var popularState by mutableStateOf(MediaState())
-        private set
+    private val _searchState = MutableStateFlow(SearchState())
+    val searchState = _searchState.asStateFlow()
 
     private var searchJob: Job? = null
 
     init {
-        searchFor(searchType = searchType, query = searchQuery, page = 1)
         getTrendingList()
-        getPopularPeopleList(mediaType = MediaType.PERSON.name.lowercase())
+        getPopularPeopleList()
     }
 
-    private fun searchFor(searchType: String, query: String, page: Int) {
+    private fun searchFor(searchType: MediaType, query: String, page: Int) {
+        searchState.value.searchResults?.let { results ->
+            if (results.totalPages < page || results.paging) return
+            if (results.page != page) {
+                _searchState.update { state ->
+                    state.copy(searchResults = state.searchResults?.copy(paging = true))
+                }
+            }
+        }
         if (query.isBlank()) {
-            searchState = MediaState()
+            _searchState.update { it.copy(searchResults = null) }
         } else {
             viewModelScope.launch {
-                searchState = searchState.copy(
-                    loading = true,
-                    errorMessage = null
-                )
+                _searchState.update {
+                    it.copy(
+                        searching = page == 1,
+                        errorMessage = null
+                    )
+                }
 
-                searchRepository.searchFor(searchType = searchType, query = query.trim(), includeAdult = false, page = page)
-                    .onError { error ->
-                        searchState = searchState.copy(
-                            loading = false,
+                val language = preferencesRepository.getLanguage()
+
+                searchRepository.searchFor(
+                    searchType = searchType.name.lowercase(),
+                    query = query.trim(),
+                    includeAdult = false,
+                    language = language,
+                    page = page
+                ).onError { error ->
+                    _searchState.update { state ->
+                        state.copy(
+                            searching = false,
+                            searchResults = state.searchResults?.copy(paging = false),
                             errorMessage = error.toUiText()
                         )
                     }
-                    .onSuccess { result ->
-                        searchState = searchState.copy(
-                            mediaResponseInfo = result,
-                            loading = false
-                        )
+                }.onSuccess { result ->
+                    _searchState.update { state ->
+                        val searchResults = state.searchResults
+                        if (searchResults == null || page == 1) {
+                            state.copy(
+                                searchResults = result,
+                                searching = false
+                            )
+                        } else {
+                            val mergedResults = searchResults.results + result.results
+                            val updatedSearchResults = searchResults.copy(
+                                results = mergedResults,
+                                page = result.page,
+                                paging = false
+                            )
+                            state.copy(
+                                searchResults = updatedSearchResults,
+                                searching = false
+                            )
+                        }
                     }
+                }
             }
         }
     }
 
-    private fun getTrendingList(language: String? = null) {
+    private fun getTrendingList() {
         viewModelScope.launch {
-            trendingState = trendingState.copy(
-                loading = true,
-                errorMessage = null
-            )
+            _searchState.update {
+                it.copy(
+                    loading = true,
+                    errorMessage = null
+                )
+            }
+
+            val language = preferencesRepository.getLanguage()
 
             searchRepository.getTrendingList(TimeWindow.WEEK, language)
                 .onError { error ->
-                    trendingState = trendingState.copy(
-                        loading = false,
-                        errorMessage = error.toUiText()
-                    )
+                    _searchState.update {
+                        it.copy(
+                            loading = false,
+                            errorMessage = error.toUiText()
+                        )
+                    }
                 }
                 .onSuccess { result ->
-                    trendingState = trendingState.copy(
-                        mediaResponseInfo = result,
-                        loading = false
-                    )
+                    _searchState.update {
+                        it.copy(
+                            trending = result,
+                            loading = false
+                        )
+                    }
                 }
         }
     }
 
-    private fun getPopularPeopleList(mediaType: String, language: String? = null) {
+    private fun getPopularPeopleList() {
         viewModelScope.launch {
-            popularState = popularState.copy(
-                loading = true,
-                errorMessage = null
-            )
+            _searchState.update {
+                it.copy(
+                    loading = true,
+                    errorMessage = null
+                )
+            }
 
-            searchRepository.getPopularPeopleList(mediaType, language)
+            val language = preferencesRepository.getLanguage()
+
+            searchRepository.getPopularPeopleList(MediaType.PERSON.name.lowercase(), language)
                 .onError { error ->
-                    popularState = popularState.copy(
-                        loading = false,
-                        errorMessage = error.toUiText()
-                    )
+                    _searchState.update {
+                        it.copy(
+                            loading = false,
+                            errorMessage = error.toUiText()
+                        )
+                    }
                 }
                 .onSuccess { result ->
-                    popularState = popularState.copy(
-                        mediaResponseInfo = result,
-                        loading = false
-                    )
+                    _searchState.update {
+                        it.copy(
+                            popularPeople = result,
+                            loading = false
+                        )
+                    }
                 }
         }
     }
@@ -122,21 +161,27 @@ class SearchViewModel @Inject constructor(
     fun searchUiEvent(event: SearchUiEvent) {
         when (event) {
             is SearchUiEvent.OnSearchQueryChange -> {
-                searchQuery = event.query
+                _searchState.update { it.copy(searchQuery = event.query) }
                 searchJob?.cancel()
                 searchJob = viewModelScope.launch {
                     delay(500L)
-                    searchFor(searchType, searchQuery, 1)
+                    searchFor(searchState.value.searchType, event.query, 1)
                 }
             }
             is SearchUiEvent.SetSearchType -> {
-                searchType = event.searchType
+                _searchState.update { it.copy(searchType = event.searchType) }
                 searchJob?.cancel()
                 searchJob = viewModelScope.launch {
-                    searchFor(searchType, searchQuery, 1)
+                    searchFor(event.searchType, searchState.value.searchQuery, 1)
                 }
             }
-            is SearchUiEvent.OnNavigateTo -> {}
+            is SearchUiEvent.SearchFor -> {
+                searchJob?.cancel()
+                searchJob = viewModelScope.launch {
+                    searchFor(event.searchType, event.query, event.page)
+                }
+            }
+            is SearchUiEvent.OnNavigateTo -> Unit
         }
     }
 }

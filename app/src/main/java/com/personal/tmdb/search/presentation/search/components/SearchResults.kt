@@ -19,31 +19,40 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.personal.tmdb.R
-import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.negativeHorizontalPadding
-import com.personal.tmdb.core.presentation.MediaState
 import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.components.MediaGrid
 import com.personal.tmdb.core.presentation.components.MediaPoster
 import com.personal.tmdb.core.presentation.components.MediaPosterShimmer
+import com.personal.tmdb.search.presentation.search.SearchState
 import com.personal.tmdb.search.presentation.search.SearchUiEvent
 
 @Composable
 fun SearchResults(
     lazyGridState: LazyGridState,
-    searchState: () -> MediaState,
-    mediaType: () -> MediaType,
+    searchState: () -> SearchState,
     preferencesState: () -> PreferencesState,
     searchUiEvent: (SearchUiEvent) -> Unit
 ) {
     MediaGrid(
         lazyGridState = lazyGridState,
         contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp),
+        loadMoreItems = {
+            searchState().searchResults?.let { results ->
+                searchUiEvent(
+                    SearchUiEvent.SearchFor(
+                        searchType = searchState().searchType,
+                        query = searchState().searchQuery,
+                        page = results.page + 1
+                    )
+                )
+            }
+        },
         span = {
             item(
                 span = { GridItemSpan(maxLineSpan) }
             ) {
-                if (searchState().loading && searchState().mediaResponseInfo == null) {
+                if (searchState().searching && searchState().searchResults == null) {
                     SearchFilterChipsShimmer(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
@@ -54,15 +63,15 @@ fun SearchResults(
                             .padding(bottom = 8.dp)
                             .horizontalScroll(rememberScrollState())
                             .padding(horizontal = 16.dp),
-                        mediaType = mediaType,
+                        mediaType = searchState()::searchType,
                         searchUiEvent = searchUiEvent
                     )
                 }
             }
         },
         items = {
-            if (searchState().loading) {
-                items(count = 15) {
+            if (searchState().searching) {
+                items(count = 20) {
                     MediaPosterShimmer(
                         modifier = Modifier.fillMaxWidth(),
                         height = Dp.Unspecified,
@@ -70,7 +79,7 @@ fun SearchResults(
                     )
                 }
             } else {
-                searchState().mediaResponseInfo?.results?.let { results ->
+                searchState().searchResults?.results?.let { results ->
                     if (results.isEmpty()) {
                         item(
                             span = { GridItemSpan(maxLineSpan) }
@@ -106,10 +115,23 @@ fun SearchResults(
                                 onNavigateTo = { searchUiEvent(SearchUiEvent.OnNavigateTo(it)) },
                                 height = Dp.Unspecified,
                                 mediaInfo = mediaInfo,
-                                mediaType = mediaInfo.mediaType ?: mediaType(),
+                                mediaType = mediaInfo.mediaType ?: searchState().searchType,
                                 showTitle = preferencesState().showTitle,
                                 showVoteAverage = preferencesState().showVoteAverage
                             )
+                        }
+                        if (searchState().searchResults?.paging == true) {
+                            items(
+                                count = 4
+                            ) {
+                                MediaPosterShimmer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .animateItem(),
+                                    height = Dp.Unspecified,
+                                    showTitle = preferencesState().showTitle,
+                                )
+                            }
                         }
                     }
                 }

@@ -19,23 +19,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import com.personal.tmdb.R
-import com.personal.tmdb.core.navigation.Route
-import com.personal.tmdb.core.presentation.MediaState
-import com.personal.tmdb.core.presentation.components.CustomListItem
+import com.personal.tmdb.core.domain.models.MediaResponseInfo
 import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.shimmerEffect
+import com.personal.tmdb.core.navigation.Route
+import com.personal.tmdb.core.presentation.components.CustomListItem
 import com.personal.tmdb.search.presentation.search.SearchUiEvent
 
 @Composable
 fun SearchTrending(
     modifier: Modifier = Modifier,
-    trendingState: () -> MediaState,
+    trending: () -> MediaResponseInfo?,
     searchUiEvent: (SearchUiEvent) -> Unit
 ) {
-    if (trendingState().loading) {
+    if (trending() == null) {
         SearchTrendingShimmer(modifier)
     } else {
-        trendingState().mediaResponseInfo?.results?.take(10)?.let { mediaInfoList ->
+        trending()?.results?.take(10)?.let { mediaInfoList ->
             Column(
                 modifier = modifier,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -84,7 +84,7 @@ fun SearchTrending(
                                                 )
                                             }
                                             else -> {
-                                                /*TODO: Navigate to lost your way screen*/
+                                                searchUiEvent(SearchUiEvent.OnNavigateTo(Route.Lost))
                                             }
                                         }
                                     }

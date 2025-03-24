@@ -37,7 +37,7 @@ fun SearchFilterChips(
         ) {
             FilterChip(
                 selected = mediaType() == MediaType.MULTI,
-                onClick = { searchUiEvent(SearchUiEvent.SetSearchType(MediaType.MULTI.name.lowercase())) },
+                onClick = { searchUiEvent(SearchUiEvent.SetSearchType(MediaType.MULTI)) },
                 label = { Text(text = stringResource(id = R.string.all)) },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -49,7 +49,7 @@ fun SearchFilterChips(
             )
             FilterChip(
                 selected = mediaType() == MediaType.TV,
-                onClick = { searchUiEvent(SearchUiEvent.SetSearchType(MediaType.TV.name.lowercase())) },
+                onClick = { searchUiEvent(SearchUiEvent.SetSearchType(MediaType.TV)) },
                 label = { Text(text = stringResource(id = R.string.tv_shows)) },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -61,7 +61,7 @@ fun SearchFilterChips(
             )
             FilterChip(
                 selected = mediaType() == MediaType.MOVIE,
-                onClick = { searchUiEvent(SearchUiEvent.SetSearchType(MediaType.MOVIE.name.lowercase())) },
+                onClick = { searchUiEvent(SearchUiEvent.SetSearchType(MediaType.MOVIE)) },
                 label = { Text(text = stringResource(id = R.string.movies)) },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -73,7 +73,7 @@ fun SearchFilterChips(
             )
             FilterChip(
                 selected = mediaType() == MediaType.PERSON,
-                onClick = { searchUiEvent(SearchUiEvent.SetSearchType(MediaType.PERSON.name.lowercase())) },
+                onClick = { searchUiEvent(SearchUiEvent.SetSearchType(MediaType.PERSON)) },
                 label = { Text(text = stringResource(id = R.string.people)) },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,

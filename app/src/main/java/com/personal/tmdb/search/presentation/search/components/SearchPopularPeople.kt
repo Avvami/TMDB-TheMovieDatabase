@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.personal.tmdb.R
+import com.personal.tmdb.core.domain.models.MediaResponseInfo
 import com.personal.tmdb.core.domain.util.MediaType
-import com.personal.tmdb.core.presentation.MediaState
 import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.components.MediaCarousel
 import com.personal.tmdb.core.presentation.components.MediaPoster
@@ -17,7 +17,7 @@ import com.personal.tmdb.search.presentation.search.SearchUiEvent
 @Composable
 fun SearchPopularPeople(
     modifier: Modifier = Modifier,
-    popularState: () -> MediaState,
+    popularPeople: () -> MediaResponseInfo?,
     preferencesState: () -> PreferencesState,
     searchUiEvent: (SearchUiEvent) -> Unit
 ) {
@@ -27,14 +27,14 @@ fun SearchPopularPeople(
             Text(text = stringResource(id = R.string.popular_people))
         },
         items = {
-            if (popularState().loading) {
-                items(15) {
+            if (popularPeople() == null) {
+                items(20) {
                     MediaPosterShimmer(showTitle = preferencesState().showTitle)
                 }
             } else {
-                popularState().mediaResponseInfo?.results?.let { popular ->
+                popularPeople()?.results?.let { people ->
                     items(
-                        items = popular,
+                        items = people,
                         key = { it.id }
                     ) { mediaInfo ->
                         MediaPoster(
