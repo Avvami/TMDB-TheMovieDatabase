@@ -75,7 +75,6 @@ fun CollectionScreenShimmer(
                             minLines = 4
                         )
                         Row(
-                            modifier = modifier,
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
