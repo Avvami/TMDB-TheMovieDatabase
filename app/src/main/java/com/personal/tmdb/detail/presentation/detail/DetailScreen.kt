@@ -61,6 +61,7 @@ import com.personal.tmdb.detail.presentation.detail.components.DetailOverview
 import com.personal.tmdb.detail.presentation.detail.components.DetailReview
 import com.personal.tmdb.detail.presentation.detail.components.DetailScreenShimmer
 import com.personal.tmdb.detail.presentation.detail.components.DetailTitle
+import com.personal.tmdb.detail.presentation.detail.components.RatingBottomSheet
 
 @Composable
 fun DetailScreenRoot(
@@ -378,5 +379,12 @@ private fun DetailScreen(
                 }
             }
         }
+    }
+    if (detailState().showRatingSheet) {
+        RatingBottomSheet(
+            detailState = detailState,
+            onDismissRequest = { detailUiEvent(DetailUiEvent.ShowRatingSheet(false)) },
+            detailUiEvent = detailUiEvent
+        )
     }
 }

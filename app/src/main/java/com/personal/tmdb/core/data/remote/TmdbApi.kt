@@ -24,6 +24,7 @@ import com.personal.tmdb.detail.data.models.Genres
 import com.personal.tmdb.detail.data.models.Images
 import com.personal.tmdb.detail.data.models.MediaDetailDto
 import com.personal.tmdb.detail.data.models.PersonDto
+import com.personal.tmdb.detail.data.models.Rated
 import com.personal.tmdb.detail.data.models.Reviews
 import com.personal.tmdb.detail.data.models.SeasonDto
 import retrofit2.http.Body
@@ -299,5 +300,22 @@ interface TmdbApi {
     @HTTP(method = "DELETE", path = "4/auth/access_token", hasBody = true)
     suspend fun removeSessionId(
         @Body request: LogoutRequestBody
+    )
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @POST("3/{media_type}/{media_id}}/rating?")
+    suspend fun addRating(
+        @Path("media_type") mediaType: String,
+        @Path("media_id") mediaId: Int,
+        @Query("session_id") sessionId: String,
+        @Body request: Rated
+    )
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @DELETE("3/{media_type}/{media_id}}/rating?")
+    suspend fun removeRating(
+        @Path("media_type") mediaType: String,
+        @Path("media_id") mediaId: Int,
+        @Query("session_id") sessionId: String
     )
 }

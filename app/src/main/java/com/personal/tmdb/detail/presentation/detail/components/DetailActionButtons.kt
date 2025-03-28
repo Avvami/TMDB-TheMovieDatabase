@@ -58,7 +58,7 @@ fun DetailActionButtons(
         ) {
             if (!userState().user?.sessionId.isNullOrEmpty()) {
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { detailUiEvent(DetailUiEvent.ShowRatingSheet(true)) },
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -66,9 +66,9 @@ fun DetailActionButtons(
                     ),
                     shape = MaterialTheme.shapes.small
                 ) {
-                    when (val ratedState = detailState().accountState?.rated) {
+                    when (val rated = detailState().accountState?.rated) {
                         is Rated.Value -> {
-                            when (ratedState.value) {
+                            when (rated.value) {
                                 in 1..4 -> {
                                     Icon(
                                         modifier = Modifier.size(ButtonDefaults.IconSize),
@@ -95,7 +95,7 @@ fun DetailActionButtons(
                                 }
                             }
                             Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
-                            Text(text = ratedState.value.toString())
+                            Text(text = rated.value.toString())
                         }
                         else -> {
                             Icon(

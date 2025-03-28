@@ -12,4 +12,6 @@ sealed interface DetailUiEvent {
     data object ChangeAvailableDialogState: DetailUiEvent
     data class ShowMoreDetails(val state: Boolean): DetailUiEvent
     data class GetAccountState(val mediaType: MediaType, val mediaId: Int): DetailUiEvent
+    data class SetRating(val mediaType: MediaType, val mediaId: Int, val rating: Int): DetailUiEvent
+    data class ShowRatingSheet(val state: Boolean): DetailUiEvent
 }

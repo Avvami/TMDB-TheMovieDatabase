@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -34,6 +35,9 @@ fun SearchResults(
     preferencesState: () -> PreferencesState,
     searchUiEvent: (SearchUiEvent) -> Unit
 ) {
+    LaunchedEffect(searchState().searching) {
+        if (searchState().searching) lazyGridState.animateScrollToItem(0)
+    }
     MediaGrid(
         lazyGridState = lazyGridState,
         contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp),
@@ -105,7 +109,7 @@ fun SearchResults(
                     } else {
                         items(
                             items = results,
-                            key = { it.id },
+                            key = { it.uuid },
                             contentType = { "Poster" }
                         ) { mediaInfo ->
                             MediaPoster(

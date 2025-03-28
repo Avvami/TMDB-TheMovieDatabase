@@ -15,5 +15,7 @@ data class DetailState(
     val watchCountry: String = "",
     val showMoreDetails: Boolean = false,
     val loading: Boolean = false,
+    val rating: Boolean = false,
+    val showRatingSheet: Boolean = false,
     val errorMessage: UiText? = null
 )

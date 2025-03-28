@@ -10,12 +10,15 @@ import androidx.navigation.toRoute
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.MediaType
+import com.personal.tmdb.core.domain.util.SnackbarController
+import com.personal.tmdb.core.domain.util.SnackbarEvent
 import com.personal.tmdb.core.domain.util.appendToResponse
 import com.personal.tmdb.core.domain.util.convertMediaType
 import com.personal.tmdb.core.domain.util.onError
 import com.personal.tmdb.core.domain.util.onSuccess
 import com.personal.tmdb.core.domain.util.toUiText
 import com.personal.tmdb.core.navigation.Route
+import com.personal.tmdb.detail.data.models.Rated
 import com.personal.tmdb.detail.domain.repository.DetailRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -150,6 +153,63 @@ class DetailViewModel @Inject constructor(
         }
     }
 
+    private fun addRating(mediaType: MediaType, mediaId: Int, rating: Int) {
+        viewModelScope.launch {
+            _detailState.update { it.copy(rating = true) }
+            val sessionId = userRepository.getUser()?.sessionId
+
+            userRepository.addRating(
+                mediaType = mediaType.name.lowercase(),
+                mediaId = mediaId,
+                sessionId = sessionId ?: "",
+                ratingRequest = Rated.Value(rating)
+            ).onError { error ->
+                SnackbarController.sendEvent(
+                    event = SnackbarEvent(message = error.toUiText())
+                )
+                _detailState.update { it.copy(rating = false) }
+            }.onSuccess {
+                _detailState.update { state ->
+                    val updatedAccountState = state.accountState?.copy(
+                        rated = Rated.Value(rating)
+                    )
+                    state.copy(
+                        rating = false,
+                        accountState = updatedAccountState
+                    )
+                }
+            }
+        }
+    }
+
+    private fun removeRating(mediaType: MediaType, mediaId: Int) {
+        viewModelScope.launch {
+            _detailState.update { it.copy(rating = true) }
+            val sessionId = userRepository.getUser()?.sessionId
+
+            userRepository.removeRating(
+                mediaType = mediaType.name.lowercase(),
+                mediaId = mediaId,
+                sessionId = sessionId ?: ""
+            ).onError { error ->
+                SnackbarController.sendEvent(
+                    event = SnackbarEvent(message = error.toUiText())
+                )
+                _detailState.update { it.copy(rating = false) }
+            }.onSuccess {
+                _detailState.update { state ->
+                    val updatedAccountState = state.accountState?.copy(
+                        rated = Rated.NotRated
+                    )
+                    state.copy(
+                        rating = false,
+                        accountState = updatedAccountState
+                    )
+                }
+            }
+        }
+    }
+
     fun detailUiEvent(event: DetailUiEvent) {
         when (event) {
             DetailUiEvent.OnNavigateBack -> Unit
@@ -182,6 +242,16 @@ class DetailViewModel @Inject constructor(
                     mediaType = event.mediaType,
                     mediaId = event.mediaId
                 )
+            }
+            is DetailUiEvent.SetRating -> {
+                if (event.rating == 0) {
+                    removeRating(event.mediaType, event.mediaId)
+                } else {
+                    addRating(event.mediaType, event.mediaId, event.rating)
+                }
+            }
+            is DetailUiEvent.ShowRatingSheet -> {
+                _detailState.update { it.copy(showRatingSheet = event.state) }
             }
         }
     }

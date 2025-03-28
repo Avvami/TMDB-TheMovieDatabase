@@ -20,6 +20,7 @@ import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.EmptyResult
 import com.personal.tmdb.core.domain.util.Result
+import com.personal.tmdb.detail.data.models.Rated
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -170,6 +171,27 @@ class UserRepositoryImpl @Inject constructor(
     ): EmptyResult<DataError.Remote> {
         return safeApiCall {
             tmdbApi.updateFavoriteItem(accountId, sessionId, mediaRequest)
+        }
+    }
+
+    override suspend fun addRating(
+        mediaType: String,
+        mediaId: Int,
+        sessionId: String,
+        ratingRequest: Rated
+    ): EmptyResult<DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.addRating(mediaType, mediaId, sessionId, ratingRequest)
+        }
+    }
+
+    override suspend fun removeRating(
+        mediaType: String,
+        mediaId: Int,
+        sessionId: String
+    ): EmptyResult<DataError.Remote> {
+        return safeApiCall {
+            tmdbApi.removeRating(mediaType, mediaId, sessionId)
         }
     }
 }

@@ -11,6 +11,7 @@ import com.personal.tmdb.core.domain.models.User
 import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.EmptyResult
 import com.personal.tmdb.core.domain.util.Result
+import com.personal.tmdb.detail.data.models.Rated
 
 interface UserRepository {
 
@@ -61,4 +62,8 @@ interface UserRepository {
     ): Result<MediaResponseInfo, DataError.Remote>
 
     suspend fun updateFavoriteItem(accountId: Int, sessionId: String, mediaRequest: MediaRequest): EmptyResult<DataError.Remote>
+
+    suspend fun addRating(mediaType: String, mediaId: Int, sessionId: String, ratingRequest: Rated): EmptyResult<DataError.Remote>
+
+    suspend fun removeRating(mediaType: String, mediaId: Int, sessionId: String): EmptyResult<DataError.Remote>
 }

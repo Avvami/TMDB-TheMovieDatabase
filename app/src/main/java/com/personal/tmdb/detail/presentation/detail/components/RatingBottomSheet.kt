@@ -72,7 +72,7 @@ fun RatingBottomSheet(
     onDismissRequest: () -> Unit,
     detailUiEvent: (DetailUiEvent) -> Unit
 ) {
-    val rated = detailState().details?.accountStates?.rated
+    val rated = detailState().accountState?.rated
     val pagerState = rememberPagerState(
         pageCount = { 11 },
         initialPage = when (rated) {
