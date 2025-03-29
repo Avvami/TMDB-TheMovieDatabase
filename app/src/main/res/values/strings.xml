@@ -218,4 +218,6 @@
     <string name="remove_rating">Remove rating</string>
     <string name="change_rating">Change rating</string>
     <string name="share">Share</string>
+    <string name="empty_languages">Sorry, no languages to choose from</string>
+    <string name="language_note">Note: Changing the language setting will affect the language used in API requests but will not change the app\'s interface language.</string>
 </resources>

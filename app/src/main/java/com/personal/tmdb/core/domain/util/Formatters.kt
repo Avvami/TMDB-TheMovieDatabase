@@ -13,6 +13,7 @@ import com.personal.tmdb.R
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import java.util.NavigableMap
 import java.util.TreeMap
 
@@ -147,4 +148,10 @@ fun formatNumberOfItems(numberOfItems: Int): String {
 
 fun formatListVisibility(isPublic: Boolean): UiText {
     return if (isPublic) UiText.StringResource(R.string.list_public) else UiText.StringResource(R.string.list_private)
+}
+
+fun capitalizeFirstLetter(input: String): String {
+    return input.replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+    }
 }

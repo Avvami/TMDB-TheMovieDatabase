@@ -41,6 +41,7 @@ import com.personal.tmdb.profile.presentation.profile.ProfileScreenRoot
 import com.personal.tmdb.profile.presentation.watchlist.WatchlistScreenRoot
 import com.personal.tmdb.search.presentation.search.SearchScreenRoot
 import com.personal.tmdb.settings.presentation.appearance.AppearanceScreenRoot
+import com.personal.tmdb.settings.presentation.languages.LanguagesScreenRoot
 import com.personal.tmdb.settings.presentation.settings.SettingsScreenRoot
 import kotlinx.coroutines.launch
 
@@ -398,7 +399,12 @@ fun ChildNavHost(
                 userState = userState
             )
         }
-        animatedComposable<Route.Language> {}
+        animatedComposable<Route.Language> {
+            LanguagesScreenRoot(
+                bottomPadding = bottomBarPadding,
+                onNavigateBack = onNavigateBack
+            )
+        }
         animatedComposable<Route.Lost> {}
         animatedComposable<Route.ListDetails> {
             ListDetailsScreenRoot(

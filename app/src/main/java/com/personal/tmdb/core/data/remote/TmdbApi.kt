@@ -318,4 +318,10 @@ interface TmdbApi {
         @Path("media_id") mediaId: Int,
         @Query("session_id") sessionId: String
     )
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @GET("3/configuration/primary_translations")
+    suspend fun getPrimaryTranslations(): List<LanguageCode>
 }
+
+typealias LanguageCode = String

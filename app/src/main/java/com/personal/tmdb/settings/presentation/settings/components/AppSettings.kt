@@ -16,10 +16,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.personal.tmdb.R
+import com.personal.tmdb.core.domain.util.capitalizeFirstLetter
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.components.CustomListItem
 import com.personal.tmdb.settings.presentation.settings.SettingsUiEvent
+import java.util.Locale
 
 @Composable
 fun AppSettings(
@@ -70,7 +72,7 @@ fun AppSettings(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = stringResource(id = R.string.language))
+                    Text(text = capitalizeFirstLetter(Locale(preferencesState().language).displayName))
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                         contentDescription = null
