@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import coil3.ImageLoader
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.request.ImageRequest
 import com.personal.tmdb.core.data.local.AppDatabase
 import com.personal.tmdb.core.data.remote.TmdbApi
 import com.personal.tmdb.core.domain.util.AdditionalNavigationItem
@@ -81,4 +84,17 @@ object AppModule {
     @Singleton
     @Provides
     fun provideSharedPreferences(@ApplicationContext appContext: Context): SharedPreferences = appContext.getSharedPreferences("localCache", Context.MODE_PRIVATE)
+
+    @Singleton
+    @Provides
+    fun provideImageRequestBuilder(@ApplicationContext appContext: Context): ImageRequest.Builder = ImageRequest.Builder(appContext)
+
+    @Singleton
+    @Provides
+    fun provideImageLoaderBuilder(@ApplicationContext appContext: Context): ImageLoader.Builder {
+        val okHttpClient = OkHttpClient.Builder()
+            .dns(CustomDns())
+            .build()
+        return ImageLoader.Builder(appContext).components { add(OkHttpNetworkFetcherFactory(callFactory = okHttpClient)) }
+    }
 }

@@ -137,7 +137,7 @@ class DominantColorState(
 }
 
 @Immutable
-private data class DominantColors(val color: Color, val onColor: Color)
+data class DominantColors(val color: Color, val onColor: Color)
 
 /**
  * Fetches the given [imageUrl] with [Coil], then uses [Palette] to calculate the dominant color.

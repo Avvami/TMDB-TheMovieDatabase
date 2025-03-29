@@ -1,6 +1,7 @@
 package com.personal.tmdb.profile.presentation.profile.components
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RadialGradientShader
 import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
@@ -50,12 +52,11 @@ import coil3.compose.AsyncImage
 import com.personal.tmdb.MainActivity
 import com.personal.tmdb.R
 import com.personal.tmdb.UserState
-import com.personal.tmdb.core.presentation.components.AutoResizedText
 import com.personal.tmdb.core.domain.util.C
 import com.personal.tmdb.core.domain.util.findActivity
+import com.personal.tmdb.core.presentation.components.AutoResizedText
 import com.personal.tmdb.profile.presentation.profile.ProfileUiEvent
 import com.personal.tmdb.ui.theme.surfaceLight
-import com.personal.tmdb.ui.theme.surfaceVariantLight
 import com.personal.tmdb.ui.theme.tmdbRadialDarkPurple
 import com.personal.tmdb.ui.theme.tmdbRed
 
@@ -72,7 +73,6 @@ fun ProfileBox(
     ) { userSignedIn ->
         if (userSignedIn) {
             SignedInUser(
-                modifier = Modifier.padding(16.dp),
                 userState = userState
             )
         } else {
@@ -89,8 +89,28 @@ fun SignedInUser(
     modifier: Modifier = Modifier,
     userState: () -> UserState
 ) {
+    val animatedGradientColor by animateColorAsState(
+        targetValue = userState().dominantColor?.color ?: MaterialTheme.colorScheme.secondary,
+        label = "Animated gradient color"
+    )
+    val radialGradient by remember(animatedGradientColor) {
+        mutableStateOf(
+            object : ShaderBrush() {
+                override fun createShader(size: Size): Shader {
+                    val biggerDimension = maxOf(size.height, size.width)
+                    return RadialGradientShader(
+                        colors = listOf(animatedGradientColor.copy(alpha = .3f), Color.Transparent),
+                        center = Offset.Zero,
+                        radius = biggerDimension
+                    )
+                }
+            }
+        )
+    }
     Row(
-        modifier = modifier,
+        modifier = modifier
+            .background(radialGradient)
+            .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -117,7 +137,7 @@ fun SignedInUser(
                     text = userState().user?.username ?: "",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
-                    color = surfaceLight
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             } else {
                 Text(
@@ -126,14 +146,14 @@ fun SignedInUser(
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = surfaceLight
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = userState().user?.username ?: "",
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = surfaceVariantLight
+                    color = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
         }

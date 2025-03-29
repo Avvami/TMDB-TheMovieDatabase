@@ -1,6 +1,7 @@
 package com.personal.tmdb.core.presentation.welcome_back
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,22 +67,28 @@ private fun WelcomeBackScreen(
     onNavigateBack: () -> Unit = {},
     userState: () -> UserState = { UserState(user = User(name = "John Doe")) }
 ) {
+    val animatedGradientColor by animateColorAsState(
+        targetValue = userState().dominantColor?.color ?: MaterialTheme.colorScheme.secondary,
+        label = "Animated gradient color"
+    )
     AnimatedContent(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        animatedGradientColor.copy(alpha = .3f),
+                        Color.Transparent
+                    )
+                )
+            ),
         targetState = userState().loading,
         label = ""
     ) { loading ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = .3f),
-                            Color.Transparent
-                        )
-                    )
-                )
                 .padding(16.dp)
                 .safeDrawingPadding(),
             contentAlignment = Alignment.Center
@@ -238,8 +246,8 @@ private fun WelcomeBackScreen(
                             Button(
                                 onClick = { onNavigateBack() },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.surface
+                                    containerColor = animatedGradientColor,
+                                    contentColor = userState().dominantColor?.onColor ?: MaterialTheme.colorScheme.surface
                                 ),
                                 contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
                             ) {

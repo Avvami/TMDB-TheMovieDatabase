@@ -11,6 +11,7 @@ import com.personal.tmdb.auth.data.models.RequestTokenBody
 import com.personal.tmdb.auth.domain.repository.AuthRepository
 import com.personal.tmdb.core.domain.models.LogoutRequestBody
 import com.personal.tmdb.core.domain.models.User
+import com.personal.tmdb.core.domain.repository.DominantColorRepository
 import com.personal.tmdb.core.domain.repository.LocalCache
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.repository.UserRepository
@@ -37,7 +38,8 @@ class MainViewModel @Inject constructor(
     private val preferencesRepository: PreferencesRepository,
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
-    private val localCache: LocalCache
+    private val localCache: LocalCache,
+    private val dominantColorRepository: DominantColorRepository
 ): ViewModel() {
 
     var holdSplash by mutableStateOf(true)
@@ -188,6 +190,13 @@ class MainViewModel @Inject constructor(
                     _userState.value.user?.let { userRepository.saveUser(it) }
                 }
                 .onSuccess { result ->
+                    val dominantColors = dominantColorRepository.calculateDominantColor(
+                        imageUrl = if (result.tmdbAvatarPath == null) {
+                            C.GRAVATAR_IMAGES_BASE_URL.format(result.gravatarAvatarPath)
+                        } else {
+                            C.TMDB_IMAGES_BASE_URL + C.PROFILE_W185 + result.tmdbAvatarPath
+                        }
+                    )
                     _userState.update { state ->
                         val user = state.user?.copy(
                             accountId = result.accountId,
@@ -202,6 +211,7 @@ class MainViewModel @Inject constructor(
                         user?.let { userRepository.saveUser(it) }
                         state.copy(
                             loading = false,
+                            dominantColor = dominantColors,
                             user = user
                         )
                     }
