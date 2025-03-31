@@ -159,6 +159,16 @@ private fun ListDetailsScreen(
             listDetailsUiEvent(ListDetailsUiEvent.SetSelectEnabled(false))
         }
     }
+    LaunchedEffect(true) {
+        if (!lazyGridState.canScrollBackward) {
+            listDetailsUiEvent(
+                ListDetailsUiEvent.GetListDetails(
+                    listId = listDetailsState().listId,
+                    page = 1
+                )
+            )
+        }
+    }
     if (listDetailsState().deletingList) {
         Dialog(
             properties = DialogProperties(

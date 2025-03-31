@@ -28,7 +28,7 @@ fun MediaGrid(
     val reachingEnd by remember {
         derivedStateOf {
             val visibleItems = lazyGridState.layoutInfo.visibleItemsInfo
-            if (visibleItems.isNotEmpty() && lazyGridState.isScrollInProgress) {
+            if (visibleItems.isNotEmpty()) {
                 val lastVisibleItemIndex = visibleItems.last().index
                 val totalItemsCount = lazyGridState.layoutInfo.totalItemsCount
                 lastVisibleItemIndex >= totalItemsCount - 10

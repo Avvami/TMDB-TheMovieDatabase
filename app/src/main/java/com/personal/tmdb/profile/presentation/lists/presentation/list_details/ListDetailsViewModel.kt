@@ -40,13 +40,6 @@ class ListDetailsViewModel @Inject constructor(
     private val _listDetailsState = MutableStateFlow(ListDetailsState(listId = routeData.listId))
     val listDetailsState = _listDetailsState.asStateFlow()
 
-    init {
-        getListDetails(
-            listId = routeData.listId,
-            page = 1
-        )
-    }
-
     private fun getListDetails(listId: Int, page: Int) {
         listDetailsState.value.listDetails?.let { details ->
             if (details.totalPages < page || listDetailsState.value.paging) {

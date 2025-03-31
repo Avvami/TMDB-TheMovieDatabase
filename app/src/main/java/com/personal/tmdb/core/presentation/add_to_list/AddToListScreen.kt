@@ -444,7 +444,6 @@ private fun AddToListScreen(
                                     key = { it.id }
                                 ) { listInfo ->
                                     CustomListItem(
-                                        modifier = Modifier.animateItem(),
                                         onClick = {
                                             addToListUiEvent(AddToListUiEvent.AddToList(listInfo.id))
                                         },

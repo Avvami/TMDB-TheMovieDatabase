@@ -91,6 +91,7 @@ class SearchViewModel @Inject constructor(
                             )
                         }
                     }
+                    if (page == 1 && result.totalPages >= 2) searchFor(searchType, query, 2)
                 }
             }
         }
