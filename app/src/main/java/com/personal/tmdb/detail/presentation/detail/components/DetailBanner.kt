@@ -32,6 +32,7 @@ import com.personal.tmdb.core.domain.util.C
 import com.personal.tmdb.detail.data.models.Provider
 import com.personal.tmdb.detail.domain.models.MediaDetailInfo
 import com.personal.tmdb.detail.presentation.detail.DetailUiEvent
+import com.personal.tmdb.detail.presentation.detail.DetailUiState
 import com.personal.tmdb.ui.theme.onSurfaceDark
 import com.personal.tmdb.ui.theme.surfaceContainerDark
 import com.personal.tmdb.ui.theme.surfaceVariantDark
@@ -45,12 +46,6 @@ fun DetailBanner(
 ) {
     Column(
         modifier = modifier
-            .clickable(
-                interactionSource = null,
-                indication = null
-            ) {
-                detailUiEvent(DetailUiEvent.ChangeAvailableDialogState)
-            }
     ) {
         Box(
             modifier = Modifier
@@ -91,15 +86,18 @@ fun DetailBanner(
         }
         info().watchProviders?.takeIf { it.isNotEmpty() }?.let { watchProviders ->
             watchProviders.getOrElse(watchCountry()) {
-                watchProviders.entries.firstOrNull()?.key?.let { country ->
-                    detailUiEvent(DetailUiEvent.SetSelectedCountry(country))
-                }
                 watchProviders.entries.firstOrNull()?.value
             }?.let { available ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(surfaceContainerDark)
+                        .clickable(
+                            interactionSource = null,
+                            indication = null
+                        ) {
+                            detailUiEvent(DetailUiEvent.SetUiState(DetailUiState.WATCH_PROVIDERS))
+                        }
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically
@@ -139,15 +137,6 @@ fun DetailBanner(
                 }
             }
         }
-//        if (availableState().isDialogShown) {
-//            AvailableDialog(
-//                watchProviders = { watchProviders },
-//                availableSearchQuery = availableSearchQuery,
-//                availableCountries = availableCountries,
-//                availableState = availableState,
-//                detailUiEvent = detailUiEvent
-//            )
-//        }
     }
 }
 

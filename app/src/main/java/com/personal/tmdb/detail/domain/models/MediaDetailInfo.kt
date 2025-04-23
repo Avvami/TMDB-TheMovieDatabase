@@ -50,5 +50,7 @@ data class MediaDetailInfo(
     val tagline: String?,
     val voteAverage: Float?,
     val voteCount: Int?,
-    val watchProviders: Map<String, Available>?,
+    val watchProviders: Map<CountryName, Available>?,
 )
+
+typealias CountryName = String

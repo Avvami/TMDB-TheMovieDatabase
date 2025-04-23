@@ -6,6 +6,7 @@ import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.crossfade
+import coil3.svg.SvgDecoder
 import com.personal.tmdb.core.domain.util.CustomDns
 import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
@@ -19,7 +20,10 @@ class TmdbApplication: Application(), SingletonImageLoader.Factory {
             .build()
 
         return ImageLoader.Builder(context)
-            .components { add(OkHttpNetworkFetcherFactory(callFactory = okHttpClient)) }
+            .components {
+                add(OkHttpNetworkFetcherFactory(callFactory = okHttpClient))
+                add(SvgDecoder.Factory())
+            }
             .crossfade(true)
             .build()
     }

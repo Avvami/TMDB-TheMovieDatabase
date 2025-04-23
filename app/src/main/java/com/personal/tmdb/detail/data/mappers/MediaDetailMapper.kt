@@ -50,7 +50,7 @@ fun MediaDetailDto.toMediaDetailInfo(): MediaDetailInfo {
         tagline = if (tagline.isNullOrEmpty()) null else tagline,
         voteAverage = voteAverage?.toFloat(),
         voteCount = voteCount,
-        watchProviders = watchProviders?.watchProvidersResults?.mapKeys { (key, _) -> Locale("", key).displayCountry}
+        watchProviders = watchProviders?.watchProvidersResults?.mapKeys { (countryCode, _) -> Locale("", countryCode).displayCountry }
     )
 }
 

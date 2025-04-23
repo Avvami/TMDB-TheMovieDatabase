@@ -24,7 +24,6 @@ import com.personal.tmdb.detail.presentation.detail.DetailState
 @Composable
 fun DetailAll(
     modifier: Modifier = Modifier,
-    innerPadding: PaddingValues,
     detailState: () -> DetailState,
     userState: () -> UserState
 ) {
@@ -32,7 +31,7 @@ fun DetailAll(
         LazyColumn(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(start = 16.dp, top = innerPadding.calculateTopPadding(), end = 16.dp, bottom = 16.dp)
+            contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
         ) {
             details.tagline?.let { tagline ->
                 item {

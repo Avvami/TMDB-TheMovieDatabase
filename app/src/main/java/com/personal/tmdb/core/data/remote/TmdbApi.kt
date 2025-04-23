@@ -325,3 +325,4 @@ interface TmdbApi {
 }
 
 typealias LanguageCode = String
+typealias CountryCode = String

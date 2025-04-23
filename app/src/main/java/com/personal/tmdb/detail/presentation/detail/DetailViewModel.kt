@@ -1,12 +1,10 @@
 package com.personal.tmdb.detail.presentation.detail
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.personal.tmdb.core.data.remote.CountryCode
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.MediaType
@@ -19,15 +17,14 @@ import com.personal.tmdb.core.domain.util.onSuccess
 import com.personal.tmdb.core.domain.util.toUiText
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.detail.data.models.Rated
+import com.personal.tmdb.detail.domain.models.CountryName
 import com.personal.tmdb.detail.domain.repository.DetailRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,26 +45,7 @@ class DetailViewModel @Inject constructor(
     )
     val detailState = _detailState.asStateFlow()
 
-    var availableState by mutableStateOf(AvailableState())
-        private set
-
-    private val _availableSearchQuery = MutableStateFlow("")
-    var availableSearchQuery = _availableSearchQuery.asStateFlow()
-
-    private val _availableCountries = MutableStateFlow(detailState.value.details?.watchProviders?.keys)
-    val availableCountries = availableSearchQuery.combine(_availableCountries) { query, countries ->
-        if (query.isBlank()) {
-            countries
-        } else {
-            countries?.filter {
-                it.contains(query, ignoreCase = true)
-            }
-        }
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        _availableCountries.value
-    )
+    private var watchCountries: Map<CountryCode, CountryName>? = null
 
     init {
         getMediaDetails(
@@ -90,6 +68,7 @@ class DetailViewModel @Inject constructor(
                 )
             }
 
+            val userCountry = userRepository.getUser()?.iso31661 ?: "US"
             val language = preferencesRepository.getLanguage()
             val includeImageLanguage = "$language,en,null"
             val sessionId = userRepository.getUser()?.sessionId
@@ -107,17 +86,20 @@ class DetailViewModel @Inject constructor(
                     result.belongsToCollection?.let { collection ->
                         getCollection(collectionId = collection.id)
                     }
-                    if (result.watchProviders != null) {
-                        _availableCountries.value = result.watchProviders.keys
-                        availableState = availableState.copy(
-                            selectedCountry = "United States"
-                        )
-                    }
+                    watchCountries = result.watchProviders?.keys
+                        ?.mapNotNull { countryName ->
+                            val code = Locale.getISOCountries().find { code ->
+                                Locale("", code).displayCountry == countryName
+                            }
+                            code?.let { it to countryName }
+                        }
+                        ?.toMap()
                     _detailState.update {
                         it.copy(
                             accountState = result.accountStates,
                             details = result,
-                            watchCountry = "United States",
+                            watchCountry = Locale("", userCountry).displayCountry,
+                            watchCountries = watchCountries,
                             loading = false
                         )
                     }
@@ -129,7 +111,7 @@ class DetailViewModel @Inject constructor(
         viewModelScope.launch {
             detailRepository.getCollection(collectionId, language)
                 .onError { error ->
-                    println(error.toUiText())
+                    println(error)
                 }
                 .onSuccess { result ->
                     _detailState.update { it.copy(collection = result) }
@@ -215,27 +197,23 @@ class DetailViewModel @Inject constructor(
             DetailUiEvent.OnNavigateBack -> Unit
             is DetailUiEvent.OnNavigateTo -> Unit
             is DetailUiEvent.SetSelectedCountry -> {
-                availableState = availableState.copy(
-                    selectedCountry = event.country,
-                    isSearchActive = false
-                )
-                _availableSearchQuery.value = ""
+                _detailState.update {
+                    it.copy(
+                        watchCountry = event.country,
+                        watchCountries = watchCountries
+                    )
+                }
             }
-            is DetailUiEvent.SetAvailableSearchQuery -> {
-                _availableSearchQuery.value = event.query
+            is DetailUiEvent.FilterWatchCountries -> {
+                _detailState.update { state ->
+                    state.copy(
+                        watchCountries = if (event.query.isBlank()) watchCountries else
+                            watchCountries?.filterValues { it.contains(event.query, ignoreCase = true) }
+                    )
+                }
             }
-            DetailUiEvent.ChangeAvailableSearchState -> {
-                availableState = availableState.copy(
-                    isSearchActive = !availableState.isSearchActive
-                )
-            }
-            DetailUiEvent.ChangeAvailableDialogState -> {
-                availableState = availableState.copy(
-                    isDialogShown = !availableState.isDialogShown
-                )
-            }
-            is DetailUiEvent.ShowMoreDetails -> {
-                _detailState.update { it.copy(showMoreDetails = event.state) }
+            is DetailUiEvent.SetUiState -> {
+                _detailState.update { it.copy(uiState = event.state) }
             }
             is DetailUiEvent.GetAccountState -> {
                 getAccountState(
