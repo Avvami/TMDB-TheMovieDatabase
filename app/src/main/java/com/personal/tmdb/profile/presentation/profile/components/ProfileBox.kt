@@ -90,7 +90,7 @@ fun SignedInUser(
     userState: () -> UserState
 ) {
     val animatedGradientColor by animateColorAsState(
-        targetValue = userState().dominantColor?.color ?: MaterialTheme.colorScheme.secondary,
+        targetValue = userState().dominantColor?.color ?: MaterialTheme.colorScheme.surface,
         label = "Animated gradient color"
     )
     val radialGradient by remember(animatedGradientColor) {
@@ -257,6 +257,7 @@ fun SignedOutUser(
             ) {
                 AutoResizedText(
                     text = stringResource(id = R.string.tmdb),
+                    softWrap = false,
                     style = MaterialTheme.typography.displayLarge.copy(
                         color = surfaceLight,
                         fontSize = 86.sp,
@@ -293,7 +294,10 @@ fun SignedOutUser(
                 }
                 Button(
                     modifier = Modifier.weight(1f),
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        showLoadingDialog = true
+                        profileUiEvent(ProfileUiEvent.CreateRequestToken)
+                    },
                     shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = tmdbRed,

@@ -68,7 +68,11 @@ private fun CastScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = castState().mediaName,
+                        text = castState().mediaName + (castState().seasonNumber?.let { season ->
+                            castState().episodeNumber?.let { episode ->
+                                " ${stringResource(id = R.string.season_episode, season, episode)}"
+                            }
+                        } ?: ""),
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

@@ -25,10 +25,8 @@ import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.PreferencesState
-import com.personal.tmdb.ui.theme.surfaceContainerDark
-import com.personal.tmdb.ui.theme.surfaceContainerLight
-import com.personal.tmdb.ui.theme.surfaceVariantDark
-import com.personal.tmdb.ui.theme.surfaceVariantLight
+import com.personal.tmdb.ui.theme.onSurfaceDark
+import com.personal.tmdb.ui.theme.onSurfaceLight
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -124,8 +122,8 @@ fun SharedTransitionScope.DiscoverTabs(
                 MediaType.UNKNOWN -> {
                     /*TODO: Fix SharedTransitionLayout theming bug??*/
                     val chipColors = SuggestionChipDefaults.suggestionChipColors(
-                        containerColor = if (preferencesState().darkTheme ?: isSystemInDarkTheme()) surfaceContainerDark else surfaceContainerLight,
-                        labelColor = if (preferencesState().darkTheme ?: isSystemInDarkTheme()) surfaceVariantDark else surfaceVariantLight
+                        containerColor = if (preferencesState().darkTheme ?: isSystemInDarkTheme()) onSurfaceDark.copy(alpha = .05f) else onSurfaceLight.copy(alpha = .05f),
+                        labelColor = if (preferencesState().darkTheme ?: isSystemInDarkTheme()) onSurfaceDark.copy(alpha = .7f) else onSurfaceLight.copy(alpha = .7f)
                     )
                     SuggestionChip(
                         modifier = Modifier.sharedElement(

@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.isUnspecified
 fun AutoResizedText(
     modifier: Modifier = Modifier,
     text: String,
+    softWrap: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
     color: Color = style.color
 ) {
@@ -33,10 +35,11 @@ fun AutoResizedText(
         },
         text = text,
         color = color,
-        softWrap = false,
+        softWrap = softWrap,
+        maxLines = maxLines,
         style = resizedTextStyle,
         onTextLayout = { result ->
-            if (result.didOverflowWidth) {
+            if (result.hasVisualOverflow) {
                 if (style.fontSize.isUnspecified) {
                     resizedTextStyle = resizedTextStyle.copy(
                         fontSize = defaultFontSize

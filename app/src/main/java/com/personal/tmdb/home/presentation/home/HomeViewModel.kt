@@ -3,6 +3,7 @@ package com.personal.tmdb.home.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.personal.tmdb.core.domain.models.MediaInfo
+import com.personal.tmdb.core.domain.repository.DominantColorRepository
 import com.personal.tmdb.core.domain.util.C
 import com.personal.tmdb.core.domain.util.TimeWindow
 import com.personal.tmdb.core.domain.util.onError
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val homeRepository: HomeRepository,
-    private val detailRepository: DetailRepository
+    private val detailRepository: DetailRepository,
+    private val dominantColorRepository: DominantColorRepository
 ): ViewModel() {
 
     private val _homeState = MutableStateFlow(HomeState())
@@ -45,6 +47,9 @@ class HomeViewModel @Inject constructor(
                 }
                 .onSuccess { result ->
                     val randomMedia = result.results.randomOrNull()
+                    val randomMediaDominantColors = dominantColorRepository.calculateDominantColor(
+                        imageUrl = C.TMDB_IMAGES_BASE_URL + C.BACKDROP_W780 + randomMedia?.backdropPath
+                    )
                     randomMedia?.let {
                         getRandomMediaLogos(it)
                     }
@@ -52,7 +57,8 @@ class HomeViewModel @Inject constructor(
                         it.copy(
                             loading = false,
                             trending = result,
-                            randomMedia = randomMedia
+                            randomMedia = randomMedia,
+                            randomMediaDominantColors = randomMediaDominantColors
                         )
                     }
                 }
@@ -92,7 +98,21 @@ class HomeViewModel @Inject constructor(
 
     fun homeUiEvent(event: HomeUiEvent) {
         when (event) {
-            is HomeUiEvent.OnNavigateTo -> {}
+            is HomeUiEvent.OnNavigateTo -> Unit
+            HomeUiEvent.ChangeRandom -> {
+                viewModelScope.launch {
+                    val randomMedia = homeState.value.trending?.results?.randomOrNull()
+                    val randomMediaDominantColors = dominantColorRepository.calculateDominantColor(
+                        imageUrl = C.TMDB_IMAGES_BASE_URL + C.BACKDROP_W780 + randomMedia?.backdropPath
+                    )
+                    _homeState.update {
+                        it.copy(
+                            randomMedia = randomMedia,
+                            randomMediaDominantColors = randomMediaDominantColors
+                        )
+                    }
+                }
+            }
         }
     }
 }

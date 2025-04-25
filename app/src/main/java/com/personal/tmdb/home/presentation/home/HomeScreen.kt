@@ -1,12 +1,17 @@
 package com.personal.tmdb.home.presentation.home
 
 import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,15 +26,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.personal.tmdb.R
+import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.components.MediaBanner
@@ -37,7 +47,6 @@ import com.personal.tmdb.core.presentation.components.MediaBannerShimmer
 import com.personal.tmdb.core.presentation.components.MediaCarousel
 import com.personal.tmdb.core.presentation.components.MediaPoster
 import com.personal.tmdb.core.presentation.components.MediaPosterShimmer
-import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.home.presentation.components.DiscoverTabs
 import com.personal.tmdb.home.presentation.home.components.HomeBanner
 
@@ -87,37 +96,55 @@ private fun SharedTransitionScope.HomeScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface
     ) { innerPadding ->
+        val animatedColor by animateColorAsState(
+            targetValue = homeState().randomMediaDominantColors?.color ?: MaterialTheme.colorScheme.surface,
+            label = "AnimatedShadowColor"
+        )
         LazyColumn(
             modifier = modifier,
-            contentPadding = PaddingValues(top = innerPadding.calculateTopPadding() + 16.dp, bottom = 16.dp),
+            contentPadding = PaddingValues(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             state = lazyListState
         ) {
             item {
-                DiscoverTabs(
-                    preferencesState = preferencesState,
-                    onTabSelected = { route ->
-                        homeUiEvent(HomeUiEvent.OnNavigateTo(route))
-                    },
-                    uiState = MediaType.UNKNOWN,
-                    animatedContentScope = animatedContentScope
-                )
-            }
-            item {
-                HomeBanner(
+                Box(
                     modifier = Modifier
-                        .height(450.dp)
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                        .clip(MaterialTheme.shapes.extraLarge)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
-                            shape = MaterialTheme.shapes.extraLarge
-                        ),
-                    homeState = homeState,
-                    homeUiEvent = homeUiEvent
-                )
+                        .fillMaxWidth()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(animatedColor.copy(alpha = .5f), Color.Transparent)
+                            )
+                        )
+                        .padding(top = innerPadding.calculateTopPadding() + 16.dp)
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        DiscoverTabs(
+                            preferencesState = preferencesState,
+                            onTabSelected = { route ->
+                                homeUiEvent(HomeUiEvent.OnNavigateTo(route))
+                            },
+                            uiState = MediaType.UNKNOWN,
+                            animatedContentScope = animatedContentScope
+                        )
+                        HomeBanner(
+                            modifier = Modifier
+                                .height(450.dp)
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp)
+                                .clip(MaterialTheme.shapes.extraLarge)
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
+                                    shape = MaterialTheme.shapes.extraLarge
+                                ),
+                            preferencesState = preferencesState,
+                            homeState = homeState,
+                            homeUiEvent = homeUiEvent
+                        )
+                    }
+                }
             }
             item {
                 MediaCarousel(
@@ -177,11 +204,23 @@ private fun SharedTransitionScope.HomeScreen(
                 )
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface.copy(.7f))
-                .statusBarsPadding()
-        )
+        val showStatusBarColor by remember {
+            derivedStateOf {
+                lazyListState.firstVisibleItemScrollOffset > 50
+            }
+        }
+        AnimatedVisibility(
+            modifier = Modifier.fillMaxWidth(),
+            visible = showStatusBarColor,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface.copy(.7f))
+                    .statusBarsPadding()
+            )
+        }
     }
 }
