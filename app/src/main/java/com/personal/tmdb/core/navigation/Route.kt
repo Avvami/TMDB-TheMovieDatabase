@@ -66,4 +66,7 @@ sealed interface Route {
 
     @Serializable
     data object WelcomeBack: Route
+
+    @Serializable
+    data class Discover(val mediaType: String): Route
 }

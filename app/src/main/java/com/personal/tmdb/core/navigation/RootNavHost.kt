@@ -1,6 +1,8 @@
 package com.personal.tmdb.core.navigation
 
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.lazy.LazyListState
@@ -33,6 +35,7 @@ import com.personal.tmdb.detail.presentation.episodes.EpisodesScreenRoot
 import com.personal.tmdb.detail.presentation.image.ImageViewerScreenRoot
 import com.personal.tmdb.detail.presentation.person.PersonScreenRoot
 import com.personal.tmdb.detail.presentation.reviews.ReviewsScreenRoot
+import com.personal.tmdb.home.presentation.discover.DiscoverScreenRoot
 import com.personal.tmdb.home.presentation.home.HomeScreenRoot
 import com.personal.tmdb.profile.presentation.favorite.FavoriteScreenRoot
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.ListDetailsScreenRoot
@@ -249,6 +252,7 @@ fun RootNavHost(
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ChildNavHost(
     rootNavController: NavHostController,
@@ -269,150 +273,164 @@ fun ChildNavHost(
             launchSingleTop = if (route is Route.Image || route is Route.AddToList) true else route !is Route.Detail
         }
     }
-    NavHost(
-        navController = navController,
-        startDestination = startDestination::class
-    ) {
-        animatedComposable<Route.Home> {
-            HomeScreenRoot(
-                bottomPadding = bottomBarPadding,
-                lazyListState = scrollState as LazyListState,
-                onNavigateTo = onNavigateTo,
-                preferencesState = preferencesState
-            )
-        }
-        animatedComposable<Route.Search> {
-            SearchScreenRoot(
-                bottomPadding = bottomBarPadding,
-                lazyGridState = scrollState as LazyGridState,
-                onNavigateTo = onNavigateTo,
-                preferencesState = preferencesState
-            )
-        }
-        animatedComposable<Route.Watchlist> {
-            WatchlistScreenRoot(
-                bottomPadding = bottomBarPadding,
-                canNavigateBack = preferencesState().additionalNavigationItem != AdditionalNavigationItem.WATCHLIST,
-                lazyGridState = if (preferencesState().additionalNavigationItem == AdditionalNavigationItem.WATCHLIST) scrollState as LazyGridState else rememberLazyGridState(),
-                onNavigateBack = onNavigateBack,
-                onNavigateTo = onNavigateTo,
-                preferencesState = preferencesState
-            )
-        }
-        animatedComposable<Route.MyLists> {
-            ListsScreenRoot(
-                bottomPadding = bottomBarPadding,
-                canNavigateBack = preferencesState().additionalNavigationItem != AdditionalNavigationItem.LISTS,
-                lazyGridState = if (preferencesState().additionalNavigationItem == AdditionalNavigationItem.LISTS) scrollState as LazyGridState else rememberLazyGridState(),
-                onNavigateBack = onNavigateBack,
-                onNavigateTo = onNavigateTo
-            )
-        }
-        animatedComposable<Route.Favorite> {
-            FavoriteScreenRoot(
-                bottomPadding = bottomBarPadding,
-                canNavigateBack = preferencesState().additionalNavigationItem != AdditionalNavigationItem.FAVORITE,
-                lazyGridState = if (preferencesState().additionalNavigationItem == AdditionalNavigationItem.FAVORITE) scrollState as LazyGridState else rememberLazyGridState(),
-                onNavigateBack = onNavigateBack,
-                onNavigateTo = onNavigateTo,
-                preferencesState = preferencesState
-            )
-        }
-        animatedComposable<Route.Profile> {
-            ProfileScreenRoot(
-                bottomPadding = bottomBarPadding,
-                lazyListState = scrollState as LazyListState,
-                onNavigateTo = onNavigateTo,
-                preferencesState = preferencesState,
-                userState = userState,
-                uiEvent = uiEvent
-            )
-        }
-        animatedComposable<Route.Detail> {
-            DetailScreenRoot(
-                bottomPadding = bottomBarPadding,
-                onNavigateBack = onNavigateBack,
-                onNavigateTo = onNavigateTo,
-                preferencesState = preferencesState,
-                userState = userState
-            )
-        }
-        animatedComposable<Route.Reviews> {
-            ReviewsScreenRoot(
-                bottomPadding = bottomBarPadding,
-                onNavigateBack = onNavigateBack
-            )
-        }
-        animatedComposable<Route.Episodes> {
-            EpisodesScreenRoot(
-                bottomPadding = bottomBarPadding,
-                onNavigateBack = onNavigateBack,
-                onNavigateTo = onNavigateTo
-            )
-        }
-        animatedComposable<Route.Episode> {
-            EpisodeDetailsScreenRoot(
-                bottomPadding = bottomBarPadding,
-                onNavigateBack = onNavigateBack,
-                onNavigateTo = onNavigateTo,
-                userState = userState
-            )
-        }
-        animatedComposable<Route.Collection> {
-            CollectionScreenRoot(
-                bottomPadding = bottomBarPadding,
-                onNavigateBack = onNavigateBack,
-                preferencesState = preferencesState,
-                onNavigateTo = onNavigateTo
-            )
-        }
-        animatedComposable<Route.Cast> {
-            CastScreenRoot(
-                bottomPadding = bottomBarPadding,
-                onNavigateBack = onNavigateBack,
-                onNavigateTo = onNavigateTo
-            )
-        }
-        animatedComposable<Route.Person> {
-            PersonScreenRoot(
-                bottomPadding = bottomBarPadding,
-                onNavigateBack = onNavigateBack,
-                onNavigateTo = onNavigateTo,
-                preferencesState = preferencesState
-            )
-        }
-        animatedComposable<Route.Settings> {
-            SettingsScreenRoot(
-                bottomPadding = bottomBarPadding,
-                onNavigateBack = onNavigateBack,
-                onNavigateTo = onNavigateTo,
-                preferencesState = preferencesState,
-                userState = userState,
-                uiEvent = uiEvent
-            )
-        }
-        animatedComposable<Route.Appearance> {
-            AppearanceScreenRoot(
-                bottomPadding = bottomBarPadding,
-                onNavigateBack = onNavigateBack,
-                preferencesState = preferencesState,
-                userState = userState
-            )
-        }
-        animatedComposable<Route.Language> {
-            LanguagesScreenRoot(
-                bottomPadding = bottomBarPadding,
-                onNavigateBack = onNavigateBack
-            )
-        }
-        animatedComposable<Route.Lost> {}
-        animatedComposable<Route.ListDetails> {
-            ListDetailsScreenRoot(
-                bottomPadding = bottomBarPadding,
-                onNavigateBack = onNavigateBack,
-                onNavigateTo = onNavigateTo,
-                preferencesState = preferencesState
-            )
+    SharedTransitionLayout {
+        NavHost(
+            navController = navController,
+            startDestination = startDestination::class
+        ) {
+            animatedComposable<Route.Home> {
+                HomeScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    lazyListState = scrollState as LazyListState,
+                    onNavigateTo = onNavigateTo,
+                    preferencesState = preferencesState,
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedContentScope = this@animatedComposable
+                )
+            }
+            animatedComposable<Route.Search> {
+                SearchScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    lazyGridState = scrollState as LazyGridState,
+                    onNavigateTo = onNavigateTo,
+                    preferencesState = preferencesState
+                )
+            }
+            animatedComposable<Route.Watchlist> {
+                WatchlistScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    canNavigateBack = preferencesState().additionalNavigationItem != AdditionalNavigationItem.WATCHLIST,
+                    lazyGridState = if (preferencesState().additionalNavigationItem == AdditionalNavigationItem.WATCHLIST) scrollState as LazyGridState else rememberLazyGridState(),
+                    onNavigateBack = onNavigateBack,
+                    onNavigateTo = onNavigateTo,
+                    preferencesState = preferencesState
+                )
+            }
+            animatedComposable<Route.MyLists> {
+                ListsScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    canNavigateBack = preferencesState().additionalNavigationItem != AdditionalNavigationItem.LISTS,
+                    lazyGridState = if (preferencesState().additionalNavigationItem == AdditionalNavigationItem.LISTS) scrollState as LazyGridState else rememberLazyGridState(),
+                    onNavigateBack = onNavigateBack,
+                    onNavigateTo = onNavigateTo
+                )
+            }
+            animatedComposable<Route.Favorite> {
+                FavoriteScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    canNavigateBack = preferencesState().additionalNavigationItem != AdditionalNavigationItem.FAVORITE,
+                    lazyGridState = if (preferencesState().additionalNavigationItem == AdditionalNavigationItem.FAVORITE) scrollState as LazyGridState else rememberLazyGridState(),
+                    onNavigateBack = onNavigateBack,
+                    onNavigateTo = onNavigateTo,
+                    preferencesState = preferencesState
+                )
+            }
+            animatedComposable<Route.Profile> {
+                ProfileScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    lazyListState = scrollState as LazyListState,
+                    onNavigateTo = onNavigateTo,
+                    preferencesState = preferencesState,
+                    userState = userState,
+                    uiEvent = uiEvent
+                )
+            }
+            animatedComposable<Route.Detail> {
+                DetailScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack,
+                    onNavigateTo = onNavigateTo,
+                    preferencesState = preferencesState,
+                    userState = userState
+                )
+            }
+            animatedComposable<Route.Reviews> {
+                ReviewsScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack
+                )
+            }
+            animatedComposable<Route.Episodes> {
+                EpisodesScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack,
+                    onNavigateTo = onNavigateTo
+                )
+            }
+            animatedComposable<Route.Episode> {
+                EpisodeDetailsScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack,
+                    onNavigateTo = onNavigateTo,
+                    userState = userState
+                )
+            }
+            animatedComposable<Route.Collection> {
+                CollectionScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack,
+                    preferencesState = preferencesState,
+                    onNavigateTo = onNavigateTo
+                )
+            }
+            animatedComposable<Route.Cast> {
+                CastScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack,
+                    onNavigateTo = onNavigateTo
+                )
+            }
+            animatedComposable<Route.Person> {
+                PersonScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack,
+                    onNavigateTo = onNavigateTo,
+                    preferencesState = preferencesState
+                )
+            }
+            animatedComposable<Route.Settings> {
+                SettingsScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack,
+                    onNavigateTo = onNavigateTo,
+                    preferencesState = preferencesState,
+                    userState = userState,
+                    uiEvent = uiEvent
+                )
+            }
+            animatedComposable<Route.Appearance> {
+                AppearanceScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack,
+                    preferencesState = preferencesState,
+                    userState = userState
+                )
+            }
+            animatedComposable<Route.Language> {
+                LanguagesScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack
+                )
+            }
+            animatedComposable<Route.Lost> {}
+            animatedComposable<Route.ListDetails> {
+                ListDetailsScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack,
+                    onNavigateTo = onNavigateTo,
+                    preferencesState = preferencesState
+                )
+            }
+            animatedComposable<Route.Discover> {
+                DiscoverScreenRoot(
+                    bottomPadding = bottomBarPadding,
+                    onNavigateBack = onNavigateBack,
+                    onNavigateTo = onNavigateTo,
+                    preferencesState = preferencesState,
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedContentScope = this@animatedComposable
+                )
+            }
         }
     }
 }

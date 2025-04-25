@@ -1,12 +1,13 @@
 package com.personal.tmdb.home.presentation.home
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,15 +17,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SuggestionChip
-import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,37 +38,46 @@ import com.personal.tmdb.core.presentation.components.MediaCarousel
 import com.personal.tmdb.core.presentation.components.MediaPoster
 import com.personal.tmdb.core.presentation.components.MediaPosterShimmer
 import com.personal.tmdb.core.domain.util.MediaType
+import com.personal.tmdb.home.presentation.components.DiscoverTabs
 import com.personal.tmdb.home.presentation.home.components.HomeBanner
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun HomeScreenRoot(
     bottomPadding: Dp,
     lazyListState: LazyListState = rememberLazyListState(),
     onNavigateTo: (route: Route) -> Unit,
     preferencesState: () -> PreferencesState,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val homeState by viewModel.homeState.collectAsStateWithLifecycle()
-    HomeScreen(
-        modifier = Modifier.padding(bottom = bottomPadding),
-        lazyListState = lazyListState,
-        preferencesState = preferencesState,
-        homeState = { homeState },
-        homeUiEvent = { event ->
-            when (event) {
-                is HomeUiEvent.OnNavigateTo -> {
-                    onNavigateTo(event.route)
+    with(sharedTransitionScope) {
+        HomeScreen(
+            modifier = Modifier.padding(bottom = bottomPadding),
+            animatedContentScope = animatedContentScope,
+            lazyListState = lazyListState,
+            preferencesState = preferencesState,
+            homeState = { homeState },
+            homeUiEvent = { event ->
+                when (event) {
+                    is HomeUiEvent.OnNavigateTo -> {
+                        onNavigateTo(event.route)
+                    }
+                    else -> Unit
                 }
-                else -> Unit
+                viewModel.homeUiEvent(event)
             }
-            viewModel.homeUiEvent(event)
-        }
-    )
+        )
+    }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun HomeScreen(
+private fun SharedTransitionScope.HomeScreen(
     modifier: Modifier = Modifier,
+    animatedContentScope: AnimatedContentScope,
     lazyListState: LazyListState,
     preferencesState: () -> PreferencesState,
     homeState: () -> HomeState,
@@ -89,50 +94,14 @@ private fun HomeScreen(
             state = lazyListState
         ) {
             item {
-                CompositionLocalProvider(
-                    LocalMinimumInteractiveComponentSize provides Dp.Unspecified
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .horizontalScroll(rememberScrollState())
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        SuggestionChip(
-                            onClick = { /*TODO*/ },
-                            label = {
-                                Text(text = stringResource(id = R.string.tv_shows))
-                            },
-                            colors = SuggestionChipDefaults.suggestionChipColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                labelColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                            border = null
-                        )
-                        SuggestionChip(
-                            onClick = { /*TODO*/ },
-                            label = {
-                                Text(text = stringResource(id = R.string.movies))
-                            },
-                            colors = SuggestionChipDefaults.suggestionChipColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                labelColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                            border = null
-                        )
-                        SuggestionChip(
-                            onClick = { /*TODO*/ },
-                            label = {
-                                Text(text = stringResource(id = R.string.people))
-                            },
-                            colors = SuggestionChipDefaults.suggestionChipColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                labelColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                            border = null
-                        )
-                    }
-                }
+                DiscoverTabs(
+                    preferencesState = preferencesState,
+                    onTabSelected = { route ->
+                        homeUiEvent(HomeUiEvent.OnNavigateTo(route))
+                    },
+                    uiState = MediaType.UNKNOWN,
+                    animatedContentScope = animatedContentScope
+                )
             }
             item {
                 HomeBanner(

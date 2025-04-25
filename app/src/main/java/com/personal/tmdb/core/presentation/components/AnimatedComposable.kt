@@ -1,6 +1,6 @@
 package com.personal.tmdb.core.presentation.components
 
-import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
@@ -15,7 +15,7 @@ const val initialOffset = 0.10f
 
 inline fun <reified T: Any> NavGraphBuilder.animatedComposable(
     deepLinks: List<NavDeepLink> = emptyList(),
-    noinline content: @Composable AnimatedVisibilityScope.(NavBackStackEntry) -> Unit
+    noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit
 ) = composable<T>(
     deepLinks = deepLinks,
     enterTransition = {
@@ -35,7 +35,7 @@ inline fun <reified T: Any> NavGraphBuilder.animatedComposable(
 
 inline fun <reified T: Any> NavGraphBuilder.staticComposable(
     deepLinks: List<NavDeepLink> = emptyList(),
-    noinline content: @Composable AnimatedVisibilityScope.(NavBackStackEntry) -> Unit
+    noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit
 ) = composable<T>(
     deepLinks = deepLinks,
     enterTransition = { EnterTransition.None },

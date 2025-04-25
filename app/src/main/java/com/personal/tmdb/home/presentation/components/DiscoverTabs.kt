@@ -1,0 +1,185 @@
+package com.personal.tmdb.home.presentation.components
+
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.personal.tmdb.R
+import com.personal.tmdb.core.domain.util.MediaType
+import com.personal.tmdb.core.navigation.Route
+import com.personal.tmdb.core.presentation.PreferencesState
+import com.personal.tmdb.ui.theme.surfaceContainerDark
+import com.personal.tmdb.ui.theme.surfaceContainerLight
+import com.personal.tmdb.ui.theme.surfaceVariantDark
+import com.personal.tmdb.ui.theme.surfaceVariantLight
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun SharedTransitionScope.DiscoverTabs(
+    modifier: Modifier = Modifier,
+    preferencesState: () -> PreferencesState,
+    onTabSelected: ((route: Route) -> Unit)? = null,
+    uiState: MediaType,
+    animatedContentScope: AnimatedContentScope,
+    leadingContent: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null
+) {
+    CompositionLocalProvider(
+        LocalMinimumInteractiveComponentSize provides Dp.Unspecified
+    ) {
+        Row(
+            modifier = modifier
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            leadingContent?.let {
+                it()
+            }
+            when (uiState) {
+                MediaType.TV, MediaType.MOVIE -> {
+                    if (uiState == MediaType.TV) {
+                        SuggestionChip(
+                            modifier = Modifier.sharedElement(
+                                state = rememberSharedContentState(key = MediaType.TV),
+                                animatedVisibilityScope = animatedContentScope
+                            ),
+                            enabled = false,
+                            onClick = {},
+                            label = {
+                                Text(text = stringResource(id = R.string.tv_shows))
+                            },
+                            colors = SuggestionChipDefaults.suggestionChipColors(
+                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
+                                disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant
+                            ),
+                            border = BorderStroke(
+                                width = 2.dp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)
+                            )
+                        )
+                    } else {
+                        SuggestionChip(
+                            modifier = Modifier.sharedElement(
+                                state = rememberSharedContentState(key = MediaType.MOVIE),
+                                animatedVisibilityScope = animatedContentScope
+                            ),
+                            enabled = false,
+                            onClick = {},
+                            label = {
+                                Text(text = stringResource(id = R.string.movies))
+                            },
+                            colors = SuggestionChipDefaults.suggestionChipColors(
+                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
+                                disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant
+                            ),
+                            border = BorderStroke(
+                                width = 2.dp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)
+                            )
+                        )
+                    }
+                    trailingContent?.let {
+                        it()
+                    }
+                }
+                MediaType.PERSON -> {
+                    SuggestionChip(
+                        modifier = Modifier.sharedElement(
+                            state = rememberSharedContentState(key = MediaType.PERSON),
+                            animatedVisibilityScope = animatedContentScope
+                        ),
+                        enabled = false,
+                        onClick = {},
+                        label = {
+                            Text(text = stringResource(id = R.string.people))
+                        },
+                        colors = SuggestionChipDefaults.suggestionChipColors(
+                            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
+                            disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        border = BorderStroke(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)
+                        )
+                    )
+                }
+                MediaType.UNKNOWN -> {
+                    /*TODO: Fix SharedTransitionLayout theming bug??*/
+                    val chipColors = SuggestionChipDefaults.suggestionChipColors(
+                        containerColor = if (preferencesState().darkTheme == true) surfaceContainerDark else surfaceContainerLight,
+                        labelColor = if (preferencesState().darkTheme == true) surfaceVariantDark else surfaceVariantLight
+                    )
+                    SuggestionChip(
+                        modifier = Modifier.sharedElement(
+                            state = rememberSharedContentState(key = MediaType.TV),
+                            animatedVisibilityScope = animatedContentScope,
+                            renderInOverlayDuringTransition = false
+                        ),
+                        onClick = {
+                            onTabSelected?.let {
+                                it(Route.Discover(MediaType.TV.name.lowercase()))
+                            }
+                        },
+                        label = {
+                            Text(text = stringResource(id = R.string.tv_shows))
+                        },
+                        colors = chipColors,
+                        border = null
+                    )
+                    SuggestionChip(
+                        modifier = Modifier.sharedElement(
+                            state = rememberSharedContentState(key = MediaType.MOVIE),
+                            animatedVisibilityScope = animatedContentScope,
+                            renderInOverlayDuringTransition = false
+                        ),
+                        onClick = {
+                            onTabSelected?.let {
+                                it(Route.Discover(MediaType.MOVIE.name.lowercase()))
+                            }
+                        },
+                        label = {
+                            Text(text = stringResource(id = R.string.movies))
+                        },
+                        colors = chipColors,
+                        border = null
+                    )
+                    SuggestionChip(
+                        modifier = Modifier.sharedElement(
+                            state = rememberSharedContentState(key = MediaType.PERSON),
+                            animatedVisibilityScope = animatedContentScope,
+                            renderInOverlayDuringTransition = false
+                        ),
+                        onClick = {
+                            onTabSelected?.let {
+                                it(Route.Discover(MediaType.PERSON.name.lowercase()))
+                            }
+                        },
+                        label = {
+                            Text(text = stringResource(id = R.string.people))
+                        },
+                        colors = chipColors,
+                        border = null
+                    )
+                }
+                else -> Unit
+            }
+        }
+    }
+}
