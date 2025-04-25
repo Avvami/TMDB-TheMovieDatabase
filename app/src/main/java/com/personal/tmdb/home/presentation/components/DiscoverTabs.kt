@@ -5,6 +5,7 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -123,8 +124,8 @@ fun SharedTransitionScope.DiscoverTabs(
                 MediaType.UNKNOWN -> {
                     /*TODO: Fix SharedTransitionLayout theming bug??*/
                     val chipColors = SuggestionChipDefaults.suggestionChipColors(
-                        containerColor = if (preferencesState().darkTheme == true) surfaceContainerDark else surfaceContainerLight,
-                        labelColor = if (preferencesState().darkTheme == true) surfaceVariantDark else surfaceVariantLight
+                        containerColor = if (preferencesState().darkTheme ?: isSystemInDarkTheme()) surfaceContainerDark else surfaceContainerLight,
+                        labelColor = if (preferencesState().darkTheme ?: isSystemInDarkTheme()) surfaceVariantDark else surfaceVariantLight
                     )
                     SuggestionChip(
                         modifier = Modifier.sharedElement(

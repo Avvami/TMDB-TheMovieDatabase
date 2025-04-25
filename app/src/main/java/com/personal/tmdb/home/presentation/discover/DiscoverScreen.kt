@@ -38,6 +38,7 @@ import com.personal.tmdb.core.presentation.components.IconChip
 import com.personal.tmdb.core.presentation.components.IconChipDefaults
 import com.personal.tmdb.core.presentation.components.MediaGrid
 import com.personal.tmdb.home.presentation.components.DiscoverTabs
+import com.personal.tmdb.home.presentation.discover.components.GenresDialog
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -63,6 +64,7 @@ fun DiscoverScreenRoot(
                     is DiscoverUiEvent.OnNavigateTo -> onNavigateTo(event.route)
                     else -> Unit
                 }
+                viewModel.discoverUiEvent(event)
             }
         )
     }
@@ -118,10 +120,10 @@ private fun SharedTransitionScope.DiscoverScreen(
                     trailingContent = {
                         FilterChip(
                             selected = false,
-                            onClick = { /*TODO*/ },
+                            onClick = { discoverUiEvent(DiscoverUiEvent.SetShowGenresState(true)) },
                             label = {
                                 Text(
-                                    text = stringResource(id = R.string.genres)
+                                    text = discoverState().selectedGenre?.name ?: stringResource(id = R.string.genres)
                                 )
                             },
                             colors = FilterChipDefaults.filterChipColors(
@@ -163,5 +165,12 @@ private fun SharedTransitionScope.DiscoverScreen(
                 .background(MaterialTheme.colorScheme.surface.copy(.7f))
                 .statusBarsPadding()
         )
+        if (discoverState().showGenres) {
+            GenresDialog(
+                discoverState = discoverState,
+                onDismissRequest = { discoverUiEvent(DiscoverUiEvent.SetShowGenresState(false)) },
+                selectGenre = { /*TODO*/ }
+            )
+        }
     }
 }

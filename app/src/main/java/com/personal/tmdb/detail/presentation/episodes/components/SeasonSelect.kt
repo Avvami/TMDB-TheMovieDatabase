@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Close
@@ -44,9 +45,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import com.personal.tmdb.R
+import com.personal.tmdb.core.domain.util.fadingEdges
 import com.personal.tmdb.core.domain.util.formatEpisodesCount
 import com.personal.tmdb.core.domain.util.formatVoteAverage
 import com.personal.tmdb.core.domain.util.shimmerEffect
+import com.personal.tmdb.core.presentation.components.CustomListItem
 import com.personal.tmdb.detail.presentation.episodes.EpisodesUiEvent
 import com.personal.tmdb.detail.presentation.episodes.SeasonState
 import com.personal.tmdb.ui.theme.onSurfaceLight
@@ -120,6 +123,7 @@ fun LazyListScope.seasonSelect(
                             onDismissRequest = { showDialog = false },
                             properties = DialogProperties(dismissOnClickOutside = false)
                         ) {
+                            val lazyListState = rememberLazyListState()
                             (LocalView.current.parent as DialogWindowProvider).window.setDimAmount(.8f)
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -130,29 +134,34 @@ fun LazyListScope.seasonSelect(
                                         .fillMaxWidth(),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    LazyColumn {
+                                    LazyColumn(
+                                        modifier = Modifier.fadingEdges(lazyListState),
+                                        state = lazyListState
+                                    ) {
                                         items(
                                             items = seasons,
                                             key = { it.id }
                                         ) { season ->
-                                            Text(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .clickable {
-                                                        episodesUiEvent(
-                                                            EpisodesUiEvent.SetSelectedSeason(
-                                                                seasonState().mediaId,
-                                                                season.seasonNumber
-                                                            )
+                                            CustomListItem(
+                                                onClick = {
+                                                    episodesUiEvent(
+                                                        EpisodesUiEvent.SetSelectedSeason(
+                                                            seasonState().mediaId,
+                                                            season.seasonNumber
                                                         )
-                                                        showDialog = false
-                                                    }
-                                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                                                text = season.name ?: season.seasonNumber.toString(),
-                                                fontSize = if (season.seasonNumber == seasonState().seasonNumber) 22.sp else 18.sp,
-                                                fontWeight = if (season.seasonNumber == seasonState().seasonNumber) FontWeight.SemiBold else FontWeight.Normal,
-                                                color = if (season.seasonNumber == seasonState().seasonNumber) surfaceLight else MaterialTheme.colorScheme.surfaceVariant,
-                                                textAlign = TextAlign.Center
+                                                    )
+                                                    showDialog = false
+                                                },
+                                                headlineContent = {
+                                                    Text(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        text = season.name ?: season.seasonNumber.toString(),
+                                                        fontSize = if (season.seasonNumber == seasonState().seasonNumber) 22.sp else 18.sp,
+                                                        fontWeight = if (season.seasonNumber == seasonState().seasonNumber) FontWeight.SemiBold else FontWeight.Normal,
+                                                        color = if (season.seasonNumber == seasonState().seasonNumber) surfaceLight else surfaceLight.copy(alpha = .7f),
+                                                        textAlign = TextAlign.Center
+                                                    )
+                                                }
                                             )
                                         }
                                     }
