@@ -1,4 +1,4 @@
-package com.personal.tmdb.home.presentation.discover
+package com.personal.tmdb.core.presentation.discover
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -37,8 +37,8 @@ import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.components.IconChip
 import com.personal.tmdb.core.presentation.components.IconChipDefaults
 import com.personal.tmdb.core.presentation.components.MediaGrid
-import com.personal.tmdb.home.presentation.components.DiscoverTabs
-import com.personal.tmdb.home.presentation.discover.components.GenresDialog
+import com.personal.tmdb.core.presentation.discover.components.DiscoverTabs
+import com.personal.tmdb.core.presentation.discover.components.GenresDialog
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -141,11 +141,26 @@ private fun SharedTransitionScope.DiscoverScreen(
                             }
                         )
                         IconChip(
-                            onClick = { /*TODO*/ },
+                            onClick = { discoverUiEvent(DiscoverUiEvent.OnNavigateTo(Route.DiscoverFilters)) },
                             icon = {
                                 Icon(
                                     modifier = Modifier.size(IconChipDefaults.IconSize),
                                     painter = painterResource(id = R.drawable.icon_page_info_fill0_wght400),
+                                    contentDescription = null
+                                )
+                            },
+                            colors = IconChipDefaults.iconChipColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                iconContentColor = MaterialTheme.colorScheme.surfaceVariant
+                            ),
+                            border = null
+                        )
+                        IconChip(
+                            onClick = { /*TODO*/ },
+                            icon = {
+                                Icon(
+                                    modifier = Modifier.size(IconChipDefaults.IconSize),
+                                    painter = painterResource(id = R.drawable.icon_swap_vert_fill0_wght400),
                                     contentDescription = null
                                 )
                             },

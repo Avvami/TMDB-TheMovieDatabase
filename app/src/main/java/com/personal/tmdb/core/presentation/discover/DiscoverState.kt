@@ -1,4 +1,4 @@
-package com.personal.tmdb.home.presentation.discover
+package com.personal.tmdb.core.presentation.discover
 
 import com.personal.tmdb.core.domain.models.MediaResponseInfo
 import com.personal.tmdb.core.domain.util.MediaType

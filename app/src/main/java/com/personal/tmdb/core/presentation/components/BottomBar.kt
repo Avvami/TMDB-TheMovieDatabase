@@ -15,11 +15,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -45,15 +42,15 @@ import com.personal.tmdb.core.presentation.PreferencesState
 @Composable
 fun BottomBar(
     rootNavController: NavController,
+    bottomBarVisible:Boolean,
     preferencesState: () -> PreferencesState,
     userState: () -> UserState,
     navBarItemReselect: (() -> Unit)?
 ) {
     val navigationItems = rememberNavigationItems(preferencesState, userState)
-    val bottomBarVisibilityState = bottomBarVisibility(navController = rootNavController)
 
     AnimatedVisibility(
-        visible = bottomBarVisibilityState.value,
+        visible = bottomBarVisible,
         enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
         exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
     ) {
@@ -268,22 +265,4 @@ fun ProfileIcon(isSelected: Boolean, userState: () -> UserState) {
                 )
         )
     }
-}
-
-@Composable
-fun bottomBarVisibility(
-    navController: NavController
-): MutableState<Boolean> {
-
-    val bottomBarVisibilityState = rememberSaveable { (mutableStateOf(false)) }
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
-    when {
-        currentDestination?.hasRoute(Route.Image::class) == true -> bottomBarVisibilityState.value = false
-        currentDestination?.hasRoute(Route.AddToList::class) == true -> bottomBarVisibilityState.value = false
-        currentDestination?.hasRoute(Route.WelcomeBack::class) == true -> bottomBarVisibilityState.value = false
-        else -> bottomBarVisibilityState.value = true
-    }
-
-    return bottomBarVisibilityState
 }

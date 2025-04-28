@@ -1,4 +1,4 @@
-package com.personal.tmdb.home.presentation.discover
+package com.personal.tmdb.core.presentation.discover
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -109,6 +109,7 @@ class DiscoverViewModel @Inject constructor(
             is DiscoverUiEvent.SetShowGenresState -> {
                 _discoverState.update { it.copy(showGenres = event.state) }
             }
+            is DiscoverUiEvent.SetFilters -> {}
         }
     }
 }

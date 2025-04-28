@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -56,6 +57,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 val rootNavController = rememberNavController()
                 var navBarItemReselect: (() -> Unit)? by remember { mutableStateOf(null) }
+                var bottomBarVisible by rememberSaveable { mutableStateOf(true) }
                 val snackbarHostState = remember { SnackbarHostState() }
                 val scope = rememberCoroutineScope()
                 ObserveAsEvents(
@@ -93,6 +95,7 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         BottomBar(
                             rootNavController = rootNavController,
+                            bottomBarVisible = bottomBarVisible,
                             preferencesState = { preferencesState },
                             userState = { userState },
                             navBarItemReselect = navBarItemReselect
@@ -119,6 +122,7 @@ class MainActivity : ComponentActivity() {
                     RootNavHost(
                         rootNavController = rootNavController,
                         navBarItemReselect = { navBarItemReselect = it },
+                        setBottomBarVisible = { visible -> bottomBarVisible = visible },
                         bottomBarPadding = innerPadding.calculateBottomPadding(),
                         preferencesState = { preferencesState },
                         userState = { userState },

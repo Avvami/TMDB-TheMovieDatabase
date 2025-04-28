@@ -10,14 +10,23 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.Dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
+import androidx.navigation.navigation
 import com.personal.tmdb.UiEvent
 import com.personal.tmdb.UserState
 import com.personal.tmdb.core.domain.util.AdditionalNavigationItem
@@ -35,7 +44,11 @@ import com.personal.tmdb.detail.presentation.episodes.EpisodesScreenRoot
 import com.personal.tmdb.detail.presentation.image.ImageViewerScreenRoot
 import com.personal.tmdb.detail.presentation.person.PersonScreenRoot
 import com.personal.tmdb.detail.presentation.reviews.ReviewsScreenRoot
-import com.personal.tmdb.home.presentation.discover.DiscoverScreenRoot
+import com.personal.tmdb.core.presentation.discover.DiscoverScreenRoot
+import com.personal.tmdb.core.presentation.discover.DiscoverUiEvent
+import com.personal.tmdb.core.presentation.discover.DiscoverViewModel
+import com.personal.tmdb.core.presentation.discover_filters.DiscoverFiltersScreenRoot
+import com.personal.tmdb.core.presentation.discover_filters.DiscoverFiltersViewModel
 import com.personal.tmdb.home.presentation.home.HomeScreenRoot
 import com.personal.tmdb.profile.presentation.favorite.FavoriteScreenRoot
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.ListDetailsScreenRoot
@@ -53,14 +66,12 @@ fun RootNavHost(
     rootNavController: NavHostController,
     navBarItemReselect: ((() -> Unit)?) -> Unit,
     bottomBarPadding: Dp,
+    setBottomBarVisible: (visible: Boolean) -> Unit,
     preferencesState: () -> PreferencesState,
     userState: () -> UserState,
     uiEvent: (UiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val onNavigateBack: () -> Unit = {
-        rootNavController.navigateUp()
-    }
 
     NavHost(
         navController = rootNavController,
@@ -81,8 +92,8 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
-                rootNavController = rootNavController,
                 navController = navController,
+                setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyListState,
                 startDestination = Route.Home,
                 bottomBarPadding = bottomBarPadding,
@@ -106,8 +117,8 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
-                rootNavController = rootNavController,
                 navController = navController,
+                setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyGridState,
                 startDestination = Route.Search,
                 bottomBarPadding = bottomBarPadding,
@@ -131,8 +142,8 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
-                rootNavController = rootNavController,
                 navController = navController,
+                setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyGridState,
                 startDestination = Route.Watchlist,
                 bottomBarPadding = bottomBarPadding,
@@ -156,8 +167,8 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
-                rootNavController = rootNavController,
                 navController = navController,
+                setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyGridState,
                 startDestination = Route.Favorite,
                 bottomBarPadding = bottomBarPadding,
@@ -181,8 +192,8 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
-                rootNavController = rootNavController,
                 navController = navController,
+                setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyGridState,
                 startDestination = Route.MyLists,
                 bottomBarPadding = bottomBarPadding,
@@ -206,8 +217,8 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
-                rootNavController = rootNavController,
                 navController = navController,
+                setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyListState,
                 startDestination = Route.Profile,
                 bottomBarPadding = bottomBarPadding,
@@ -216,47 +227,14 @@ fun RootNavHost(
                 uiEvent = uiEvent
             )
         }
-        animatedComposable<Route.Image> {
-            ImageViewerScreenRoot(
-                onNavigateBack = onNavigateBack,
-                preferencesState = preferencesState
-            )
-        }
-        composable<Route.AddToList>(
-            enterTransition = { fadeIn(animationSpec = tween(durationMillis = 200)) },
-            exitTransition = { ExitTransition.None },
-            popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 200)) },
-            popExitTransition = { ExitTransition.None },
-        ) {
-            AddToListScreenRoot(
-                onNavigateBack = onNavigateBack
-            )
-        }
-        staticComposable<Route.WelcomeBack>(
-            deepLinks = listOf(
-                navDeepLink<Route.WelcomeBack>(
-                    basePath = C.REDIRECT_URL
-                )
-            )
-        ) {
-            LaunchedEffect(true) {
-                if (userState().user?.sessionId.isNullOrEmpty()) {
-                    uiEvent(UiEvent.SignInUser)
-                }
-            }
-            WelcomeBackScreenRoot(
-                onNavigateBack = onNavigateBack,
-                userState = userState
-            )
-        }
     }
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ChildNavHost(
-    rootNavController: NavHostController,
     navController: NavHostController,
+    setBottomBarVisible: (visible: Boolean) -> Unit,
     scrollState: Any,
     startDestination: Route,
     bottomBarPadding: Dp,
@@ -268,9 +246,8 @@ fun ChildNavHost(
         navController.navigateUp()
     }
     val onNavigateTo: (route: Route) -> Unit = { route ->
-        val controller = if (route is Route.Image || route is Route.AddToList) rootNavController else navController
-        controller.navigate(route = route) {
-            launchSingleTop = if (route is Route.Image || route is Route.AddToList) true else route !is Route.Detail
+        navController.navigate(route = route) {
+            launchSingleTop = if (route is Route.Image || route is Route.AddToList || route is Route.DiscoverFilters) true else route !is Route.Detail
         }
     }
     SharedTransitionLayout {
@@ -421,16 +398,106 @@ fun ChildNavHost(
                     preferencesState = preferencesState
                 )
             }
-            animatedComposable<Route.Discover> {
-                DiscoverScreenRoot(
-                    bottomPadding = bottomBarPadding,
+            navigation<Route.DiscoverGraph>(
+                startDestination = Route.Discover::class
+            ) {
+                animatedComposable<Route.Discover> {
+                    val viewModel = hiltViewModel<DiscoverViewModel>()
+                    val filtersViewModel = it.sharedHiltViewModel<DiscoverFiltersViewModel>(navController)
+                    val filters by filtersViewModel.filtersState.collectAsStateWithLifecycle()
+
+                    LaunchedEffect(true) {
+                        viewModel.discoverUiEvent(DiscoverUiEvent.SetFilters(filters))
+                    }
+
+                    DiscoverScreenRoot(
+                        bottomPadding = bottomBarPadding,
+                        onNavigateBack = onNavigateBack,
+                        onNavigateTo = onNavigateTo,
+                        preferencesState = preferencesState,
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedContentScope = this@animatedComposable,
+                        viewModel = viewModel
+                    )
+                }
+                animatedComposable<Route.DiscoverFilters> {
+                    DisposableEffect(Unit) {
+                        setBottomBarVisible(false)
+                        onDispose {
+                            setBottomBarVisible(true)
+                        }
+                    }
+                    val viewModel = it.sharedHiltViewModel<DiscoverFiltersViewModel>(navController)
+                    DiscoverFiltersScreenRoot(
+                        onNavigateBack = onNavigateBack,
+                        viewModel = viewModel
+                    )
+                }
+            }
+            animatedComposable<Route.Image> {
+                DisposableEffect(Unit) {
+                    setBottomBarVisible(false)
+                    onDispose {
+                        setBottomBarVisible(true)
+                    }
+                }
+                ImageViewerScreenRoot(
                     onNavigateBack = onNavigateBack,
-                    onNavigateTo = onNavigateTo,
-                    preferencesState = preferencesState,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this@animatedComposable
+                    preferencesState = preferencesState
+                )
+            }
+            composable<Route.AddToList>(
+                enterTransition = { fadeIn(animationSpec = tween(durationMillis = 200)) },
+                exitTransition = { ExitTransition.None },
+                popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 200)) },
+                popExitTransition = { ExitTransition.None },
+            ) {
+                DisposableEffect(Unit) {
+                    setBottomBarVisible(false)
+                    onDispose {
+                        setBottomBarVisible(true)
+                    }
+                }
+                AddToListScreenRoot(
+                    onNavigateBack = onNavigateBack
+                )
+            }
+            staticComposable<Route.WelcomeBack>(
+                deepLinks = listOf(
+                    navDeepLink<Route.WelcomeBack>(
+                        basePath = C.REDIRECT_URL
+                    )
+                )
+            ) {
+                DisposableEffect(Unit) {
+                    setBottomBarVisible(false)
+                    onDispose {
+                        setBottomBarVisible(true)
+                    }
+                }
+                LaunchedEffect(true) {
+                    if (userState().user?.sessionId.isNullOrEmpty()) {
+                        uiEvent(UiEvent.SignInUser)
+                    }
+                }
+                WelcomeBackScreenRoot(
+                    onNavigateBack = onNavigateBack,
+                    userState = userState
                 )
             }
         }
     }
+}
+
+@Composable
+private inline fun <reified T: ViewModel> NavBackStackEntry.sharedHiltViewModel(
+    navController: NavController
+): T {
+    val navGraphRoute = destination.parent?.route ?: return hiltViewModel<T>()
+    val parentEntry = remember(this) {
+        navController.getBackStackEntry(navGraphRoute)
+    }
+    return hiltViewModel(
+        viewModelStoreOwner = parentEntry
+    )
 }

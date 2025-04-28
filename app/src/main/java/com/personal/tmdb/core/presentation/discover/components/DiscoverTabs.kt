@@ -1,4 +1,4 @@
-package com.personal.tmdb.home.presentation.components
+package com.personal.tmdb.core.presentation.discover.components
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi

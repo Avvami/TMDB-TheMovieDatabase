@@ -220,4 +220,11 @@
     <string name="share">Share</string>
     <string name="empty_languages">Sorry, no languages to choose from</string>
     <string name="language_note">Note: Changing the language setting will affect the language used in API requests but will not change the app\'s interface language.</string>
+    <string name="filters">Filters</string>
+    <string name="clear_all">Clear all</string>
+    <string name="all_genres">All Genres</string>
+    <string name="air_dates">Air Dates</string>
+    <string name="runtime">Runtime</string>
+    <string name="include_adult">Include Adult</string>
+    <string name="content_origin">Content Origin</string>
 </resources>
