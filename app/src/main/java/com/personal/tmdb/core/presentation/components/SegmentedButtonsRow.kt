@@ -103,10 +103,10 @@ fun RowScope.VerticalSegmentedButton(
     enabled: Boolean = true,
     onClick: () -> Unit,
     selected: Boolean,
-    shape: Shape,
+    shape: Shape = MaterialTheme.shapes.medium,
     colors: SegmentedButtonColors = SegmentedButtonDefaults.colors(),
     interactionSource: MutableInteractionSource? = null,
-    icon: @Composable () -> Unit,
+    icon: (@Composable () -> Unit)? = null,
     label: @Composable () -> Unit,
 ) {
     @Suppress("NAME_SHADOWING")
@@ -144,7 +144,7 @@ fun RowScope.VerticalSegmentedButton(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(ContentPadding)
                 ) {
-                    icon()
+                    icon?.let { it() }
                     label()
                 }
             }
@@ -180,10 +180,10 @@ fun RowScope.HorizontalSegmentedButton(
     enabled: Boolean = true,
     onClick: () -> Unit,
     selected: Boolean,
-    shape: Shape,
+    shape: Shape = MaterialTheme.shapes.medium,
     colors: SegmentedButtonColors = SegmentedButtonDefaults.colors(),
     interactionSource: MutableInteractionSource? = null,
-    icon: @Composable () -> Unit,
+    icon: (@Composable () -> Unit)? = null,
     label: @Composable () -> Unit,
 ) {
     @Suppress("NAME_SHADOWING")
@@ -221,7 +221,7 @@ fun RowScope.HorizontalSegmentedButton(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(ContentPadding, Alignment.CenterHorizontally)
                 ) {
-                    icon()
+                    icon?.let { it() }
                     label()
                 }
             }

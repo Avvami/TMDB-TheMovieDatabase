@@ -1,4 +1,4 @@
-package com.personal.tmdb.core.presentation.discover
+package com.personal.tmdb.discover.presentation.discover
 
 import com.personal.tmdb.core.domain.models.MediaResponseInfo
 import com.personal.tmdb.core.domain.util.MediaType
@@ -13,5 +13,6 @@ data class DiscoverState(
     val selectedGenre: Genre? = null,
     val genresInfo: GenresInfo? = null,
     val discover: MediaResponseInfo? = null,
+    val filtersApplied: Boolean = false,
     val errorMessage: UiText? = null
 )

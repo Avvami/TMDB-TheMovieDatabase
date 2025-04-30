@@ -56,7 +56,7 @@ fun formatEpisodesCount(numberOfEpisodes: Int): String {
     }
 }
 
-fun formatDate(localDate: LocalDate): String = localDate.format(DateTimeFormatter.ofPattern("MMM d, yyyy"))
+fun formatDate(localDate: LocalDate, pattern: String = "MMM d, yyyy"): String = localDate.format(DateTimeFormatter.ofPattern(pattern))
 
 fun formatDateTime(localDateTime: LocalDateTime): UiText {
     val today = LocalDate.now()

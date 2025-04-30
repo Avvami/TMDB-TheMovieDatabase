@@ -18,6 +18,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.unit.dp
 
@@ -31,7 +33,8 @@ fun CustomListItem(
     trailingContent: @Composable (() -> Unit)? = null,
     selected: Boolean = false,
     enabled: Boolean = true,
-    colors: CustomListItemColors = CustomListItemDefaults.colors()
+    colors: CustomListItemColors = CustomListItemDefaults.colors(),
+    shape: Shape = RectangleShape
 ) {
     val containerColor by animateColorAsState(
         targetValue = if (selected) colors.selectedContainerColor else colors.containerColor,
@@ -43,7 +46,8 @@ fun CustomListItem(
         modifier = modifier,
         onClick = onClick,
         enabled = enabled,
-        color = containerColor
+        color = containerColor,
+        shape = shape
     ) {
         Row(
             modifier = Modifier.padding(contentPadding),

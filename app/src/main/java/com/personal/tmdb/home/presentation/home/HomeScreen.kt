@@ -47,7 +47,7 @@ import com.personal.tmdb.core.presentation.components.MediaBannerShimmer
 import com.personal.tmdb.core.presentation.components.MediaCarousel
 import com.personal.tmdb.core.presentation.components.MediaPoster
 import com.personal.tmdb.core.presentation.components.MediaPosterShimmer
-import com.personal.tmdb.core.presentation.discover.components.DiscoverTabs
+import com.personal.tmdb.discover.presentation.discover.components.DiscoverTabs
 import com.personal.tmdb.home.presentation.home.components.HomeBanner
 
 @OptIn(ExperimentalSharedTransitionApi::class)

@@ -1,4 +1,4 @@
-package com.personal.tmdb.core.presentation.discover
+package com.personal.tmdb.discover.presentation.discover
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -16,6 +16,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -37,8 +39,8 @@ import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.components.IconChip
 import com.personal.tmdb.core.presentation.components.IconChipDefaults
 import com.personal.tmdb.core.presentation.components.MediaGrid
-import com.personal.tmdb.core.presentation.discover.components.DiscoverTabs
-import com.personal.tmdb.core.presentation.discover.components.GenresDialog
+import com.personal.tmdb.discover.presentation.discover.components.DiscoverTabs
+import com.personal.tmdb.discover.presentation.discover.components.GenresDialog
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -140,21 +142,29 @@ private fun SharedTransitionScope.DiscoverScreen(
                                 )
                             }
                         )
-                        IconChip(
-                            onClick = { discoverUiEvent(DiscoverUiEvent.OnNavigateTo(Route.DiscoverFilters)) },
-                            icon = {
-                                Icon(
-                                    modifier = Modifier.size(IconChipDefaults.IconSize),
-                                    painter = painterResource(id = R.drawable.icon_page_info_fill0_wght400),
-                                    contentDescription = null
-                                )
-                            },
-                            colors = IconChipDefaults.iconChipColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                iconContentColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                            border = null
-                        )
+                        BadgedBox(
+                            badge = {
+                                if (discoverState().filtersApplied) {
+                                    Badge(containerColor = MaterialTheme.colorScheme.primary)
+                                }
+                            }
+                        ) {
+                            IconChip(
+                                onClick = { discoverUiEvent(DiscoverUiEvent.OnNavigateTo(Route.DiscoverFilters)) },
+                                icon = {
+                                    Icon(
+                                        modifier = Modifier.size(IconChipDefaults.IconSize),
+                                        painter = painterResource(id = R.drawable.icon_page_info_fill0_wght400),
+                                        contentDescription = null
+                                    )
+                                },
+                                colors = IconChipDefaults.iconChipColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    iconContentColor = MaterialTheme.colorScheme.surfaceVariant
+                                ),
+                                border = null
+                            )
+                        }
                         IconChip(
                             onClick = { /*TODO*/ },
                             icon = {

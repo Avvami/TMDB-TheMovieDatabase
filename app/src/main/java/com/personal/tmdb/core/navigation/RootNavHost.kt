@@ -44,11 +44,11 @@ import com.personal.tmdb.detail.presentation.episodes.EpisodesScreenRoot
 import com.personal.tmdb.detail.presentation.image.ImageViewerScreenRoot
 import com.personal.tmdb.detail.presentation.person.PersonScreenRoot
 import com.personal.tmdb.detail.presentation.reviews.ReviewsScreenRoot
-import com.personal.tmdb.core.presentation.discover.DiscoverScreenRoot
-import com.personal.tmdb.core.presentation.discover.DiscoverUiEvent
-import com.personal.tmdb.core.presentation.discover.DiscoverViewModel
-import com.personal.tmdb.core.presentation.discover_filters.DiscoverFiltersScreenRoot
-import com.personal.tmdb.core.presentation.discover_filters.DiscoverFiltersViewModel
+import com.personal.tmdb.discover.presentation.discover.DiscoverScreenRoot
+import com.personal.tmdb.discover.presentation.discover.DiscoverUiEvent
+import com.personal.tmdb.discover.presentation.discover.DiscoverViewModel
+import com.personal.tmdb.discover.presentation.discover_filters.DiscoverFiltersScreenRoot
+import com.personal.tmdb.discover.presentation.discover_filters.DiscoverFiltersViewModel
 import com.personal.tmdb.home.presentation.home.HomeScreenRoot
 import com.personal.tmdb.profile.presentation.favorite.FavoriteScreenRoot
 import com.personal.tmdb.profile.presentation.lists.presentation.list_details.ListDetailsScreenRoot

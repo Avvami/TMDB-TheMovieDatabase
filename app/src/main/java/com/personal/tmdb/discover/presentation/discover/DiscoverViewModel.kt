@@ -1,5 +1,8 @@
-package com.personal.tmdb.core.presentation.discover
+package com.personal.tmdb.discover.presentation.discover
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +14,8 @@ import com.personal.tmdb.core.domain.util.onError
 import com.personal.tmdb.core.domain.util.onSuccess
 import com.personal.tmdb.core.domain.util.toUiText
 import com.personal.tmdb.core.navigation.Route
+import com.personal.tmdb.discover.presentation.discover_filters.FiltersState
+import com.personal.tmdb.discover.presentation.discover_filters.hasChangesComparedTo
 import com.personal.tmdb.home.domain.repository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +39,7 @@ class DiscoverViewModel @Inject constructor(
         )
     )
     val discoverState = _discoverState.asStateFlow()
+    private var filtersState by mutableStateOf(FiltersState())
 
     init {
         discover(
@@ -109,7 +115,17 @@ class DiscoverViewModel @Inject constructor(
             is DiscoverUiEvent.SetShowGenresState -> {
                 _discoverState.update { it.copy(showGenres = event.state) }
             }
-            is DiscoverUiEvent.SetFilters -> {}
+            is DiscoverUiEvent.SetFilters -> {
+                println(event.filters)
+                val filters = event.filters
+                val filtersApplied = filters.ratingApplied || filters.airDateApplied || filters.runtimeApplied
+                        || filters.includeAdult || filters.contentOriginApplied
+                _discoverState.update { it.copy(filtersApplied = filtersApplied) }
+                if (filters.hasChangesComparedTo(filtersState)) {
+                    filtersState = filters
+                    /*TODO: Api call*/
+                }
+            }
         }
     }
 }

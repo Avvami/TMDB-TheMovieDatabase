@@ -227,4 +227,12 @@
     <string name="runtime">Runtime</string>
     <string name="include_adult">Include Adult</string>
     <string name="content_origin">Content Origin</string>
+    <string name="from">from</string>
+    <string name="to">to</string>
+    <string name="minimumVoteCount">Minimum Vote Count</string>
+    <string name="range">Range</string>
+    <string name="min">min</string>
+    <string name="country">Country</string>
+    <string name="year">Year</string>
+    <string name="select_year">Select year</string>
 </resources>

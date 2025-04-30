@@ -1,5 +1,6 @@
-package com.personal.tmdb.core.presentation.discover_filters.components
+package com.personal.tmdb.discover.presentation.discover_filters.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -9,9 +10,9 @@ import androidx.compose.ui.res.stringResource
 import com.personal.tmdb.R
 import com.personal.tmdb.core.presentation.components.CustomListItem
 import com.personal.tmdb.core.presentation.components.CustomListItemDefaults
-import com.personal.tmdb.core.presentation.discover_filters.DiscoverFiltersUiEvent
-import com.personal.tmdb.core.presentation.discover_filters.FiltersState
-import com.personal.tmdb.core.presentation.discover_filters.FiltersUi
+import com.personal.tmdb.discover.presentation.discover_filters.DiscoverFiltersUiEvent
+import com.personal.tmdb.discover.presentation.discover_filters.FiltersState
+import com.personal.tmdb.discover.presentation.discover_filters.FiltersUi
 
 @Composable
 fun FilterTabs(
@@ -74,18 +75,22 @@ fun FilterTabs(
                 headlineColor = if (filtersState().includeAdult) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
             )
         )
-        CustomListItem(
-            selected = filtersState().filtersUi == FiltersUi.CONTENT_ORIGIN,
-            onClick = {
-                filtersUiEvent(DiscoverFiltersUiEvent.SetSelectedTab(FiltersUi.CONTENT_ORIGIN))
-            },
-            headlineContent = {
-                Text(text = stringResource(id = R.string.content_origin))
-            },
-            colors = CustomListItemDefaults.colors(
-                selectedContainerColor = MaterialTheme.colorScheme.surface,
-                headlineColor = if (filtersState().originApplied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+        AnimatedVisibility(
+            visible = filtersState().countries != null && filtersState().languages != null
+        ) {
+            CustomListItem(
+                selected = filtersState().filtersUi == FiltersUi.CONTENT_ORIGIN,
+                onClick = {
+                    filtersUiEvent(DiscoverFiltersUiEvent.SetSelectedTab(FiltersUi.CONTENT_ORIGIN))
+                },
+                headlineContent = {
+                    Text(text = stringResource(id = R.string.content_origin))
+                },
+                colors = CustomListItemDefaults.colors(
+                    selectedContainerColor = MaterialTheme.colorScheme.surface,
+                    headlineColor = if (filtersState().contentOriginApplied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                )
             )
-        )
+        }
     }
 }

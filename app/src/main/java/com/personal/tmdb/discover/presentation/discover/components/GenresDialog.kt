@@ -1,4 +1,4 @@
-package com.personal.tmdb.core.presentation.discover.components
+package com.personal.tmdb.discover.presentation.discover.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,7 +30,7 @@ import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.util.fadingEdges
 import com.personal.tmdb.core.presentation.components.CustomListItem
 import com.personal.tmdb.detail.data.models.Genre
-import com.personal.tmdb.core.presentation.discover.DiscoverState
+import com.personal.tmdb.discover.presentation.discover.DiscoverState
 import com.personal.tmdb.ui.theme.onSurfaceLight
 import com.personal.tmdb.ui.theme.surfaceLight
 
