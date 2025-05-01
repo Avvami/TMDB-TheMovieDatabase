@@ -49,7 +49,7 @@ fun IncludeAdultFilter(
                     )
                 }
             },
-            contentPadding = PaddingValues(16.dp)
+            contentPadding = PaddingValues(8.dp)
         )
     }
 }

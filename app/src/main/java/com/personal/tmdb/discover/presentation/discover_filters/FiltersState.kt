@@ -28,8 +28,8 @@ data class FiltersState(
     val countries: List<Country>? = null,
     val languages: List<Language>? = null,
     val searchQuery: String = "",
-    val selectedOrigin: Any? = null,
-    val selectedOriginCode: String = "",
+    val selectedCountry: Country? = null,
+    val selectedLanguage: Language? = null,
     val contentOriginApplied: Boolean = false
 )
 

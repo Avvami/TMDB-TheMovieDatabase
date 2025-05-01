@@ -70,13 +70,22 @@ class DiscoverFiltersViewModel @Inject constructor(
     }
 
     private fun isAirDateApplied(state: FiltersState): Boolean {
-        return state.fromAirDate != cleanState.fromAirDate || state.toAirDate != cleanState.toAirDate ||
-                state.yearAirDate != cleanState.yearAirDate
+        return when (state.airDateType) {
+            AirDateType.RANGE -> state.fromAirDate != cleanState.fromAirDate || state.toAirDate != cleanState.toAirDate
+            AirDateType.YEAR -> state.yearAirDate != cleanState.yearAirDate
+        }
     }
 
     private fun isRuntimeApplied(state: FiltersState): Boolean {
         return state.fromRuntime != cleanState.fromRuntime ||
                 state.toRuntime != cleanState.toRuntime
+    }
+
+    private fun isContentOriginApplied(state: FiltersState): Boolean {
+        return when (state.contentOriginType) {
+            ContentOriginType.COUNTRY -> state.selectedCountry != cleanState.selectedCountry
+            ContentOriginType.LANGUAGE -> state.selectedLanguage != cleanState.selectedLanguage
+        }
     }
 
     fun filtersUiEvent(event: DiscoverFiltersUiEvent) {
@@ -126,14 +135,17 @@ class DiscoverFiltersViewModel @Inject constructor(
                 _filtersState.update {
                     it.copy(
                         airDateApplied = false,
-                        fromAirDate = null,
-                        toAirDate = null,
-                        yearAirDate = ""
+                        fromAirDate = if (it.airDateType == AirDateType.RANGE) null else it.fromAirDate,
+                        toAirDate = if (it.airDateType == AirDateType.RANGE) null else it.toAirDate,
+                        yearAirDate = if (it.airDateType == AirDateType.YEAR) "" else it.yearAirDate
                     )
                 }
             }
             is DiscoverFiltersUiEvent.SetAirDateType -> {
-                _filtersState.update { it.copy(airDateType = event.type) }
+                _filtersState.update {
+                    val state = it.copy(airDateType = event.type)
+                    state.copy(airDateApplied = isAirDateApplied(state))
+                }
             }
             is DiscoverFiltersUiEvent.SetFromAirDate -> {
                 event.dateMillis?.let { millis ->
@@ -193,8 +205,8 @@ class DiscoverFiltersViewModel @Inject constructor(
                 _filtersState.update {
                     it.copy(
                         contentOriginApplied = false,
-                        selectedOrigin = null,
-                        selectedOriginCode = "",
+                        selectedCountry = if (it.contentOriginType == ContentOriginType.COUNTRY) null else it.selectedCountry,
+                        selectedLanguage = if (it.contentOriginType == ContentOriginType.LANGUAGE) null else it.selectedLanguage,
                         searchQuery = "",
                         countries = countries,
                         languages = languages
@@ -202,7 +214,10 @@ class DiscoverFiltersViewModel @Inject constructor(
                 }
             }
             is DiscoverFiltersUiEvent.SetContentOriginType -> {
-                _filtersState.update { it.copy(contentOriginType = event.type) }
+                _filtersState.update {
+                    val state = it.copy(contentOriginType = event.type)
+                    state.copy(contentOriginApplied = isContentOriginApplied(state))
+                }
             }
             is DiscoverFiltersUiEvent.SetSearchQuery -> {
                 _filtersState.update { it.copy(searchQuery = event.query) }
@@ -223,11 +238,8 @@ class DiscoverFiltersViewModel @Inject constructor(
                 _filtersState.update {
                     it.copy(
                         contentOriginApplied = true,
-                        selectedOrigin = event.origin,
-                        selectedOriginCode = when (it.contentOriginType) {
-                            ContentOriginType.COUNTRY -> (event.origin as Country).code
-                            ContentOriginType.LANGUAGE -> (event.origin as Language).code
-                        }
+                        selectedCountry = if (it.contentOriginType == ContentOriginType.COUNTRY) event.origin as Country else it.selectedCountry,
+                        selectedLanguage = if (it.contentOriginType == ContentOriginType.LANGUAGE) event.origin as Language else it.selectedLanguage
                     )
                 }
             }

@@ -33,7 +33,7 @@ fun FilterTabs(
             },
             colors = CustomListItemDefaults.colors(
                 selectedContainerColor = MaterialTheme.colorScheme.surface,
-                headlineColor = if (filtersState().ratingApplied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                headlineColor = if (filtersState().ratingApplied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
             )
         )
         CustomListItem(
@@ -46,7 +46,7 @@ fun FilterTabs(
             },
             colors = CustomListItemDefaults.colors(
                 selectedContainerColor = MaterialTheme.colorScheme.surface,
-                headlineColor = if (filtersState().airDateApplied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                headlineColor = if (filtersState().airDateApplied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
             )
         )
         CustomListItem(
@@ -59,7 +59,7 @@ fun FilterTabs(
             },
             colors = CustomListItemDefaults.colors(
                 selectedContainerColor = MaterialTheme.colorScheme.surface,
-                headlineColor = if (filtersState().runtimeApplied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                headlineColor = if (filtersState().runtimeApplied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
             )
         )
         CustomListItem(
@@ -72,7 +72,7 @@ fun FilterTabs(
             },
             colors = CustomListItemDefaults.colors(
                 selectedContainerColor = MaterialTheme.colorScheme.surface,
-                headlineColor = if (filtersState().includeAdult) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                headlineColor = if (filtersState().includeAdult) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
             )
         )
         AnimatedVisibility(
@@ -88,7 +88,7 @@ fun FilterTabs(
                 },
                 colors = CustomListItemDefaults.colors(
                     selectedContainerColor = MaterialTheme.colorScheme.surface,
-                    headlineColor = if (filtersState().contentOriginApplied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                    headlineColor = if (filtersState().contentOriginApplied) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                 )
             )
         }

@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -155,6 +156,11 @@ fun ContentOriginFilter(
                 ContentOriginType.COUNTRY -> {
                     filtersState().countries?.let { countries ->
                         val lazyListState = rememberLazyListState()
+                        LaunchedEffect(key1 = true) {
+                            countries.indexOf(filtersState().selectedCountry).takeIf { it != -1 }?.let {
+                                lazyListState.scrollToItem(it)
+                            }
+                        }
                         LazyColumn(
                             modifier = Modifier.fadingEdges(lazyListState),
                             state = lazyListState
@@ -176,10 +182,10 @@ fun ContentOriginFilter(
                                     },
                                     leadingContent = {
                                         AnimatedContent(
-                                            targetState = filtersState().selectedOrigin,
+                                            targetState = filtersState().selectedCountry,
                                             label = "SelectedOriginCheckAnimation"
-                                        ) { selectedOrigin ->
-                                            if (selectedOrigin == country) {
+                                        ) { selectedCountry ->
+                                            if (selectedCountry == country) {
                                                 Icon(
                                                     imageVector = Icons.Rounded.Check,
                                                     contentDescription = null,
@@ -201,6 +207,11 @@ fun ContentOriginFilter(
                 ContentOriginType.LANGUAGE -> {
                     filtersState().languages?.let { languages ->
                         val lazyListState = rememberLazyListState()
+                        LaunchedEffect(key1 = true) {
+                            languages.indexOf(filtersState().selectedLanguage).takeIf { it != -1 }?.let {
+                                lazyListState.scrollToItem(it)
+                            }
+                        }
                         LazyColumn(
                             modifier = Modifier.fadingEdges(lazyListState),
                             state = lazyListState
@@ -224,10 +235,10 @@ fun ContentOriginFilter(
                                     },
                                     leadingContent = {
                                         AnimatedContent(
-                                            targetState = filtersState().selectedOrigin,
+                                            targetState = filtersState().selectedLanguage,
                                             label = "SelectedOriginCheckAnimation"
-                                        ) { selectedOrigin ->
-                                            if (selectedOrigin == language) {
+                                        ) { selectedLanguage ->
+                                            if (selectedLanguage == language) {
                                                 Icon(
                                                     imageVector = Icons.Rounded.Check,
                                                     contentDescription = null,

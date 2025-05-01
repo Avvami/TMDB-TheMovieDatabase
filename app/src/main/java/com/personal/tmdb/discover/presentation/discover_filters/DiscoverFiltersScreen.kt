@@ -116,7 +116,7 @@ private fun DiscoverFiltersScreen(
         ) {
             FilterTabs(
                 modifier = Modifier
-                    .width(150.dp)
+                    .width(120.dp)
                     .fillMaxHeight()
                     .background(MaterialTheme.colorScheme.surfaceContainer)
                     .verticalScroll(rememberScrollState()),
@@ -133,7 +133,7 @@ private fun DiscoverFiltersScreen(
                         RatingFilter(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(8.dp),
                             filtersState = filtersState,
                             filtersUiEvent = filtersUiEvent
                         )
@@ -142,7 +142,7 @@ private fun DiscoverFiltersScreen(
                         AirDatesFilter(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(8.dp),
                             filtersState = filtersState,
                             filtersUiEvent = filtersUiEvent
                         )
@@ -151,7 +151,7 @@ private fun DiscoverFiltersScreen(
                         RuntimeFilter(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(8.dp),
                             filtersState = filtersState,
                             filtersUiEvent = filtersUiEvent
                         )
@@ -167,7 +167,7 @@ private fun DiscoverFiltersScreen(
                         ContentOriginFilter(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(8.dp),
                             filtersState = filtersState,
                             filtersUiEvent = filtersUiEvent
                         )
