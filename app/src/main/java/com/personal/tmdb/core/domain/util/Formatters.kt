@@ -56,6 +56,8 @@ fun formatEpisodesCount(numberOfEpisodes: Int): String {
     }
 }
 
+fun formatAirDateRequest(localDate: LocalDate?): String = localDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) ?: ""
+
 fun formatDate(localDate: LocalDate, pattern: String = "MMM d, yyyy"): String = localDate.format(DateTimeFormatter.ofPattern(pattern))
 
 fun formatDateTime(localDateTime: LocalDateTime): UiText {

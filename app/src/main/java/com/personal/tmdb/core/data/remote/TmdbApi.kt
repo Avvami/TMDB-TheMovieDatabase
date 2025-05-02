@@ -332,6 +332,30 @@ interface TmdbApi {
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @GET("3/configuration/languages")
     suspend fun getLanguages(): List<LanguageDto>
+
+    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
+    @GET("3/discover/{media_type}?")
+    suspend fun discoverMedia(
+        @Path("media_type") mediaType: String,
+        @Query("language") language: String?,
+        @Query("page") page: Int,
+        @Query("include_adult") includeAdult: Boolean,
+        @Query("first_air_date_year") airDateYear: String,
+        @Query("primary_release_year") releaseDateYear: String,
+        @Query("first_air_date.gte") fromAirDate: String,
+        @Query("primary_release_date.gte") fromReleaseDate: String,
+        @Query("first_air_date.lte") toAirDate: String,
+        @Query("primary_release_date.lte") toReleaseDate: String,
+        @Query("sort_by") sortBy: String,
+        @Query("vote_average.gte") fromRating: Float,
+        @Query("vote_average.lte") toRating: Float,
+        @Query("vote_count.gte") minRatingCount: Float,
+        @Query("with_genres") withGenre: String,
+        @Query("with_origin_country") withOriginCountry: String,
+        @Query("with_original_language") withOriginalLanguage: String,
+        @Query("with_runtime.gte") fromRuntime: Int,
+        @Query("with_runtime.lte") toRuntime: Int,
+    ): MediaResponseDto
 }
 
 typealias LanguageCode = String

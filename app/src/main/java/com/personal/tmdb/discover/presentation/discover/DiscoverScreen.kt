@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
@@ -29,16 +30,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.personal.tmdb.R
+import com.personal.tmdb.core.domain.util.negativeHorizontalPadding
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.components.IconChip
 import com.personal.tmdb.core.presentation.components.IconChipDefaults
 import com.personal.tmdb.core.presentation.components.MediaGrid
+import com.personal.tmdb.core.presentation.components.MediaPoster
+import com.personal.tmdb.core.presentation.components.MediaPosterShimmer
 import com.personal.tmdb.discover.presentation.discover.components.DiscoverTabs
 import com.personal.tmdb.discover.presentation.discover.components.GenresDialog
 
@@ -87,74 +92,93 @@ private fun SharedTransitionScope.DiscoverScreen(
     ) { innerPadding ->
         MediaGrid(
             modifier = modifier,
-            contentPadding = PaddingValues(top = innerPadding.calculateTopPadding() + 16.dp, bottom = 16.dp),
-        ) {
-            item(
-                span = { GridItemSpan(maxLineSpan) }
-            ) {
-                DiscoverTabs(
-                    preferencesState = preferencesState,
-                    uiState = discoverState().uiState,
-                    animatedContentScope = animatedContentScope,
-                    leadingContent = {
-                        IconChip(
-                            onClick = {
-                                discoverUiEvent(DiscoverUiEvent.OnNavigateBack)
-                            },
-                            icon = {
-                                Icon(
-                                    modifier = Modifier.size(IconChipDefaults.IconSize),
-                                    imageVector = Icons.Rounded.Close,
-                                    contentDescription = null
-                                )
-                            },
-                            colors = IconChipDefaults.iconChipColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                iconContentColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                            border = BorderStroke(
-                                width = 2.dp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)
-                            ),
-                            shape = CircleShape
-                        )
-                    },
-                    trailingContent = {
-                        FilterChip(
-                            selected = false,
-                            onClick = { discoverUiEvent(DiscoverUiEvent.SetShowGenresState(true)) },
-                            label = {
-                                Text(
-                                    text = discoverState().selectedGenre?.name ?: stringResource(id = R.string.genres)
-                                )
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                labelColor = MaterialTheme.colorScheme.surfaceVariant,
-                                iconColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                            border = null,
-                            trailingIcon = {
-                                Icon(
-                                    modifier = Modifier.size(FilterChipDefaults.IconSize),
-                                    imageVector = Icons.Rounded.KeyboardArrowDown,
-                                    contentDescription = null
-                                )
-                            }
-                        )
-                        BadgedBox(
-                            badge = {
-                                if (discoverState().filtersApplied) {
-                                    Badge(containerColor = MaterialTheme.colorScheme.primary)
-                                }
-                            }
-                        ) {
+            contentPadding = PaddingValues(start = 16.dp, top = innerPadding.calculateTopPadding() + 16.dp, end = 16.dp, bottom = 16.dp),
+            span = {
+                item(
+                    span = { GridItemSpan(maxLineSpan) }
+                ) {
+                    DiscoverTabs(
+                        modifier = Modifier
+                            .negativeHorizontalPadding((-16).dp)
+                            .padding(bottom = 8.dp),
+                        preferencesState = preferencesState,
+                        uiState = discoverState().uiState,
+                        animatedContentScope = animatedContentScope,
+                        leadingContent = {
                             IconChip(
-                                onClick = { discoverUiEvent(DiscoverUiEvent.OnNavigateTo(Route.DiscoverFilters)) },
+                                onClick = {
+                                    discoverUiEvent(DiscoverUiEvent.OnNavigateBack)
+                                },
                                 icon = {
                                     Icon(
                                         modifier = Modifier.size(IconChipDefaults.IconSize),
-                                        painter = painterResource(id = R.drawable.icon_page_info_fill0_wght400),
+                                        imageVector = Icons.Rounded.Close,
+                                        contentDescription = null
+                                    )
+                                },
+                                colors = IconChipDefaults.iconChipColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    iconContentColor = MaterialTheme.colorScheme.surfaceVariant
+                                ),
+                                border = BorderStroke(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)
+                                ),
+                                shape = CircleShape
+                            )
+                        },
+                        trailingContent = {
+                            FilterChip(
+                                selected = false,
+                                onClick = { discoverUiEvent(DiscoverUiEvent.SetShowGenresState(true)) },
+                                label = {
+                                    Text(
+                                        text = discoverState().selectedGenre?.name ?: stringResource(id = R.string.genres)
+                                    )
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    labelColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    iconColor = MaterialTheme.colorScheme.surfaceVariant
+                                ),
+                                border = null,
+                                trailingIcon = {
+                                    Icon(
+                                        modifier = Modifier.size(FilterChipDefaults.IconSize),
+                                        imageVector = Icons.Rounded.KeyboardArrowDown,
+                                        contentDescription = null
+                                    )
+                                }
+                            )
+                            BadgedBox(
+                                badge = {
+                                    if (discoverState().filtersApplied) {
+                                        Badge(containerColor = MaterialTheme.colorScheme.primary)
+                                    }
+                                }
+                            ) {
+                                IconChip(
+                                    onClick = { discoverUiEvent(DiscoverUiEvent.OnNavigateTo(Route.DiscoverFilters)) },
+                                    icon = {
+                                        Icon(
+                                            modifier = Modifier.size(IconChipDefaults.IconSize),
+                                            painter = painterResource(id = R.drawable.icon_page_info_fill0_wght400),
+                                            contentDescription = null
+                                        )
+                                    },
+                                    colors = IconChipDefaults.iconChipColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                        iconContentColor = MaterialTheme.colorScheme.surfaceVariant
+                                    ),
+                                    border = null
+                                )
+                            }
+                            IconChip(
+                                onClick = { /*TODO*/ },
+                                icon = {
+                                    Icon(
+                                        modifier = Modifier.size(IconChipDefaults.IconSize),
+                                        painter = painterResource(id = R.drawable.icon_swap_vert_fill0_wght400),
                                         contentDescription = null
                                     )
                                 },
@@ -165,23 +189,57 @@ private fun SharedTransitionScope.DiscoverScreen(
                                 border = null
                             )
                         }
-                        IconChip(
-                            onClick = { /*TODO*/ },
-                            icon = {
-                                Icon(
-                                    modifier = Modifier.size(IconChipDefaults.IconSize),
-                                    painter = painterResource(id = R.drawable.icon_swap_vert_fill0_wght400),
-                                    contentDescription = null
-                                )
-                            },
-                            colors = IconChipDefaults.iconChipColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                iconContentColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                            border = null
-                        )
+                    )
+                }
+            }
+        ) {
+            if (discoverState().loading) {
+                items(
+                    count = 15,
+                    contentType = { "Poster" }
+                ) {
+                    MediaPosterShimmer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .animateItem(),
+                        height = Dp.Unspecified,
+                        showTitle = preferencesState().showTitle,
+                    )
+                }
+            } else {
+                discoverState().errorMessage?.let {  }
+                discoverState().discover?.results?.let { favorite ->
+                    if (favorite.isEmpty()) {
+                        item(
+                            span = { GridItemSpan(maxLineSpan) }
+                        ) {
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = stringResource(id = R.string.empty_discover),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    } else {
+                        items(
+                            items = favorite,
+                            key = { it.id }
+                        ) { mediaInfo ->
+                            MediaPoster(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .animateItem(),
+                                onNavigateTo = { discoverUiEvent(DiscoverUiEvent.OnNavigateTo(it)) },
+                                height = Dp.Unspecified,
+                                mediaInfo = mediaInfo,
+                                mediaType = discoverState().uiState,
+                                showTitle = preferencesState().showTitle,
+                                showVoteAverage = preferencesState().showVoteAverage
+                            )
+                        }
                     }
-                )
+                }
             }
         }
         Box(
@@ -194,7 +252,7 @@ private fun SharedTransitionScope.DiscoverScreen(
             GenresDialog(
                 discoverState = discoverState,
                 onDismissRequest = { discoverUiEvent(DiscoverUiEvent.SetShowGenresState(false)) },
-                selectGenre = { /*TODO*/ }
+                selectGenre = { genre -> discoverUiEvent(DiscoverUiEvent.SetGenre(genre)) }
             )
         }
     }

@@ -10,13 +10,17 @@ import androidx.navigation.toRoute
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.convertMediaType
+import com.personal.tmdb.core.domain.util.formatAirDateRequest
 import com.personal.tmdb.core.domain.util.onError
 import com.personal.tmdb.core.domain.util.onSuccess
+import com.personal.tmdb.core.domain.util.sortTypeToRequestString
 import com.personal.tmdb.core.domain.util.toUiText
 import com.personal.tmdb.core.navigation.Route
+import com.personal.tmdb.discover.domain.repository.DiscoverRepository
+import com.personal.tmdb.discover.presentation.discover_filters.AirDateType
+import com.personal.tmdb.discover.presentation.discover_filters.ContentOriginType
 import com.personal.tmdb.discover.presentation.discover_filters.FiltersState
 import com.personal.tmdb.discover.presentation.discover_filters.hasChangesComparedTo
-import com.personal.tmdb.home.domain.repository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +32,7 @@ import javax.inject.Inject
 class DiscoverViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val preferencesRepository: PreferencesRepository,
-    private val homeRepository: HomeRepository
+    private val discoverRepository: DiscoverRepository
 ): ViewModel() {
 
     private val routeData = savedStateHandle.toRoute<Route.Discover>()
@@ -43,14 +47,16 @@ class DiscoverViewModel @Inject constructor(
 
     init {
         discover(
-            mediaType = convertMediaType(routeData.mediaType),
-            page = 1
+            mediaType = routeData.mediaType,
+            page = 1,
+            filters = filtersState
         )
     }
 
     private fun discover(
-        mediaType: MediaType,
-        page: Int
+        mediaType: String,
+        page: Int,
+        filters: FiltersState
     ) {
         viewModelScope.launch {
             _discoverState.update {
@@ -61,51 +67,87 @@ class DiscoverViewModel @Inject constructor(
             }
             val language = preferencesRepository.getLanguage()
 
-            if (mediaType == MediaType.PERSON) {
+            if (convertMediaType(mediaType) == MediaType.PERSON) {
                 discoverPopularPeople(language, page)
             } else {
                 getGenres(mediaType, language)
-                /*TODO*/
+                discoverMedia(mediaType, language, page, filters)
             }
         }
     }
 
-    private fun discoverPopularPeople(language: String?, page: Int) {
-        viewModelScope.launch {
-            homeRepository.getPopularList(MediaType.PERSON.name.lowercase(), language, page)
-                .onError { error ->
-                    _discoverState.update {
-                        it.copy(
-                            loading = false,
-                            errorMessage = error.toUiText()
-                        )
-                    }
-                }
-                .onSuccess { result ->
-                    _discoverState.update {
-                        it.copy(
-                            loading = false,
-                            discover = result
-                        )
-                    }
-                }
+    private suspend fun discoverMedia(
+        mediaType: String,
+        language: String?,
+        page: Int,
+        filters: FiltersState
+    ) {
+        discoverRepository.discoverMedia(
+            mediaType = mediaType,
+            language = language,
+            page = page,
+            includeAdult = filters.includeAdult,
+            airDateYear = filters.yearAirDate.takeIf { filters.airDateType == AirDateType.YEAR } ?: "",
+            fromAirDate = formatAirDateRequest(filters.fromAirDate?.takeIf { filters.airDateType == AirDateType.RANGE }),
+            toAirDate = formatAirDateRequest(filters.toAirDate?.takeIf { filters.airDateType == AirDateType.RANGE }),
+            sortBy = sortTypeToRequestString(_discoverState.value.sortBy, convertMediaType(mediaType)),
+            fromRating = filters.fromRating.takeIf { it.isNotEmpty() }?.toFloatOrNull() ?: filters.fromRatingDefault.toFloat(),
+            toRating = filters.toRating.takeIf { it.isNotEmpty() }?.toFloatOrNull() ?: filters.toRatingDefault.toFloat(),
+            minRatingCount = filters.minimumVoteCount.takeIf { it.isNotEmpty() }?.toFloatOrNull() ?: filters.minimumVoteCountDefault.toFloat(),
+            withGenre = _discoverState.value.selectedGenre?.id?.toString() ?: "",
+            withOriginCountry = filters.selectedCountry?.code?.takeIf { filters.contentOriginType == ContentOriginType.COUNTRY } ?: "",
+            withOriginalLanguage = filters.selectedLanguage?.code?.takeIf { filters.contentOriginType == ContentOriginType.LANGUAGE } ?: "",
+            fromRuntime = filters.fromRuntime.takeIf { it.isNotEmpty() }?.toIntOrNull() ?: filters.fromRuntimeDefault,
+            toRuntime = filters.toRuntime.takeIf { it.isNotEmpty() }?.toIntOrNull() ?: filters.toRuntimeDefault
+        ).onError { error ->
+            _discoverState.update {
+                it.copy(
+                    loading = false,
+                    errorMessage = error.toUiText()
+                )
+            }
+        }.onSuccess { result ->
+            _discoverState.update {
+                it.copy(
+                    loading = false,
+                    discover = result
+                )
+            }
         }
     }
 
-    private fun getGenres(mediaType: MediaType, language: String?) {
-        viewModelScope.launch {
-            homeRepository.getGenres(mediaType.name.lowercase(), language)
-                .onError { error ->
-                    println(error.toString())
+    private suspend fun discoverPopularPeople(language: String?, page: Int) {
+        discoverRepository.getPopularPeople(language, page)
+            .onError { error ->
+                _discoverState.update {
+                    it.copy(
+                        loading = false,
+                        errorMessage = error.toUiText()
+                    )
                 }
-                .onSuccess { result ->
-                    _discoverState.update {
-                        it.copy(
-                            genresInfo = result
-                        )
-                    }
+            }
+            .onSuccess { result ->
+                _discoverState.update {
+                    it.copy(
+                        loading = false,
+                        discover = result
+                    )
                 }
-        }
+            }
+    }
+
+    private suspend fun getGenres(mediaType: String, language: String?) {
+        discoverRepository.getGenres(mediaType, language)
+            .onError { error ->
+                println(error.toString())
+            }
+            .onSuccess { result ->
+                _discoverState.update {
+                    it.copy(
+                        genresInfo = result
+                    )
+                }
+            }
     }
 
     fun discoverUiEvent(event: DiscoverUiEvent) {
@@ -116,15 +158,26 @@ class DiscoverViewModel @Inject constructor(
                 _discoverState.update { it.copy(showGenres = event.state) }
             }
             is DiscoverUiEvent.SetFilters -> {
-                println(event.filters)
                 val filters = event.filters
                 val filtersApplied = filters.ratingApplied || filters.airDateApplied || filters.runtimeApplied
                         || filters.includeAdult || filters.contentOriginApplied
                 _discoverState.update { it.copy(filtersApplied = filtersApplied) }
-                if (filters.hasChangesComparedTo(filtersState)) {
+                if (filtersApplied && filters.hasChangesComparedTo(filtersState)) {
                     filtersState = filters
-                    /*TODO: Api call*/
+                    discover(
+                        mediaType = routeData.mediaType,
+                        page = 1,
+                        filters = filtersState
+                    )
                 }
+            }
+            is DiscoverUiEvent.SetGenre -> {
+                _discoverState.update { it.copy(selectedGenre = event.genre) }
+                discover(
+                    mediaType = routeData.mediaType,
+                    page = 1,
+                    filters = filtersState
+                )
             }
         }
     }

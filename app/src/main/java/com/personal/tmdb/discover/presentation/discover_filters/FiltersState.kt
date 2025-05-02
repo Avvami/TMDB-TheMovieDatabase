@@ -11,7 +11,7 @@ data class FiltersState(
     val toRating: String = "",
     val toRatingDefault: Int = 10,
     val minimumVoteCount: String = "",
-    val minimumVoteCountDefault: Int = 200,
+    val minimumVoteCountDefault: Int = 300,
     val ratingApplied: Boolean = false,
     val airDateType: AirDateType = AirDateType.RANGE,
     val fromAirDate: LocalDate? = null,
