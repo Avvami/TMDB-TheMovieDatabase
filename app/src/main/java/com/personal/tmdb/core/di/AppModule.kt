@@ -40,8 +40,8 @@ object AppModule {
                 super.onCreate(db)
                 val defaultPreferences = ContentValues().apply {
                     put("language", "en")
-                    put("showTitle", false)
-                    put("showVoteAverage", false)
+                    put("showTitle", true)
+                    put("showVoteAverage", true)
                     put("additionalNavigationItem", AdditionalNavigationItem.WATCHLIST.key)
                 }
                 db.insert("preferencesentity", SQLiteDatabase.CONFLICT_REPLACE, defaultPreferences)

@@ -120,7 +120,6 @@
     <string name="backdrops">Backdrops</string>
     <string name="reviews">Reviews</string>
     <string name="review">Review</string>
-    <string name="now_playing">Now Playing</string>
     <string name="logout">Logout</string>
     <string name="change_cover_color">Change Cover Color</string>
     <string name="home">Home</string>
@@ -242,4 +241,7 @@
     <string name="air_date_desc">First Air Date Descending</string>
     <string name="air_date_asc">First Air Date Ascending</string>
     <string name="empty_discover">No results found. Try adjusting your filters.</string>
+    <string name="upcoming_movies">Upcoming Movies</string>
+    <string name="popular_movies">Popular Movies</string>
+    <string name="popular_tv">Popular TV Shows</string>
 </resources>

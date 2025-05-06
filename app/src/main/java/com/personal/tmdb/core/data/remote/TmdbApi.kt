@@ -86,7 +86,7 @@ interface TmdbApi {
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @GET("3/{media_type}/popular?")
-    suspend fun getPopularList(
+    suspend fun getPopular(
         @Path("media_type") mediaType: String,
         @Query("language") language: String?,
         @Query("page") page: Int
@@ -179,9 +179,11 @@ interface TmdbApi {
     ): Reviews
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
-    @GET("3/movie/now_playing?")
-    suspend fun getNowPlaying(
-        @Query("language") language: String?
+    @GET("3/movie/upcoming?")
+    suspend fun getUpcomingMovies(
+        @Query("language") language: String?,
+        @Query("page") page: Int,
+        @Query("region") region: String
     ): MediaResponseDto
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")

@@ -37,7 +37,7 @@ class DiscoverRepositoryImpl @Inject constructor(
         page: Int
     ): Result<MediaResponseInfo, DataError.Remote> {
         return safeApiCall {
-            tmdbApi.getPopularList(MediaType.PERSON.name.lowercase(), language, page).toMediaResponseInfo()
+            tmdbApi.getPopular(MediaType.PERSON.name.lowercase(), language, page).toMediaResponseInfo()
         }
     }
 

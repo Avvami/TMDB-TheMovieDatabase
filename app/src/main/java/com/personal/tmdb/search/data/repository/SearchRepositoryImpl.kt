@@ -39,7 +39,7 @@ class SearchRepositoryImpl @Inject constructor(
         language: String?
     ): Result<MediaResponseInfo, DataError.Remote> {
         return safeApiCall {
-            tmdbApi.getPopularList(mediaType, language, 1).toMediaResponseInfo()
+            tmdbApi.getPopular(mediaType, language, 1).toMediaResponseInfo()
         }
     }
 }

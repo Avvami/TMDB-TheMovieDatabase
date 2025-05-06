@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
@@ -39,6 +40,12 @@ fun SharedTransitionScope.DiscoverTabs(
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null
 ) {
+    /*Fix SharedTransitionLayout theming (bug??)*/
+    val darkTheme = preferencesState().darkTheme ?: isSystemInDarkTheme()
+    val chipColors = SuggestionChipDefaults.suggestionChipColors(
+        containerColor = if (darkTheme) onSurfaceDark.copy(alpha = .05f) else onSurfaceLight.copy(alpha = .05f),
+        labelColor = if (darkTheme) onSurfaceDark.copy(alpha = .7f) else onSurfaceLight.copy(alpha = .7f)
+    )
     CompositionLocalProvider(
         LocalMinimumInteractiveComponentSize provides Dp.Unspecified
     ) {
@@ -46,7 +53,7 @@ fun SharedTransitionScope.DiscoverTabs(
             modifier = modifier
                 .horizontalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             leadingContent?.let {
                 it()
@@ -66,12 +73,13 @@ fun SharedTransitionScope.DiscoverTabs(
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
                                 disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
-                                disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant
+                                disabledLabelColor = MaterialTheme.colorScheme.onSurface
                             ),
                             border = BorderStroke(
-                                width = 2.dp,
+                                width = 1.dp,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)
-                            )
+                            ),
+                            shape = CircleShape
                         )
                     } else {
                         SuggestionChip(
@@ -86,12 +94,13 @@ fun SharedTransitionScope.DiscoverTabs(
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
                                 disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
-                                disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant
+                                disabledLabelColor = MaterialTheme.colorScheme.onSurface
                             ),
                             border = BorderStroke(
-                                width = 2.dp,
+                                width = 1.dp,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)
-                            )
+                            ),
+                            shape = CircleShape
                         )
                     }
                     trailingContent?.let {
@@ -111,20 +120,16 @@ fun SharedTransitionScope.DiscoverTabs(
                         },
                         colors = SuggestionChipDefaults.suggestionChipColors(
                             disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
-                            disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurface
                         ),
                         border = BorderStroke(
-                            width = 2.dp,
+                            width = 1.dp,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)
-                        )
+                        ),
+                        shape = CircleShape
                     )
                 }
                 MediaType.UNKNOWN -> {
-                    /*TODO: Fix SharedTransitionLayout theming bug??*/
-                    val chipColors = SuggestionChipDefaults.suggestionChipColors(
-                        containerColor = if (preferencesState().darkTheme ?: isSystemInDarkTheme()) onSurfaceDark.copy(alpha = .05f) else onSurfaceLight.copy(alpha = .05f),
-                        labelColor = if (preferencesState().darkTheme ?: isSystemInDarkTheme()) onSurfaceDark.copy(alpha = .7f) else onSurfaceLight.copy(alpha = .7f)
-                    )
                     SuggestionChip(
                         modifier = Modifier.sharedElement(
                             state = rememberSharedContentState(key = MediaType.TV),
@@ -140,7 +145,8 @@ fun SharedTransitionScope.DiscoverTabs(
                             Text(text = stringResource(id = R.string.tv_shows))
                         },
                         colors = chipColors,
-                        border = null
+                        border = BorderStroke(width = 1.dp, color = chipColors.containerColor),
+                        shape = CircleShape
                     )
                     SuggestionChip(
                         modifier = Modifier.sharedElement(
@@ -157,7 +163,8 @@ fun SharedTransitionScope.DiscoverTabs(
                             Text(text = stringResource(id = R.string.movies))
                         },
                         colors = chipColors,
-                        border = null
+                        border = BorderStroke(width = 1.dp, color = chipColors.containerColor),
+                        shape = CircleShape
                     )
                     SuggestionChip(
                         modifier = Modifier.sharedElement(
@@ -174,7 +181,8 @@ fun SharedTransitionScope.DiscoverTabs(
                             Text(text = stringResource(id = R.string.people))
                         },
                         colors = chipColors,
-                        border = null
+                        border = BorderStroke(width = 1.dp, color = chipColors.containerColor),
+                        shape = CircleShape
                     )
                 }
                 else -> Unit
