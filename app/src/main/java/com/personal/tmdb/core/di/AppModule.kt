@@ -10,6 +10,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import coil3.ImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.ImageRequest
+import com.personal.tmdb.BuildConfig
 import com.personal.tmdb.core.data.local.AppDatabase
 import com.personal.tmdb.core.data.remote.TmdbApi
 import com.personal.tmdb.core.domain.util.AdditionalNavigationItem
@@ -24,6 +25,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
@@ -65,7 +67,10 @@ object AppModule {
     @Singleton
     @Provides
     fun provideTmdbApi(): TmdbApi {
+        val logging = HttpLoggingInterceptor()
+        logging.level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
         val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor(logging)
             .dns(CustomDns())
             .build()
 

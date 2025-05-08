@@ -244,4 +244,6 @@
     <string name="upcoming_movies">Upcoming Movies</string>
     <string name="popular_movies">Popular Movies</string>
     <string name="popular_tv">Popular TV Shows</string>
+    <string name="retry">Retry</string>
+    <string name="error_general">Oops! We ran into a problem</string>
 </resources>

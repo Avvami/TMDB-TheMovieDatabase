@@ -21,6 +21,7 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonColors
 import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -182,6 +183,7 @@ fun RowScope.HorizontalSegmentedButton(
     selected: Boolean,
     shape: Shape = MaterialTheme.shapes.medium,
     colors: SegmentedButtonColors = SegmentedButtonDefaults.colors(),
+    contentPadding: PaddingValues = SegmentedButtonContentPadding,
     interactionSource: MutableInteractionSource? = null,
     icon: (@Composable () -> Unit)? = null,
     label: @Composable () -> Unit,
@@ -201,8 +203,7 @@ fun RowScope.HorizontalSegmentedButton(
                 .weight(1f)
                 .interactionZIndex(selected, interactionCount)
                 .defaultMinSize(
-                    minWidth = ButtonDefaults.MinWidth,
-                    minHeight = ButtonDefaults.MinHeight
+                    minHeight = SuggestionChipDefaults.Height
                 )
                 .semantics { role = Role.RadioButton },
             selected = selected,
@@ -217,7 +218,7 @@ fun RowScope.HorizontalSegmentedButton(
                 value = MaterialTheme.typography.labelLarge
             ) {
                 Row(
-                    modifier = Modifier.padding(SegmentedButtonContentPadding),
+                    modifier = Modifier.padding(contentPadding),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(ContentPadding, Alignment.CenterHorizontally)
                 ) {

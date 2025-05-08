@@ -1,7 +1,6 @@
 package com.personal.tmdb.search.presentation.search
 
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,10 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
@@ -28,8 +23,6 @@ import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.search.presentation.search.components.SearchField
 import com.personal.tmdb.search.presentation.search.components.SearchResults
 import com.personal.tmdb.search.presentation.search.components.SearchSuggestion
-import kotlinx.coroutines.android.awaitFrame
-import kotlinx.coroutines.launch
 
 @Composable
 fun SearchScreenRoot(
@@ -66,23 +59,10 @@ private fun SearchScreen(
     searchUiEvent: (SearchUiEvent) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    var backPressHandled by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    BackHandler(enabled = !backPressHandled) {
-        if (searchState().searchQuery.isNotBlank()) {
-            focusManager.clearFocus()
-            searchUiEvent(SearchUiEvent.OnSearchQueryChange(""))
-            searchUiEvent(SearchUiEvent.SetSearchType(MediaType.MULTI))
-        } else {
-            /*TODO: Find a better solution???*/
-            backPressHandled = true
-            scope.launch {
-                awaitFrame()
-                onBackPressedDispatcher?.onBackPressed()
-                backPressHandled = false
-            }
-        }
+    BackHandler(enabled = searchState().searchQuery.isNotBlank()) {
+        focusManager.clearFocus()
+        searchUiEvent(SearchUiEvent.OnSearchQueryChange(""))
+        searchUiEvent(SearchUiEvent.SetSearchType(MediaType.MULTI))
     }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -94,22 +74,24 @@ private fun SearchScreen(
             SearchField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp),
                 searchQuery = searchState()::searchQuery,
                 searchUiEvent = searchUiEvent
             )
             AnimatedContent(
-                targetState = searchState().searchResults == null && !searchState().searching && searchState().searchErrorMessage == null,
+                targetState = searchState().searchResults == null,
                 label = "Search screen content animation"
             ) { targetState ->
                 if (targetState) {
                     SearchSuggestion(
+                        modifier = Modifier.padding(top = 16.dp),
                         searchState = searchState,
                         preferencesState = preferencesState,
                         searchUiEvent = searchUiEvent
                     )
                 } else {
                     SearchResults(
+                        modifier = Modifier.padding(top = 8.dp),
                         lazyGridState = lazyGridState,
                         searchState = searchState,
                         preferencesState = preferencesState,

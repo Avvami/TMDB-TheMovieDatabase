@@ -2,15 +2,17 @@ package com.personal.tmdb.search.presentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.TimeWindow
-import com.personal.tmdb.core.domain.util.onError
-import com.personal.tmdb.core.domain.util.onSuccess
+import com.personal.tmdb.core.domain.util.fold
 import com.personal.tmdb.core.domain.util.toUiText
+import com.personal.tmdb.home.domain.models.TrendingResult
 import com.personal.tmdb.search.domain.repository.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,159 +32,85 @@ class SearchViewModel @Inject constructor(
     private var searchJob: Job? = null
 
     init {
-        getTrendingList()
-        getPopularPeopleList()
+        getSearchSuggestions()
     }
 
-    private fun searchFor(searchType: MediaType, query: String, page: Int) {
-        searchState.value.searchResults?.let { results ->
-            if (results.totalPages < page || results.paging) return
-            if (results.page != page) {
-                _searchState.update { state ->
-                    state.copy(searchResults = state.searchResults?.copy(paging = true))
-                }
-            }
-        }
+    private fun searchFor(searchType: MediaType, query: String) {
         if (query.isBlank()) {
             _searchState.update { it.copy(searchResults = null) }
         } else {
             viewModelScope.launch {
-                _searchState.update {
-                    it.copy(
-                        searching = page == 1,
-                        errorMessage = null
-                    )
-                }
-
                 val language = preferencesRepository.getLanguage()
-
-                searchRepository.searchFor(
+                val searchResults = searchRepository.searchFor(
                     searchType = searchType.name.lowercase(),
                     query = query.trim(),
                     includeAdult = false,
-                    language = language,
-                    page = page
-                ).onError { error ->
-                    _searchState.update { state ->
-                        state.copy(
-                            searching = false,
-                            searchResults = state.searchResults?.copy(paging = false),
-                            errorMessage = error.toUiText()
-                        )
-                    }
-                }.onSuccess { result ->
-                    _searchState.update { state ->
-                        val searchResults = state.searchResults
-                        if (searchResults == null || page == 1) {
-                            state.copy(
-                                searchResults = result,
-                                searching = false
-                            )
-                        } else {
-                            val mergedResults = searchResults.results + result.results
-                            val updatedSearchResults = searchResults.copy(
-                                results = mergedResults,
-                                page = result.page,
-                                paging = false
-                            )
-                            state.copy(
-                                searchResults = updatedSearchResults,
-                                searching = false
-                            )
+                    language = language
+                ).flow.cachedIn(viewModelScope)
+                _searchState.update { it.copy(searchResults = searchResults) }
+            }
+        }
+    }
+
+    private fun getSearchSuggestions() {
+        viewModelScope.launch {
+            _searchState.update {
+                it.copy(
+                    loading = true,
+                    errorMessage = null
+                )
+            }
+            val language = preferencesRepository.getLanguage()
+            val trendingDeferred = async {
+                searchRepository.getTrendingList(TimeWindow.WEEK, language)
+                    .fold(
+                        onError = { error ->
+                            TrendingResult(errorMessage = error.toUiText())
+                        },
+                        onSuccess = { result ->
+                            TrendingResult(trending = result)
                         }
-                    }
-                    if (page == 1 && result.totalPages >= 2) searchFor(searchType, query, 2)
-                }
+                    )
             }
-        }
-    }
+            val popularPeople = searchRepository.getPopularPeopleList(
+                mediaType = MediaType.PERSON.name.lowercase(),
+                language = language
+            ).flow.cachedIn(viewModelScope)
 
-    private fun getTrendingList() {
-        viewModelScope.launch {
+            val trendingResult = trendingDeferred.await()
+
             _searchState.update {
                 it.copy(
-                    loading = true,
-                    errorMessage = null
+                    loading = false,
+                    trending = trendingResult.trending,
+                    popularPeople = popularPeople,
+                    errorMessage = trendingResult.errorMessage
                 )
             }
-
-            val language = preferencesRepository.getLanguage()
-
-            searchRepository.getTrendingList(TimeWindow.WEEK, language)
-                .onError { error ->
-                    _searchState.update {
-                        it.copy(
-                            loading = false,
-                            errorMessage = error.toUiText()
-                        )
-                    }
-                }
-                .onSuccess { result ->
-                    _searchState.update {
-                        it.copy(
-                            trending = result,
-                            loading = false
-                        )
-                    }
-                }
-        }
-    }
-
-    private fun getPopularPeopleList() {
-        viewModelScope.launch {
-            _searchState.update {
-                it.copy(
-                    loading = true,
-                    errorMessage = null
-                )
-            }
-
-            val language = preferencesRepository.getLanguage()
-
-            searchRepository.getPopularPeopleList(MediaType.PERSON.name.lowercase(), language)
-                .onError { error ->
-                    _searchState.update {
-                        it.copy(
-                            loading = false,
-                            errorMessage = error.toUiText()
-                        )
-                    }
-                }
-                .onSuccess { result ->
-                    _searchState.update {
-                        it.copy(
-                            popularPeople = result,
-                            loading = false
-                        )
-                    }
-                }
         }
     }
 
     fun searchUiEvent(event: SearchUiEvent) {
         when (event) {
+            is SearchUiEvent.OnNavigateTo -> Unit
             is SearchUiEvent.OnSearchQueryChange -> {
                 _searchState.update { it.copy(searchQuery = event.query) }
                 searchJob?.cancel()
                 searchJob = viewModelScope.launch {
                     delay(500L)
-                    searchFor(searchState.value.searchType, event.query, 1)
+                    searchFor(_searchState.value.searchType, _searchState.value.searchQuery)
                 }
             }
             is SearchUiEvent.SetSearchType -> {
                 _searchState.update { it.copy(searchType = event.searchType) }
                 searchJob?.cancel()
                 searchJob = viewModelScope.launch {
-                    searchFor(event.searchType, searchState.value.searchQuery, 1)
+                    searchFor(_searchState.value.searchType, _searchState.value.searchQuery)
                 }
             }
-            is SearchUiEvent.SearchFor -> {
-                searchJob?.cancel()
-                searchJob = viewModelScope.launch {
-                    searchFor(event.searchType, event.query, event.page)
-                }
+            SearchUiEvent.RetrySuggestionsRequest -> {
+                getSearchSuggestions()
             }
-            is SearchUiEvent.OnNavigateTo -> Unit
         }
     }
 }

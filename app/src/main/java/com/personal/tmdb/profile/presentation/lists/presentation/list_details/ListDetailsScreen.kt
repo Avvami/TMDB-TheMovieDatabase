@@ -424,16 +424,6 @@ private fun ListDetailsScreen(
                         modifier = modifier.padding(top = innerPadding.calculateTopPadding()),
                         lazyGridState = lazyGridState,
                         contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
-                        loadMoreItems = {
-                            listDetailsState().listDetails?.let { details ->
-                                listDetailsUiEvent(
-                                    ListDetailsUiEvent.GetListDetails(
-                                        listId = listDetailsState().listId,
-                                        page = details.page + 1
-                                    )
-                                )
-                            }
-                        },
                         span = {
                             if (editing) {
                                 item(

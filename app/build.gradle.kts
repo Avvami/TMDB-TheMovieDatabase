@@ -105,6 +105,7 @@ dependencies {
     implementation("com.squareup.moshi:moshi:1.15.1")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
     ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.1")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
     // Dagger - Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
@@ -122,6 +123,9 @@ dependencies {
 
     // Dns-over-https
     implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:4.12.0")
+
+    implementation("androidx.paging:paging-runtime-ktx:3.3.6")
+    implementation("androidx.paging:paging-compose:3.3.6")
 }
 
 kapt {

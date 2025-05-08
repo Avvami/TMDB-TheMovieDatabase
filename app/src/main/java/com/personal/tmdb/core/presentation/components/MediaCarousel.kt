@@ -18,21 +18,25 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaCarousel(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp),
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(8.dp),
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(8.dp),
+    userScrollEnabled: Boolean = true,
     titleContent: @Composable () -> Unit = {},
     items: LazyListScope.() -> Unit
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = verticalArrangement
     ) {
         ProvideTextStyle(
-            value = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium)
+            value = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium, fontSize = 20.sp)
         ) {
             Box(modifier = Modifier.padding(contentPadding)) {
                 titleContent()
@@ -43,7 +47,8 @@ fun MediaCarousel(
         ) {
             LazyRow(
                 contentPadding = contentPadding,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = horizontalArrangement,
+                userScrollEnabled = userScrollEnabled
             ) {
                 items()
             }

@@ -1,145 +1,203 @@
 package com.personal.tmdb.search.presentation.search.components
 
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.personal.tmdb.R
-import com.personal.tmdb.core.domain.util.negativeHorizontalPadding
+import com.personal.tmdb.core.domain.util.UiTextException
+import com.personal.tmdb.core.domain.util.fadingEdges
 import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.components.MediaGrid
 import com.personal.tmdb.core.presentation.components.MediaPoster
 import com.personal.tmdb.core.presentation.components.MediaPosterShimmer
+import com.personal.tmdb.core.presentation.components.MessageContainer
 import com.personal.tmdb.search.presentation.search.SearchState
 import com.personal.tmdb.search.presentation.search.SearchUiEvent
+import kotlinx.coroutines.launch
 
 @Composable
 fun SearchResults(
+    modifier: Modifier = Modifier,
     lazyGridState: LazyGridState,
     searchState: () -> SearchState,
     preferencesState: () -> PreferencesState,
     searchUiEvent: (SearchUiEvent) -> Unit
 ) {
-    LaunchedEffect(searchState().searching) {
-        if (searchState().searching) lazyGridState.animateScrollToItem(0)
+    val searchResults = searchState().searchResults?.collectAsLazyPagingItems()
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(searchResults?.loadState?.refresh) {
+        if (searchResults?.loadState?.refresh == LoadState.Loading) lazyGridState.animateScrollToItem(0)
     }
-    MediaGrid(
-        lazyGridState = lazyGridState,
-        contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp),
-        loadMoreItems = {
-            searchState().searchResults?.let { results ->
-                searchUiEvent(
-                    SearchUiEvent.SearchFor(
-                        searchType = searchState().searchType,
-                        query = searchState().searchQuery,
-                        page = results.page + 1
-                    )
-                )
-            }
-        },
-        span = {
-            item(
-                span = { GridItemSpan(maxLineSpan) }
-            ) {
-                if (searchState().searching && searchState().searchResults == null) {
-                    SearchFilterChipsShimmer(
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+
+    Column(
+        modifier = modifier
+    ) {
+        SearchFilterTabs(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            selectedTab = searchState().searchType,
+            onSelect = {
+                if (searchState().searchType == it) {
+                    scope.launch { lazyGridState.animateScrollToItem(0) }
                 } else {
-                    SearchFilterChips(
-                        modifier = Modifier
-                            .negativeHorizontalPadding((-16).dp)
-                            .padding(bottom = 8.dp)
-                            .horizontalScroll(rememberScrollState())
-                            .padding(horizontal = 16.dp),
-                        mediaType = searchState()::searchType,
-                        searchUiEvent = searchUiEvent
-                    )
+                    searchUiEvent(SearchUiEvent.SetSearchType(it))
                 }
             }
-        },
-        items = {
-            if (searchState().searching) {
-                items(count = 20) {
-                    MediaPosterShimmer(
-                        modifier = Modifier.fillMaxWidth(),
-                        height = Dp.Unspecified,
-                        showTitle = preferencesState().showTitle
+        )
+        if (searchResults?.loadState?.refresh is LoadState.Error) {
+            val error = (searchResults.loadState.refresh as LoadState.Error).error
+            MessageContainer(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.error_general),
+                        textAlign = TextAlign.Center
                     )
+                    Text(
+                        text = when (error) {
+                            is UiTextException -> error.uiText.asString()
+                            else -> error.localizedMessage ?: stringResource(id = R.string.error_unknown)
+                        },
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                },
+                onRetry = {
+                    searchResults.retry()
                 }
-            } else {
-                searchState().searchResults?.results?.let { results ->
-                    if (results.isEmpty()) {
-                        item(
-                            span = { GridItemSpan(maxLineSpan) }
-                        ) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    text = stringResource(id = R.string.empty_search),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    textAlign = TextAlign.Center
-                                )
-                                Text(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    text = stringResource(id = R.string.empty_search_suggest),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.surfaceVariant,
-                                    textAlign = TextAlign.Center
-                                )
+            )
+        } else {
+            MediaGrid(
+                modifier = Modifier.fadingEdges(lazyGridState, topEdgeHeight = 16.dp, bottomEdgeHeight = 0.dp),
+                lazyGridState = lazyGridState,
+                contentPadding = PaddingValues(16.dp),
+                columns = GridCells.Adaptive(150.dp),
+                items = {
+                    searchResults?.let { results ->
+                        when (results.loadState.refresh) {
+                            LoadState.Loading -> {
+                                items(20) {
+                                    MediaPosterShimmer(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        height = Dp.Unspecified,
+                                        showTitle = preferencesState().showTitle
+                                    )
+                                }
                             }
-                        }
-                    } else {
-                        items(
-                            items = results,
-                            key = { it.uuid },
-                            contentType = { "Poster" }
-                        ) { mediaInfo ->
-                            MediaPoster(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .animateItem(),
-                                onNavigateTo = { searchUiEvent(SearchUiEvent.OnNavigateTo(it)) },
-                                height = Dp.Unspecified,
-                                mediaInfo = mediaInfo,
-                                mediaType = mediaInfo.mediaType ?: searchState().searchType,
-                                showTitle = preferencesState().showTitle,
-                                showVoteAverage = preferencesState().showVoteAverage
-                            )
-                        }
-                        if (searchState().searchResults?.paging == true) {
-                            items(
-                                count = 4
-                            ) {
-                                MediaPosterShimmer(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .animateItem(),
-                                    height = Dp.Unspecified,
-                                    showTitle = preferencesState().showTitle,
-                                )
+                            else -> {
+                                if (results.itemCount == 0) {
+                                    item(
+                                        span = { GridItemSpan(maxLineSpan) }
+                                    ) {
+                                        MessageContainer(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            content = {
+                                                Text(
+                                                    text = stringResource(id = R.string.empty_search),
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    textAlign = TextAlign.Center
+                                                )
+                                                Text(
+                                                    text = stringResource(id = R.string.empty_search_suggest),
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    color = MaterialTheme.colorScheme.surfaceVariant,
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
+                                        )
+                                    }
+                                } else {
+                                    items(
+                                        count = results.itemCount,
+                                        key = results.itemKey { it.uuid },
+                                        contentType = results.itemContentType { "Poster" }
+                                    ) { index ->
+                                        results[index]?.let { mediaInfo ->
+                                            MediaPoster(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .animateItem(),
+                                                onNavigateTo = { searchUiEvent(SearchUiEvent.OnNavigateTo(it)) },
+                                                height = Dp.Unspecified,
+                                                mediaInfo = mediaInfo,
+                                                mediaType = mediaInfo.mediaType ?: searchState().searchType,
+                                                showTitle = preferencesState().showTitle,
+                                                showVoteAverage = preferencesState().showVoteAverage
+                                            )
+                                        }
+                                    }
+                                    when (results.loadState.append) {
+                                        is LoadState.Error -> {
+                                            val error = (results.loadState.append as LoadState.Error).error
+                                            item(
+                                                span = { GridItemSpan(maxLineSpan) },
+                                                key = "Error",
+                                                contentType = "MessageContainer"
+                                            ) {
+                                                MessageContainer(
+                                                    content = {
+                                                        Text(
+                                                            text = when (error) {
+                                                                is UiTextException -> error.uiText.asString()
+                                                                else -> error.localizedMessage ?: stringResource(id = R.string.error_unknown)
+                                                            },
+                                                            style = MaterialTheme.typography.bodyLarge,
+                                                            color = MaterialTheme.colorScheme.surfaceVariant,
+                                                            textAlign = TextAlign.Center
+                                                        )
+                                                    },
+                                                    onRetry = {
+                                                        results.retry()
+                                                    }
+                                                )
+                                            }
+                                        }
+                                        LoadState.Loading -> {
+                                            items(
+                                                count = 2,
+                                                key = { "Loading" },
+                                                contentType = { "ShimmerPosters" }
+                                            ) {
+                                                MediaPosterShimmer(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .animateItem(),
+                                                    height = Dp.Unspecified,
+                                                    showTitle = preferencesState().showTitle,
+                                                )
+                                            }
+                                        }
+                                        else -> Unit
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
+            )
         }
-    )
+    }
 }

@@ -80,7 +80,7 @@ fun Modifier.fadingEdges(
         label = "TopFadeDpAnimation"
     )
     val animatedBottomEdgeHeight by animateDpAsState(
-        targetValue = if (state.canScrollForward) topEdgeHeight else 0.dp,
+        targetValue = if (state.canScrollForward) bottomEdgeHeight else 0.dp,
         label = "BottomFadeDpAnimation"
     )
     this

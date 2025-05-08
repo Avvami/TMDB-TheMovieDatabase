@@ -12,6 +12,13 @@ inline fun <T, E: Error, R> Result<T, E>.map(map: (T) -> R): Result<R, E> {
         is Result.Success -> Result.Success(map(data))
     }
 }
+inline fun <D, E: Error, R> Result<D, E>.fold(
+    onSuccess: (D) -> R,
+    onError: (E) -> R
+): R = when(this) {
+    is Result.Error -> onError(error)
+    is Result.Success -> onSuccess(data)
+}
 
 fun <T, E: Error> Result<T, E>.asEmptyDataResult(): EmptyResult<E> {
     return map {  }
