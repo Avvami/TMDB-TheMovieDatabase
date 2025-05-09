@@ -154,7 +154,6 @@ fun SearchResults(
                                             val error = (results.loadState.append as LoadState.Error).error
                                             item(
                                                 span = { GridItemSpan(maxLineSpan) },
-                                                key = "Error",
                                                 contentType = "MessageContainer"
                                             ) {
                                                 MessageContainer(
@@ -178,7 +177,6 @@ fun SearchResults(
                                         LoadState.Loading -> {
                                             items(
                                                 count = 2,
-                                                key = { "Loading" },
                                                 contentType = { "ShimmerPosters" }
                                             ) {
                                                 MediaPosterShimmer(

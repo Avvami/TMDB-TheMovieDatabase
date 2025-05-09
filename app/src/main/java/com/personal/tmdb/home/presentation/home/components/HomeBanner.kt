@@ -19,10 +19,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -89,7 +87,6 @@ fun HomeBanner(
             model = C.TMDB_IMAGES_BASE_URL + C.BACKDROP_W1280 + homeState().randomMedia?.backdropPath,
             contentDescription = "Backdrop",
             contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.scrim.copy(.1f), BlendMode.Darken),
             onSuccess = { showGradient = true }
         )
         AnimatedVisibility(
@@ -111,8 +108,11 @@ fun HomeBanner(
         }
         homeState().randomMediaLogos?.let { logos ->
             val painter = rememberAsyncImagePainter(
-                model = C.TMDB_IMAGES_BASE_URL + C.LOGO_W500 + (logos.find { it?.iso6391 == preferencesState().language }?.filePath
-                    ?: homeState().randomMediaLogos?.getOrNull(0)?.filePath)
+                model = C.TMDB_IMAGES_BASE_URL + C.LOGO_W500 + (
+                        logos.find { it?.iso6391 == preferencesState().language }?.filePath
+                            ?: logos.find { it?.iso6391 == homeState().randomMedia?.originalLanguage }?.filePath
+                            ?: homeState().randomMediaLogos?.getOrNull(0)?.filePath
+                        )
             )
             val painterState by painter.state.collectAsStateWithLifecycle()
             when (painterState) {

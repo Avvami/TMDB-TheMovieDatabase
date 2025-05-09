@@ -43,9 +43,10 @@ interface TmdbApi {
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @GET("3/trending/all/{time_window}?")
-    suspend fun getTrendingList(
+    suspend fun getTrending(
         @Path("time_window") timeWindow: String,
-        @Query("language") language: String?
+        @Query("language") language: String?,
+        @Query("page") page: Int
     ): MediaResponseDto
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")

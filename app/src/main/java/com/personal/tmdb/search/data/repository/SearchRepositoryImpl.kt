@@ -1,17 +1,16 @@
 package com.personal.tmdb.search.data.repository
 
 import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import com.personal.tmdb.core.data.mappers.toMediaResponseInfo
 import com.personal.tmdb.core.data.remote.TmdbApi
 import com.personal.tmdb.core.data.remote.safeApiCall
+import com.personal.tmdb.core.data.source.MediaPagingSource
 import com.personal.tmdb.core.domain.models.MediaInfo
 import com.personal.tmdb.core.domain.models.MediaResponseInfo
 import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.Result
 import com.personal.tmdb.core.domain.util.TimeWindow
-import com.personal.tmdb.search.data.source.SearchPagingSource
-import com.personal.tmdb.search.data.source.SearchPopularPeoplePagingSource
+import com.personal.tmdb.core.domain.util.mediaPager
 import com.personal.tmdb.search.domain.repository.SearchRepository
 import javax.inject.Inject
 
@@ -24,19 +23,15 @@ class SearchRepositoryImpl @Inject constructor(
         includeAdult: Boolean?,
         language: String?
     ): Pager<Int, MediaInfo> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 20,
-                prefetchDistance = 1,
-                enablePlaceholders = false,
-                initialLoadSize = 20
-            ),
-            pagingSourceFactory = {
-                SearchPagingSource(
-                    tmdbApi, searchType, query, includeAdult, language
-                )
-            }
-        )
+        return mediaPager {
+            MediaPagingSource(
+                loadPage = { page ->
+                    safeApiCall {
+                        tmdbApi.searchFor(searchType, query, includeAdult, language, page).toMediaResponseInfo()
+                    }
+                }
+            )
+        }
     }
 
     override suspend fun getTrendingList(
@@ -44,7 +39,7 @@ class SearchRepositoryImpl @Inject constructor(
         language: String?
     ): Result<MediaResponseInfo, DataError.Remote> {
         return safeApiCall {
-            tmdbApi.getTrendingList(timeWindow.name.lowercase(), language).toMediaResponseInfo()
+            tmdbApi.getTrending(timeWindow.name.lowercase(), language, 1).toMediaResponseInfo()
         }
     }
 
@@ -52,16 +47,15 @@ class SearchRepositoryImpl @Inject constructor(
         mediaType: String,
         language: String?
     ): Pager<Int, MediaInfo> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 20,
-                prefetchDistance = 1,
-                enablePlaceholders = false,
-                initialLoadSize = 20
-            ),
-            pagingSourceFactory = {
-                SearchPopularPeoplePagingSource(tmdbApi, mediaType, language)
-            }
-        )
+        return mediaPager {
+            MediaPagingSource(
+                loadPage = { page ->
+                    safeApiCall {
+                        tmdbApi.getPopular(mediaType, language, page).toMediaResponseInfo()
+                    }
+                },
+                maxPage = 3
+            )
+        }
     }
 }
