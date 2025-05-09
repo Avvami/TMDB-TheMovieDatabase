@@ -3,6 +3,7 @@ package com.personal.tmdb.core.presentation.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +30,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,6 +63,11 @@ fun CustomNavigationBar(
                 .windowInsetsPadding(windowInsets),
             contentAlignment = Alignment.Center
         ) {
+            HorizontalDivider(
+                modifier = Modifier.align(Alignment.TopCenter),
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f)
+            )
             Row(
                 modifier = Modifier
                     .widthIn(max = NavigationBarWidth)
@@ -83,8 +91,11 @@ fun RowScope.CustomNavigationBarItem(
     enabled: Boolean = true,
     label: @Composable (() -> Unit)? = null,
     alwaysShowLabel: Boolean = true,
-    colors: NavigationBarItemColors = NavigationBarItemDefaults.colors()
+    colors: NavigationBarItemColors = NavigationBarItemDefaults.colors(),
+    interactionSource: MutableInteractionSource? = null
 ) {
+    @Suppress("NAME_SHADOWING")
+    val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
     val styledIcon =
         @Composable {
             val iconColor by
@@ -124,7 +135,9 @@ fun RowScope.CustomNavigationBarItem(
                 selected = selected,
                 onClick = onClick,
                 enabled = enabled,
-                role = Role.Tab
+                role = Role.Tab,
+                interactionSource = interactionSource,
+                indication = null
             )
             .defaultMinSize(minHeight = NavigationBarHeight, minWidth = NavigationBarItemWidth)
             .weight(1f),

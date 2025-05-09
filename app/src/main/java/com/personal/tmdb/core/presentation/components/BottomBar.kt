@@ -68,7 +68,9 @@ fun NavigationBarContent(
     rootNavController: NavController,
     navBarItemReselect: (() -> Unit)?
 ) {
-    CustomNavigationBar {
+    CustomNavigationBar(
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
         val navBackStackEntry by rootNavController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
 
@@ -96,12 +98,13 @@ fun NavigationBarContent(
                     Text(text = stringResource(item.label))
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
                     indicatorColor = Color.Transparent,
                     unselectedIconColor = MaterialTheme.colorScheme.surfaceVariant,
                     unselectedTextColor = MaterialTheme.colorScheme.surfaceVariant
-                )
+                ),
+                interactionSource = null
             )
         }
     }
@@ -155,13 +158,13 @@ fun rememberNavigationItems(preferencesState: () -> PreferencesState, userState:
                                 label = R.string.watchlist,
                                 unselectedIcon = {
                                     Icon(
-                                        painter = painterResource(R.drawable.icon_bookmarks_fill0_wght400),
+                                        painter = painterResource(R.drawable.icon_bookmark_fill0_wght400),
                                         contentDescription = stringResource(R.string.watchlist)
                                     )
                                 },
                                 selectedIcon = {
                                     Icon(
-                                        painter = painterResource(R.drawable.icon_bookmarks_fill1_wght400),
+                                        painter = painterResource(R.drawable.icon_bookmark_fill1_wght400),
                                         contentDescription = stringResource(R.string.watchlist)
                                     )
                                 },
@@ -259,7 +262,7 @@ fun ProfileIcon(isSelected: Boolean, userState: () -> UserState) {
                 .then(
                     if (isSelected) Modifier.border(
                         width = 1.dp,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.primary,
                         shape = CircleShape
                     ) else Modifier
                 )
