@@ -1,12 +1,15 @@
 package com.personal.tmdb.discover.data.repository
 
+import androidx.paging.Pager
 import com.personal.tmdb.core.data.mappers.toMediaResponseInfo
 import com.personal.tmdb.core.data.remote.TmdbApi
 import com.personal.tmdb.core.data.remote.safeApiCall
-import com.personal.tmdb.core.domain.models.MediaResponseInfo
+import com.personal.tmdb.core.data.source.MediaPagingSource
+import com.personal.tmdb.core.domain.models.MediaInfo
 import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.Result
+import com.personal.tmdb.core.domain.util.mediaPager
 import com.personal.tmdb.detail.data.mappers.toGenresInfo
 import com.personal.tmdb.detail.domain.models.GenresInfo
 import com.personal.tmdb.discover.data.mappers.toCountry
@@ -33,11 +36,20 @@ class DiscoverRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPopularPeople(
-        language: String?,
-        page: Int
-    ): Result<MediaResponseInfo, DataError.Remote> {
-        return safeApiCall {
-            tmdbApi.getPopular(MediaType.PERSON.name.lowercase(), language, page).toMediaResponseInfo()
+        language: String?
+    ): Pager<Int, MediaInfo> {
+        return mediaPager {
+            MediaPagingSource(
+                loadPage = { page ->
+                    safeApiCall {
+                        tmdbApi.getPopular(
+                            mediaType = MediaType.PERSON.name.lowercase(),
+                            language = language,
+                            page = page
+                        ).toMediaResponseInfo()
+                    }
+                }
+            )
         }
     }
 
@@ -53,7 +65,6 @@ class DiscoverRepositoryImpl @Inject constructor(
     override suspend fun discoverMedia(
         mediaType: String,
         language: String?,
-        page: Int,
         includeAdult: Boolean,
         airDateYear: String,
         fromAirDate: String,
@@ -67,29 +78,35 @@ class DiscoverRepositoryImpl @Inject constructor(
         withOriginalLanguage: String,
         fromRuntime: Int,
         toRuntime: Int
-    ): Result<MediaResponseInfo, DataError.Remote> {
-        return safeApiCall {
-            tmdbApi.discoverMedia(
-                mediaType = mediaType,
-                language = language,
-                page = page,
-                includeAdult = includeAdult,
-                airDateYear = airDateYear,
-                releaseDateYear = airDateYear,
-                fromAirDate = fromAirDate,
-                fromReleaseDate = fromAirDate,
-                toAirDate = toAirDate,
-                toReleaseDate = toAirDate,
-                sortBy = sortBy,
-                fromRating = fromRating,
-                toRating = toRating,
-                minRatingCount = minRatingCount,
-                withGenre = withGenre,
-                withOriginCountry = withOriginCountry,
-                withOriginalLanguage = withOriginalLanguage,
-                fromRuntime = fromRuntime,
-                toRuntime = toRuntime
-            ).toMediaResponseInfo()
+    ):  Pager<Int, MediaInfo> {
+        return mediaPager {
+            MediaPagingSource(
+                loadPage = { page ->
+                    safeApiCall {
+                        tmdbApi.discoverMedia(
+                            mediaType = mediaType,
+                            language = language,
+                            page = page,
+                            includeAdult = includeAdult,
+                            airDateYear = airDateYear,
+                            releaseDateYear = airDateYear,
+                            fromAirDate = fromAirDate,
+                            fromReleaseDate = fromAirDate,
+                            toAirDate = toAirDate,
+                            toReleaseDate = toAirDate,
+                            sortBy = sortBy,
+                            fromRating = fromRating,
+                            toRating = toRating,
+                            minRatingCount = minRatingCount,
+                            withGenre = withGenre,
+                            withOriginCountry = withOriginCountry,
+                            withOriginalLanguage = withOriginalLanguage,
+                            fromRuntime = fromRuntime,
+                            toRuntime = toRuntime
+                        ).toMediaResponseInfo()
+                    }
+                }
+            )
         }
     }
 }

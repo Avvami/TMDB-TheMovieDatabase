@@ -99,8 +99,6 @@ private fun SharedTransitionScope.HomeScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
         topBar = {
             FlexibleTopAppBar(
                 scrollBehavior = scrollBehavior,
@@ -117,13 +115,16 @@ private fun SharedTransitionScope.HomeScreen(
                 },
                 colors = FlexibleTopBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(.8f)
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(.9f)
                 )
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
     ) { innerPadding ->
         val animatedColor by animateColorAsState(
-            targetValue = homeState().randomMediaDominantColors?.color ?: MaterialTheme.colorScheme.surface,
+            targetValue = homeState().randomMediaDominantColors?.color
+                ?: MaterialTheme.colorScheme.surface,
             label = "AnimatedShadowColor"
         )
         val trending = homeState().trending?.collectAsLazyPagingItems()
@@ -149,7 +150,8 @@ private fun SharedTransitionScope.HomeScreen(
                         .padding(top = innerPadding.calculateTopPadding())
                         .padding(16.dp),
                     content = {
-                        val error = homeState().errorMessage ?: (trending?.loadState?.refresh as? LoadState.Error)?.error
+                        val error = homeState().errorMessage
+                            ?: (trending?.loadState?.refresh as? LoadState.Error)?.error
                             ?: (popularMovies?.loadState?.refresh as? LoadState.Error)?.error
                             ?: (popularTvShows?.loadState?.refresh as? LoadState.Error)?.error
                             ?: (upcomingMovies?.loadState?.refresh as? LoadState.Error)?.error
@@ -225,18 +227,22 @@ private fun SharedTransitionScope.HomeScreen(
                                     ) { index ->
                                         trending[index]?.let { mediaInfo ->
                                             MediaPoster(
-                                                onNavigateTo = { homeUiEvent(HomeUiEvent.OnNavigateTo(it)) },
+                                                onNavigateTo = {
+                                                    homeUiEvent(HomeUiEvent.OnNavigateTo(it))
+                                                },
                                                 mediaInfo = mediaInfo,
                                                 mediaType = mediaInfo.mediaType,
                                                 showTitle = preferencesState().showTitle,
-                                                showVoteAverage = preferencesState().showVoteAverage,
+                                                showVoteAverage = preferencesState().showVoteAverage
                                             )
                                         }
                                     }
                                     when (trending.loadState.append) {
                                         LoadState.Loading -> {
                                             item {
-                                                MediaPosterShimmer(showTitle = preferencesState().showTitle)
+                                                MediaPosterShimmer(
+                                                    showTitle = preferencesState().showTitle
+                                                )
                                             }
                                         }
                                         else -> Unit
@@ -259,7 +265,9 @@ private fun SharedTransitionScope.HomeScreen(
                                     ) { index ->
                                         movies[index]?.let { mediaInfo ->
                                             MediaPoster(
-                                                onNavigateTo = { homeUiEvent(HomeUiEvent.OnNavigateTo(it)) },
+                                                onNavigateTo = {
+                                                    homeUiEvent(HomeUiEvent.OnNavigateTo(it))
+                                                },
                                                 mediaInfo = mediaInfo,
                                                 mediaType = MediaType.MOVIE,
                                                 showTitle = preferencesState().showTitle,
@@ -270,7 +278,9 @@ private fun SharedTransitionScope.HomeScreen(
                                     when (movies.loadState.append) {
                                         LoadState.Loading -> {
                                             item {
-                                                MediaPosterShimmer(showTitle = preferencesState().showTitle)
+                                                MediaPosterShimmer(
+                                                    showTitle = preferencesState().showTitle
+                                                )
                                             }
                                         }
                                         else -> Unit
@@ -293,7 +303,9 @@ private fun SharedTransitionScope.HomeScreen(
                                     ) { index ->
                                         shows[index]?.let { mediaInfo ->
                                             MediaPoster(
-                                                onNavigateTo = { homeUiEvent(HomeUiEvent.OnNavigateTo(it)) },
+                                                onNavigateTo = {
+                                                    homeUiEvent(HomeUiEvent.OnNavigateTo(it))
+                                                },
                                                 mediaInfo = mediaInfo,
                                                 mediaType = MediaType.MOVIE,
                                                 showTitle = preferencesState().showTitle,
@@ -304,7 +316,9 @@ private fun SharedTransitionScope.HomeScreen(
                                     when (shows.loadState.append) {
                                         LoadState.Loading -> {
                                             item {
-                                                MediaPosterShimmer(showTitle = preferencesState().showTitle)
+                                                MediaPosterShimmer(
+                                                    showTitle = preferencesState().showTitle
+                                                )
                                             }
                                         }
                                         else -> Unit
@@ -327,7 +341,9 @@ private fun SharedTransitionScope.HomeScreen(
                                     ) { index ->
                                         movies[index]?.let { mediaInfo ->
                                             MediaPoster(
-                                                onNavigateTo = { homeUiEvent(HomeUiEvent.OnNavigateTo(it)) },
+                                                onNavigateTo = {
+                                                    homeUiEvent(HomeUiEvent.OnNavigateTo(it))
+                                                },
                                                 mediaInfo = mediaInfo,
                                                 mediaType = MediaType.MOVIE,
                                                 showTitle = preferencesState().showTitle,
@@ -338,7 +354,9 @@ private fun SharedTransitionScope.HomeScreen(
                                     when (movies.loadState.append) {
                                         LoadState.Loading -> {
                                             item {
-                                                MediaPosterShimmer(showTitle = preferencesState().showTitle)
+                                                MediaPosterShimmer(
+                                                    showTitle = preferencesState().showTitle
+                                                )
                                             }
                                         }
                                         else -> Unit

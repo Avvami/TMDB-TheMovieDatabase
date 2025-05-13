@@ -8,8 +8,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -137,13 +135,13 @@ fun rememberNavigationItems(preferencesState: () -> PreferencesState, userState:
                     label = R.string.search,
                     unselectedIcon = {
                         Icon(
-                            imageVector = Icons.Rounded.Search,
+                            painter = painterResource(R.drawable.icon_search_fill0_wght400),
                             contentDescription = stringResource(R.string.search)
                         )
                     },
                     selectedIcon = {
                         Icon(
-                            imageVector = Icons.Rounded.Search,
+                            painter = painterResource(R.drawable.icon_search_fill0_wght400),
                             contentDescription = stringResource(R.string.search)
                         )
                     },

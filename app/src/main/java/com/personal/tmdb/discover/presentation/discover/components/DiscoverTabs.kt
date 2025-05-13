@@ -43,8 +43,10 @@ fun SharedTransitionScope.DiscoverTabs(
     /*Fix SharedTransitionLayout theming (bug??)*/
     val darkTheme = preferencesState().darkTheme ?: isSystemInDarkTheme()
     val chipColors = SuggestionChipDefaults.suggestionChipColors(
-        containerColor = if (darkTheme) onSurfaceDark.copy(alpha = .05f) else onSurfaceLight.copy(alpha = .05f),
-        labelColor = if (darkTheme) onSurfaceDark.copy(alpha = .7f) else onSurfaceLight.copy(alpha = .7f)
+        containerColor = if (darkTheme) onSurfaceDark.copy(alpha = .05f) else
+            onSurfaceLight.copy(alpha = .05f),
+        labelColor = if (darkTheme) onSurfaceDark.copy(alpha = .7f) else
+            onSurfaceLight.copy(alpha = .7f)
     )
     CompositionLocalProvider(
         LocalMinimumInteractiveComponentSize provides Dp.Unspecified
@@ -72,8 +74,10 @@ fun SharedTransitionScope.DiscoverTabs(
                                 Text(text = stringResource(id = R.string.tv_shows))
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
-                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
-                                disabledLabelColor = MaterialTheme.colorScheme.onSurface
+                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(
+                                    alpha = .1f
+                                ),
+                                disabledLabelColor = MaterialTheme.colorScheme.primary
                             ),
                             border = BorderStroke(
                                 width = 1.dp,
@@ -93,8 +97,10 @@ fun SharedTransitionScope.DiscoverTabs(
                                 Text(text = stringResource(id = R.string.movies))
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
-                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
-                                disabledLabelColor = MaterialTheme.colorScheme.onSurface
+                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(
+                                    alpha = .1f
+                                ),
+                                disabledLabelColor = MaterialTheme.colorScheme.primary
                             ),
                             border = BorderStroke(
                                 width = 1.dp,
@@ -119,8 +125,10 @@ fun SharedTransitionScope.DiscoverTabs(
                             Text(text = stringResource(id = R.string.people))
                         },
                         colors = SuggestionChipDefaults.suggestionChipColors(
-                            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f),
-                            disabledLabelColor = MaterialTheme.colorScheme.onSurface
+                            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(
+                                alpha = .1f
+                            ),
+                            disabledLabelColor = MaterialTheme.colorScheme.primary
                         ),
                         border = BorderStroke(
                             width = 1.dp,

@@ -13,6 +13,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
@@ -26,7 +27,6 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -59,15 +59,20 @@ fun FlexibleTopAppBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
     windowInsets: WindowInsets = FlexibleTopBarDefaults.windowInsets,
     content: @Composable () -> Unit,
+    subContent: (@Composable () -> Unit)? = null
 ) {
-    // Sets the app bar's height offset to collapse the entire bar's height when content is
-    // scrolled.
     var expandedHeightPx by remember {
         mutableFloatStateOf(0f)
     }
-    LaunchedEffect(expandedHeightPx) {
-        if (scrollBehavior?.state?.heightOffsetLimit != -expandedHeightPx) {
-            scrollBehavior?.state?.heightOffsetLimit = -expandedHeightPx
+    var collapsedHeightPx by remember {
+        mutableFloatStateOf(0f)
+    }
+
+    // Sets the app bar's height offset limit to hide just the bottom content when present and
+    // keep top content visible when collapsed.
+    LaunchedEffect(expandedHeightPx, collapsedHeightPx) {
+        if (scrollBehavior?.state?.heightOffsetLimit != collapsedHeightPx - expandedHeightPx) {
+            scrollBehavior?.state?.heightOffsetLimit = collapsedHeightPx - expandedHeightPx
         }
     }
 
@@ -85,7 +90,7 @@ fun FlexibleTopAppBar(
     val appBarContainerColor by animateColorAsState(
         targetValue = colors.containerColor(colorTransitionFraction),
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-        label = "FlexibleTwoColumnTopAppBarAnim"
+        label = "FlexibleTopAppBarAnim"
     )
 
     // Set up support for resizing the top app bar when vertically dragging the bar itself.
@@ -113,124 +118,68 @@ fun FlexibleTopAppBar(
     // The height of the app bar is determined by subtracting the bar's height offset from the
     // app bar's defined constant height value (i.e. the ContainerHeight token).
     Surface(modifier = modifier.then(appBarDragModifier), color = appBarContainerColor) {
-        Layout(
-            modifier = Modifier
-                .windowInsetsPadding(windowInsets)
-                // clip after padding so we don't show the title over the inset area
-                .clipToBounds(),
-            content = content,
-            measurePolicy = { measurables, constraints ->
-                val placeable = measurables.first().measure(constraints.copy(minWidth = 0))
-
-                expandedHeightPx = placeable.height.toFloat()
-                // Subtract the scrolledOffset from the maxHeight. The scrolledOffset is expected to be
-                // equal or smaller than zero.
-                val scrolledOffsetValue = scrollBehavior?.state?.heightOffset ?: 0f
-                val heightOffset = placeable.height.toFloat() + scrolledOffsetValue
-                val layoutHeight = heightOffset.roundToInt().coerceAtLeast(0)
-
-                layout(constraints.maxWidth, layoutHeight) {
-                    placeable.place(0, scrolledOffsetValue.toInt())
-                }
+        Column {
+            TopAppBarLayout(
+                modifier = Modifier
+                    .windowInsetsPadding(windowInsets)
+                    // clip after padding so we don't show the title over the inset area
+                    .clipToBounds(),
+                scrolledOffset = {
+                    if (subContent != null) 0f else scrollBehavior?.state?.heightOffset ?: 0f
+                },
+                setHeightPx = { height ->
+                    if (subContent == null) {
+                        expandedHeightPx = height
+                    } else {
+                        collapsedHeightPx = height * -1
+                    }
+                },
+                content = content
+            )
+            subContent?.let {
+                TopAppBarLayout(
+                    modifier = Modifier
+                        // only apply the horizontal sides of the window insets padding, since the
+                        // top
+                        // padding will always be applied by the layout above
+                        .windowInsetsPadding(windowInsets.only(WindowInsetsSides.Horizontal))
+                        .clipToBounds(),
+                    scrolledOffset = { scrollBehavior?.state?.heightOffset ?: 0f },
+                    setHeightPx = { height ->
+                        expandedHeightPx = collapsedHeightPx + height
+                    },
+                    content = it
+                )
             }
-        )
+        }
     }
 }
 
-/**
- * This top bar uses the same scroll behaviors as Material3 top bars,
- * but it doesn't have a layout of its own. It is simply a container in
- * which you can put whatever you want.
- */
-@ExperimentalMaterial3Api
 @Composable
-fun FlexibleTwoColumnTopAppBar(
+private fun TopAppBarLayout(
     modifier: Modifier = Modifier,
-    colors: FlexibleTopBarColors = FlexibleTopBarDefaults.topAppBarColors(),
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-    windowInsets: WindowInsets = FlexibleTopBarDefaults.windowInsets,
-    content: @Composable () -> Unit,
-    subContent: @Composable () -> Unit
+    scrolledOffset: ScrolledOffset,
+    setHeightPx: (height: Float) -> Unit,
+    content: @Composable () -> Unit
 ) {
-    // Sets the app bar's height offset to collapse the entire bar's height when content is
-    // scrolled.
-    var expandedHeightPx by remember {
-        mutableFloatStateOf(0f)
-    }
-    SideEffect {
-        // Sets the app bar's height offset to collapse the entire bar's height when content is
-        // scrolled.
-        if (scrollBehavior?.state?.heightOffsetLimit != -expandedHeightPx) {
-            scrollBehavior?.state?.heightOffsetLimit = -expandedHeightPx
-        }
-    }
+    Layout(
+        modifier = modifier,
+        content = content,
+        measurePolicy = { measurables, constraints ->
+            val placeable = measurables.first().measure(constraints.copy(minWidth = 0))
 
-    // Obtain the container color from the TopAppBarColors using the `overlapFraction`. This
-    // ensures that the colors will adjust whether the app bar behavior is pinned or scrolled.
-    // This may potentially animate or interpolate a transition between the container-color and the
-    // container's scrolled-color according to the app bar's scroll state.
-    val colorTransitionFraction by remember(scrollBehavior) {
-        // derivedStateOf to prevent redundant recompositions when the content scrolls.
-        derivedStateOf {
-            val overlappingFraction = scrollBehavior?.state?.overlappedFraction ?: 0f
-            if (overlappingFraction > 0.01f) 1f else 0f
+            setHeightPx(placeable.height.toFloat())
+            // Subtract the scrolledOffset from the maxHeight. The scrolledOffset is expected to be
+            // equal or smaller than zero.
+            val scrolledOffsetValue = scrolledOffset.offset()
+            val heightOffset = placeable.height.toFloat() + scrolledOffsetValue
+            val layoutHeight = heightOffset.roundToInt().coerceAtLeast(0)
+
+            layout(constraints.maxWidth, layoutHeight) {
+                placeable.place(0, scrolledOffsetValue.toInt())
+            }
         }
-    }
-    val appBarContainerColor by animateColorAsState(
-        targetValue = colors.containerColor(colorTransitionFraction),
-        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-        label = "FlexibleTwoColumnTopAppBarAnim"
     )
-
-    // Set up support for resizing the top app bar when vertically dragging the bar itself.
-    val appBarDragModifier = if (scrollBehavior != null && !scrollBehavior.isPinned) {
-        Modifier.draggable(
-            orientation = Orientation.Vertical,
-            state = rememberDraggableState { delta ->
-                scrollBehavior.state.heightOffset += delta
-            },
-            onDragStopped = { velocity ->
-                settleAppBar(
-                    scrollBehavior.state,
-                    velocity,
-                    scrollBehavior.flingAnimationSpec,
-                    scrollBehavior.snapAnimationSpec
-                )
-            }
-        )
-    } else {
-        Modifier
-    }
-
-    // Compose a Surface with a TopAppBarLayout content.
-    // The surface's background color is animated as specified above.
-    // The height of the app bar is determined by subtracting the bar's height offset from the
-    // app bar's defined constant height value (i.e. the ContainerHeight token).
-    Surface(modifier = modifier.then(appBarDragModifier), color = appBarContainerColor) {
-        Layout(
-            modifier = Modifier
-                .windowInsetsPadding(windowInsets)
-                // clip after padding so we don't show the title over the inset area
-                .clipToBounds(),
-            content = {
-                content()
-                subContent()
-            },
-            measurePolicy = { measurables, constraints ->
-                val contentPlaceable = measurables.first().measure(constraints.copy(minWidth = 0))
-                val subContentPlaceable = measurables.last().measure(constraints.copy(minWidth = 0))
-
-                expandedHeightPx = subContentPlaceable.height.toFloat()
-                val scrollOffset = scrollBehavior?.state?.heightOffset ?: 0f
-                val height = contentPlaceable.height + subContentPlaceable.height.toFloat() + scrollOffset
-                val layoutHeight = height.roundToInt()
-                layout(constraints.maxWidth, layoutHeight) {
-                    contentPlaceable.place(0, 0)
-                    subContentPlaceable.place(0, contentPlaceable.height + scrollOffset.toInt())
-                }
-            }
-        )
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -338,6 +287,11 @@ class FlexibleTopBarColors internal constructor(
 
         return result
     }
+}
+
+/** A functional interface for providing an app-bar scroll offset. */
+private fun interface ScrolledOffset {
+    fun offset(): Float
 }
 
 object FlexibleTopBarDefaults {

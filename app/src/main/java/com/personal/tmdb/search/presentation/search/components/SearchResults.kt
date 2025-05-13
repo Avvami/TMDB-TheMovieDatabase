@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material3.MaterialTheme
@@ -94,12 +93,14 @@ fun SearchResults(
                 modifier = Modifier.fadingEdges(lazyGridState, topEdgeHeight = 16.dp, bottomEdgeHeight = 0.dp),
                 lazyGridState = lazyGridState,
                 contentPadding = PaddingValues(16.dp),
-                columns = GridCells.Adaptive(150.dp),
                 items = {
                     searchResults?.let { results ->
                         when (results.loadState.refresh) {
                             LoadState.Loading -> {
-                                items(20) {
+                                items(
+                                    count = 20,
+                                    contentType = { "Poster" }
+                                ) {
                                     MediaPosterShimmer(
                                         modifier = Modifier.fillMaxWidth(),
                                         height = Dp.Unspecified,
@@ -157,6 +158,7 @@ fun SearchResults(
                                                 contentType = "MessageContainer"
                                             ) {
                                                 MessageContainer(
+                                                    modifier = Modifier.fillMaxWidth(),
                                                     content = {
                                                         Text(
                                                             text = when (error) {
@@ -177,7 +179,7 @@ fun SearchResults(
                                         LoadState.Loading -> {
                                             items(
                                                 count = 2,
-                                                contentType = { "ShimmerPosters" }
+                                                contentType = { "ShimmerPoster" }
                                             ) {
                                                 MediaPosterShimmer(
                                                     modifier = Modifier
