@@ -211,7 +211,9 @@ private fun SharedTransitionScope.DiscoverScreen(
                         ) {
                             FilterChip(
                                 selected = false,
-                                onClick = { discoverUiEvent(DiscoverUiEvent.SetShowGenresState(true)) },
+                                onClick = {
+                                    discoverUiEvent(DiscoverUiEvent.SetShowGenresState(true))
+                                },
                                 label = {
                                     Text(
                                         text = "Rated: 0 - 10"

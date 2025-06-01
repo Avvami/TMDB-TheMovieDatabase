@@ -13,9 +13,7 @@ import com.personal.tmdb.core.domain.util.mediaPager
 import com.personal.tmdb.detail.data.mappers.toGenresInfo
 import com.personal.tmdb.detail.domain.models.GenresInfo
 import com.personal.tmdb.discover.data.mappers.toCountry
-import com.personal.tmdb.discover.data.mappers.toLanguage
 import com.personal.tmdb.discover.domain.models.Country
-import com.personal.tmdb.discover.domain.models.Language
 import com.personal.tmdb.discover.domain.repository.DiscoverRepository
 import javax.inject.Inject
 
@@ -26,12 +24,6 @@ class DiscoverRepositoryImpl @Inject constructor(
     override suspend fun getCountries(): Result<List<Country>, DataError.Remote> {
         return safeApiCall {
             tmdbApi.getCountries().toCountry()
-        }
-    }
-
-    override suspend fun getLanguages(): Result<List<Language>, DataError.Remote> {
-        return safeApiCall {
-            tmdbApi.getLanguages().toLanguage()
         }
     }
 

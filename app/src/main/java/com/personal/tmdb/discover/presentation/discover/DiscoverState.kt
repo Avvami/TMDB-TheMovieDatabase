@@ -14,7 +14,5 @@ data class DiscoverState(
     val showGenres: Boolean = false,
     val selectedGenre: Genre? = null,
     val genresInfo: GenresInfo? = null,
-    val sortBy: SortType = SortType.RATING_DESC,
-    val discover: Flow<PagingData<MediaInfo>>? = null,
-    val filtersApplied: Boolean = false
+    val discover: Flow<PagingData<MediaInfo>>? = null
 )

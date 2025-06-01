@@ -28,7 +28,6 @@ import com.personal.tmdb.detail.data.models.Rated
 import com.personal.tmdb.detail.data.models.Reviews
 import com.personal.tmdb.detail.data.models.SeasonDto
 import com.personal.tmdb.discover.data.models.CountryDto
-import com.personal.tmdb.discover.data.models.LanguageDto
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -331,10 +330,6 @@ interface TmdbApi {
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @GET("3/configuration/countries")
     suspend fun getCountries(): List<CountryDto>
-
-    @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
-    @GET("3/configuration/languages")
-    suspend fun getLanguages(): List<LanguageDto>
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @GET("3/discover/{media_type}?")

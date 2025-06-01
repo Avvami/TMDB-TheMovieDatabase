@@ -44,10 +44,12 @@ import com.personal.tmdb.detail.presentation.episodes.EpisodesScreenRoot
 import com.personal.tmdb.detail.presentation.image.ImageViewerScreenRoot
 import com.personal.tmdb.detail.presentation.person.PersonScreenRoot
 import com.personal.tmdb.detail.presentation.reviews.ReviewsScreenRoot
+import com.personal.tmdb.discover.presentation.DiscoverSharedViewModel
 import com.personal.tmdb.discover.presentation.discover.DiscoverScreenRoot
 import com.personal.tmdb.discover.presentation.discover.DiscoverUiEvent
 import com.personal.tmdb.discover.presentation.discover.DiscoverViewModel
 import com.personal.tmdb.discover.presentation.discover_filters.DiscoverFiltersScreenRoot
+import com.personal.tmdb.discover.presentation.discover_filters.DiscoverFiltersUiEvent
 import com.personal.tmdb.discover.presentation.discover_filters.DiscoverFiltersViewModel
 import com.personal.tmdb.home.presentation.home.HomeScreenRoot
 import com.personal.tmdb.profile.presentation.favorite.FavoriteScreenRoot
@@ -403,11 +405,10 @@ fun ChildNavHost(
             ) {
                 animatedComposable<Route.Discover> {
                     val viewModel = hiltViewModel<DiscoverViewModel>()
-                    val filtersViewModel = it.sharedHiltViewModel<DiscoverFiltersViewModel>(navController)
-                    val filters by filtersViewModel.filtersState.collectAsStateWithLifecycle()
-
+                    val sharedViewModel = it.sharedHiltViewModel<DiscoverSharedViewModel>(navController)
+                    val appliedFilters by sharedViewModel.appliedFiltersState.collectAsStateWithLifecycle()
                     LaunchedEffect(true) {
-                        viewModel.discoverUiEvent(DiscoverUiEvent.SetFilters(filters))
+                        viewModel.discoverUiEvent(DiscoverUiEvent.SetFilters(appliedFilters))
                     }
 
                     DiscoverScreenRoot(
@@ -427,10 +428,18 @@ fun ChildNavHost(
                             setBottomBarVisible(true)
                         }
                     }
-                    val viewModel = it.sharedHiltViewModel<DiscoverFiltersViewModel>(navController)
+
+                    val viewModel = hiltViewModel<DiscoverFiltersViewModel>()
+                    val sharedViewModel = it.sharedHiltViewModel<DiscoverSharedViewModel>(navController)
+                    val appliedFilters by sharedViewModel.appliedFiltersState.collectAsStateWithLifecycle()
+                    LaunchedEffect(true) {
+                        viewModel.filtersUiEvent(DiscoverFiltersUiEvent.SetFilters(appliedFilters))
+                    }
+
                     DiscoverFiltersScreenRoot(
                         onNavigateBack = onNavigateBack,
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        applyFilters = { filters -> sharedViewModel.applyFilters(filters) }
                     )
                 }
             }

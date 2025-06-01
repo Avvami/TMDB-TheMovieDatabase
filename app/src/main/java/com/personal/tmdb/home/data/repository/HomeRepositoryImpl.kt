@@ -59,7 +59,7 @@ class HomeRepositoryImpl @Inject constructor(
                             fromReleaseDate = "",
                             toAirDate = "",
                             toReleaseDate = "",
-                            sortBy = sortTypeToRequestString(SortType.POPULARITY_DESC, mediaType),
+                            sortBy = sortTypeToRequestString(SortType.POPULAR, mediaType),
                             fromRating = 0f,
                             toRating = 10f,
                             minRatingCount = 200f,

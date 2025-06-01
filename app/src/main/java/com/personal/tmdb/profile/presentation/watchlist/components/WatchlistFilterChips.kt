@@ -75,7 +75,7 @@ fun WatchlistFilterChips(
                         )
                         SuggestionChip(
                             modifier = Modifier.sharedElement(
-                                state = rememberSharedContentState(key = "Recommendations"),
+                                sharedContentState = rememberSharedContentState(key = "Recommendations"),
                                 animatedVisibilityScope = this@AnimatedContent
                             ),
                             onClick = { watchlistUiEvent(WatchlistUiEvent.ShowRecommendations) },
@@ -117,7 +117,7 @@ fun WatchlistFilterChips(
                     if (!showRecommendations) {
                         SuggestionChip(
                             modifier = Modifier.sharedElement(
-                                state = rememberSharedContentState(key = "Recommendations"),
+                                sharedContentState = rememberSharedContentState(key = "Recommendations"),
                                 animatedVisibilityScope = this@AnimatedContent
                             ),
                             onClick = { watchlistUiEvent(WatchlistUiEvent.ShowRecommendations) },

@@ -234,16 +234,17 @@
     <string name="country">Country</string>
     <string name="year">Year</string>
     <string name="select_year">Select year</string>
-    <string name="popularity_desc">Popularity Descending</string>
-    <string name="popularity_asc">Popularity Ascending</string>
-    <string name="rating_desc">Rating Descending</string>
-    <string name="rating_asc">Rating Ascending</string>
-    <string name="air_date_desc">First Air Date Descending</string>
-    <string name="air_date_asc">First Air Date Ascending</string>
     <string name="empty_discover">No results found. Try adjusting your filters.</string>
     <string name="upcoming_movies">Upcoming Movies</string>
     <string name="popular_movies">Popular Movies</string>
     <string name="popular_tv">Popular TV Shows</string>
     <string name="retry">Retry</string>
     <string name="error_general">Oops! We ran into a problem</string>
+    <string name="reset">Reset</string>
+    <string name="rating_from">From %d to %d</string>
+    <string name="popular">Popular</string>
+    <string name="newest">Newest</string>
+    <string name="oldest">Oldest</string>
+    <string name="apply">Apply</string>
+    <string name="today">Today</string>
 </resources>

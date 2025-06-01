@@ -65,7 +65,7 @@ fun SharedTransitionScope.DiscoverTabs(
                     if (uiState == MediaType.TV) {
                         SuggestionChip(
                             modifier = Modifier.sharedElement(
-                                state = rememberSharedContentState(key = MediaType.TV),
+                                sharedContentState = rememberSharedContentState(key = MediaType.TV),
                                 animatedVisibilityScope = animatedContentScope
                             ),
                             enabled = false,
@@ -88,7 +88,7 @@ fun SharedTransitionScope.DiscoverTabs(
                     } else {
                         SuggestionChip(
                             modifier = Modifier.sharedElement(
-                                state = rememberSharedContentState(key = MediaType.MOVIE),
+                                sharedContentState = rememberSharedContentState(key = MediaType.MOVIE),
                                 animatedVisibilityScope = animatedContentScope
                             ),
                             enabled = false,
@@ -116,7 +116,7 @@ fun SharedTransitionScope.DiscoverTabs(
                 MediaType.PERSON -> {
                     SuggestionChip(
                         modifier = Modifier.sharedElement(
-                            state = rememberSharedContentState(key = MediaType.PERSON),
+                            sharedContentState = rememberSharedContentState(key = MediaType.PERSON),
                             animatedVisibilityScope = animatedContentScope
                         ),
                         enabled = false,
@@ -140,7 +140,7 @@ fun SharedTransitionScope.DiscoverTabs(
                 MediaType.UNKNOWN -> {
                     SuggestionChip(
                         modifier = Modifier.sharedElement(
-                            state = rememberSharedContentState(key = MediaType.TV),
+                            sharedContentState = rememberSharedContentState(key = MediaType.TV),
                             animatedVisibilityScope = animatedContentScope,
                             renderInOverlayDuringTransition = false
                         ),
@@ -158,7 +158,7 @@ fun SharedTransitionScope.DiscoverTabs(
                     )
                     SuggestionChip(
                         modifier = Modifier.sharedElement(
-                            state = rememberSharedContentState(key = MediaType.MOVIE),
+                            sharedContentState = rememberSharedContentState(key = MediaType.MOVIE),
                             animatedVisibilityScope = animatedContentScope,
                             renderInOverlayDuringTransition = false
                         ),
@@ -176,7 +176,7 @@ fun SharedTransitionScope.DiscoverTabs(
                     )
                     SuggestionChip(
                         modifier = Modifier.sharedElement(
-                            state = rememberSharedContentState(key = MediaType.PERSON),
+                            sharedContentState = rememberSharedContentState(key = MediaType.PERSON),
                             animatedVisibilityScope = animatedContentScope,
                             renderInOverlayDuringTransition = false
                         ),

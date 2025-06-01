@@ -3,10 +3,8 @@ package com.personal.tmdb.discover.presentation.discover_filters
 import androidx.compose.ui.util.fastFilter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.personal.tmdb.core.domain.util.onError
-import com.personal.tmdb.core.domain.util.onSuccess
+import com.personal.tmdb.core.domain.util.fold
 import com.personal.tmdb.discover.domain.models.Country
-import com.personal.tmdb.discover.domain.models.Language
 import com.personal.tmdb.discover.domain.repository.DiscoverRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -15,8 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,219 +23,119 @@ class DiscoverFiltersViewModel @Inject constructor(
     private val _filtersState = MutableStateFlow(FiltersState())
     val filtersState = _filtersState.asStateFlow()
 
-    private val cleanState = FiltersState()
     private var countries: List<Country>? = null
-    private var languages: List<Language>? = null
-    private var originFilterJob: Job? = null
+    private var countriesFilterJob: Job? = null
 
     init {
         getCountries()
-        getLanguages()
     }
 
     private fun getCountries() {
         viewModelScope.launch {
-            discoverRepository.getCountries()
-                .onError { error ->
-                    println(error.toString())
-                }
-                .onSuccess { result ->
-                    countries = result
-                    _filtersState.update { it.copy(countries = result) }
-                }
-        }
-    }
-
-    private fun getLanguages() {
-        viewModelScope.launch {
-            discoverRepository.getLanguages()
-                .onError { error ->
-                    println(error.toString())
-                }
-                .onSuccess { result ->
-                    languages = result
-                    _filtersState.update { it.copy(languages = result) }
-                }
-        }
-    }
-
-    private fun isRatingApplied(state: FiltersState): Boolean {
-        return state.fromRating != cleanState.fromRating ||
-                state.toRating != cleanState.toRating ||
-                state.minimumVoteCount != cleanState.minimumVoteCount
-    }
-
-    private fun isAirDateApplied(state: FiltersState): Boolean {
-        return when (state.airDateType) {
-            AirDateType.RANGE -> state.fromAirDate != cleanState.fromAirDate || state.toAirDate != cleanState.toAirDate
-            AirDateType.YEAR -> state.yearAirDate != cleanState.yearAirDate
-        }
-    }
-
-    private fun isRuntimeApplied(state: FiltersState): Boolean {
-        return state.fromRuntime != cleanState.fromRuntime ||
-                state.toRuntime != cleanState.toRuntime
-    }
-
-    private fun isContentOriginApplied(state: FiltersState): Boolean {
-        return when (state.contentOriginType) {
-            ContentOriginType.COUNTRY -> state.selectedCountry != cleanState.selectedCountry
-            ContentOriginType.LANGUAGE -> state.selectedLanguage != cleanState.selectedLanguage
+            countries = discoverRepository.getCountries().fold(
+                onSuccess = { it },
+                onError = { emptyList() }
+            )
+            _filtersState.update { it.copy(countries = countries) }
         }
     }
 
     fun filtersUiEvent(event: DiscoverFiltersUiEvent) {
         when (event) {
             DiscoverFiltersUiEvent.OnNavigateBack -> Unit
-            is DiscoverFiltersUiEvent.SetSelectedTab -> {
-                _filtersState.update { it.copy(filtersUi = event.tab) }
+            DiscoverFiltersUiEvent.ApplyFilters -> Unit
+            is DiscoverFiltersUiEvent.SetFiltersUi -> {
+                _filtersState.update {
+                    it.copy(
+                        filtersUi = event.ui,
+                        searchQuery = "",
+                        countries = countries
+                    )
+                }
             }
-            DiscoverFiltersUiEvent.ClearAll -> {
+            DiscoverFiltersUiEvent.ResetFilters -> {
                 _filtersState.update { state ->
                     FiltersState(
                         filtersUi = state.filtersUi,
-                        countries = countries,
-                        languages = languages
+                        countries = countries
                     )
                 }
             }
-            DiscoverFiltersUiEvent.ClearRatingFilter -> {
+            is DiscoverFiltersUiEvent.SetRating -> {
                 _filtersState.update {
                     it.copy(
-                        ratingApplied = false,
-                        fromRating = cleanState.fromRating,
-                        toRating = cleanState.toRating,
-                        minimumVoteCount = cleanState.minimumVoteCount
+                        startRating = event.startRating,
+                        endRating = event.endRating
                     )
-                }
-            }
-            is DiscoverFiltersUiEvent.SetFromRating -> {
-                _filtersState.update {
-                    val state = it.copy(fromRating = event.rating)
-                    state.copy(ratingApplied = isRatingApplied(state))
-                }
-            }
-            is DiscoverFiltersUiEvent.SetToRating -> {
-                _filtersState.update {
-                    val state = it.copy(toRating = event.rating)
-                    state.copy(ratingApplied = isRatingApplied(state))
                 }
             }
             is DiscoverFiltersUiEvent.SetMinVoteCount -> {
-                _filtersState.update {
-                    val state = it.copy(minimumVoteCount = event.voteCount)
-                    state.copy(ratingApplied = isRatingApplied(state))
-                }
+                _filtersState.update { it.copy(minimumVoteCount = event.voteCount) }
             }
-            DiscoverFiltersUiEvent.ClearAirDateFilter -> {
+            is DiscoverFiltersUiEvent.ShowYearPicker -> {
+                _filtersState.update { it.copy(showYearPicker = event.state) }
+            }
+            is DiscoverFiltersUiEvent.SetYears -> {
                 _filtersState.update {
                     it.copy(
-                        airDateApplied = false,
-                        fromAirDate = if (it.airDateType == AirDateType.RANGE) null else it.fromAirDate,
-                        toAirDate = if (it.airDateType == AirDateType.RANGE) null else it.toAirDate,
-                        yearAirDate = if (it.airDateType == AirDateType.YEAR) "" else it.yearAirDate
+                        startYear = event.startYear,
+                        endYear = event.endYear
                     )
                 }
             }
-            is DiscoverFiltersUiEvent.SetAirDateType -> {
-                _filtersState.update {
-                    val state = it.copy(airDateType = event.type)
-                    state.copy(airDateApplied = isAirDateApplied(state))
-                }
+            is DiscoverFiltersUiEvent.SetStartRuntime -> {
+                _filtersState.update { it.copy(startRuntime = event.runtime) }
             }
-            is DiscoverFiltersUiEvent.SetFromAirDate -> {
-                event.dateMillis?.let { millis ->
-                    val instant = Instant.ofEpochMilli(millis)
-                    val date = instant.atZone(ZoneId.systemDefault()).toLocalDate()
-                    _filtersState.update {
-                        val state = it.copy(fromAirDate = date)
-                        state.copy(airDateApplied = isAirDateApplied(state))
-                    }
-                }
-            }
-            is DiscoverFiltersUiEvent.SetToAirDate -> {
-                event.dateMillis?.let { millis ->
-                    val instant = Instant.ofEpochMilli(millis)
-                    val date = instant.atZone(ZoneId.systemDefault()).toLocalDate()
-                    _filtersState.update {
-                        val state = it.copy(toAirDate = date)
-                        state.copy(airDateApplied = isAirDateApplied(state))
-                    }
-                }
-            }
-            is DiscoverFiltersUiEvent.SetYear -> {
-                event.dateMillis?.let { millis ->
-                    val instant = Instant.ofEpochMilli(millis)
-                    val date = instant.atZone(ZoneId.systemDefault()).toLocalDate()
-                    _filtersState.update {
-                        val state = it.copy(yearAirDate = date.year.toString())
-                        state.copy(airDateApplied = isAirDateApplied(state))
-                    }
-                }
-            }
-            DiscoverFiltersUiEvent.ClearRuntimeFilter -> {
-                _filtersState.update {
-                    it.copy(
-                        runtimeApplied = false,
-                        fromRuntime = cleanState.fromRuntime,
-                        toRuntime = cleanState.toRuntime
-                    )
-                }
-            }
-            is DiscoverFiltersUiEvent.SetFromRuntime -> {
-                _filtersState.update {
-                    val state = it.copy(fromRuntime = event.runtime)
-                    state.copy(runtimeApplied = isRuntimeApplied(state))
-                }
-            }
-            is DiscoverFiltersUiEvent.SetToRuntime -> {
-                _filtersState.update {
-                    val state = it.copy(toRuntime = event.runtime)
-                    state.copy(runtimeApplied = isRuntimeApplied(state))
-                }
+            is DiscoverFiltersUiEvent.SetEndRuntime -> {
+                _filtersState.update { it.copy(endRuntime = event.runtime) }
             }
             is DiscoverFiltersUiEvent.IncludeAdult -> {
                 _filtersState.update { it.copy(includeAdult = event.adult) }
             }
-            DiscoverFiltersUiEvent.ClearContentOriginFilter -> {
-                _filtersState.update {
-                    it.copy(
-                        contentOriginApplied = false,
-                        selectedCountry = if (it.contentOriginType == ContentOriginType.COUNTRY) null else it.selectedCountry,
-                        selectedLanguage = if (it.contentOriginType == ContentOriginType.LANGUAGE) null else it.selectedLanguage,
-                        searchQuery = "",
-                        countries = countries,
-                        languages = languages
-                    )
-                }
-            }
-            is DiscoverFiltersUiEvent.SetContentOriginType -> {
-                _filtersState.update {
-                    val state = it.copy(contentOriginType = event.type)
-                    state.copy(contentOriginApplied = isContentOriginApplied(state))
-                }
-            }
             is DiscoverFiltersUiEvent.SetSearchQuery -> {
                 _filtersState.update { it.copy(searchQuery = event.query) }
-                originFilterJob?.cancel()
-                originFilterJob = viewModelScope.launch {
+                countriesFilterJob?.cancel()
+                countriesFilterJob = viewModelScope.launch {
                     delay(150L)
                     _filtersState.update { state ->
                         state.copy(
-                            countries = if (event.query.isBlank()) countries else
-                                countries?.fastFilter { it.locale.displayCountry.contains(event.query, ignoreCase = true) },
-                            languages = if (event.query.isBlank()) languages else
-                                languages?.fastFilter { it.locale.displayLanguage.contains(event.query, ignoreCase = true) }
+                            countries = if (event.query.isBlank()) {
+                                countries
+                            } else {
+                                countries?.fastFilter {
+                                    it.locale.displayCountry.contains(
+                                        other = event.query,
+                                        ignoreCase = true
+                                    )
+                                }
+                            }
                         )
                     }
                 }
             }
-            is DiscoverFiltersUiEvent.SelectOrigin -> {
+            is DiscoverFiltersUiEvent.ApplyCountry -> {
                 _filtersState.update {
                     it.copy(
-                        contentOriginApplied = true,
-                        selectedCountry = if (it.contentOriginType == ContentOriginType.COUNTRY) event.origin as Country else it.selectedCountry,
-                        selectedLanguage = if (it.contentOriginType == ContentOriginType.LANGUAGE) event.origin as Language else it.selectedLanguage
+                        filtersUi = FiltersUi.ALL,
+                        selectedCountry = event.country
+                    )
+                }
+            }
+            is DiscoverFiltersUiEvent.SetSortType -> {
+                _filtersState.update { it.copy(sortBy = event.sortType) }
+            }
+            is DiscoverFiltersUiEvent.SetFilters -> {
+                val state = event.filtersState
+                _filtersState.update {
+                    it.copy(
+                        startRating = state.startRating,
+                        endRating = state.endRating,
+                        minimumVoteCount = state.minimumVoteCount,
+                        startYear = state.startYear,
+                        endYear = state.endYear,
+                        startRuntime = state.startRuntime,
+                        endRuntime = state.endRuntime,
+                        includeAdult = state.includeAdult
                     )
                 }
             }

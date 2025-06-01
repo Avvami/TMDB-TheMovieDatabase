@@ -1,50 +1,56 @@
 package com.personal.tmdb.discover.presentation.discover_filters
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.personal.tmdb.R
-import com.personal.tmdb.discover.presentation.discover_filters.components.AirDatesFilter
-import com.personal.tmdb.discover.presentation.discover_filters.components.ContentOriginFilter
-import com.personal.tmdb.discover.presentation.discover_filters.components.FilterTabs
-import com.personal.tmdb.discover.presentation.discover_filters.components.IncludeAdultFilter
-import com.personal.tmdb.discover.presentation.discover_filters.components.RatingFilter
-import com.personal.tmdb.discover.presentation.discover_filters.components.RuntimeFilter
+import com.personal.tmdb.discover.presentation.discover_filters.components.CountryFilter
+import com.personal.tmdb.discover.presentation.discover_filters.components.Filters
+import com.personal.tmdb.discover.presentation.discover_filters.components.SortBy
 
 @Composable
 fun DiscoverFiltersScreenRoot(
     onNavigateBack: () -> Unit,
-    viewModel: DiscoverFiltersViewModel = hiltViewModel()
+    viewModel: DiscoverFiltersViewModel = hiltViewModel(),
+    applyFilters: (filters: FiltersState) -> Unit
 ) {
     val filtersState by viewModel.filtersState.collectAsStateWithLifecycle()
     DiscoverFiltersScreen(
@@ -52,6 +58,10 @@ fun DiscoverFiltersScreenRoot(
         filtersUiEvent = { event ->
             when (event) {
                 DiscoverFiltersUiEvent.OnNavigateBack -> onNavigateBack()
+                DiscoverFiltersUiEvent.ApplyFilters -> {
+                    applyFilters(filtersState)
+                    onNavigateBack()
+                }
                 else -> Unit
             }
             viewModel.filtersUiEvent(event)
@@ -59,118 +69,167 @@ fun DiscoverFiltersScreenRoot(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 private fun DiscoverFiltersScreen(
     modifier: Modifier = Modifier,
     filtersState: () -> FiltersState,
     filtersUiEvent: (DiscoverFiltersUiEvent) -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.filters),
-                        fontWeight = FontWeight.Medium
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { filtersUiEvent(DiscoverFiltersUiEvent.OnNavigateBack) }
-                    )  {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Go back"
-                        )
-                    }
-                },
-                actions = {
-                    AnimatedVisibility(
-                        visible = FiltersState().hasChangesComparedTo(filtersState()),
-                        enter = fadeIn(tween(100)),
-                        exit = fadeOut(tween(100))
-                    ) {
-                        TextButton(
-                            onClick = { filtersUiEvent(DiscoverFiltersUiEvent.ClearAll) }
-                        ) {
-                            Text(text = stringResource(id = R.string.clear_all))
+    BackHandler(
+        enabled = filtersState().filtersUi == FiltersUi.COUNTRY
+                || filtersState().filtersUi == FiltersUi.YEAR
+    ) {
+        filtersUiEvent(DiscoverFiltersUiEvent.SetFiltersUi(FiltersUi.ALL))
+    }
+    SharedTransitionLayout {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        when (filtersState().filtersUi) {
+                            FiltersUi.ALL -> {
+                                Text(
+                                    text = stringResource(id = R.string.filters),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            FiltersUi.COUNTRY -> {
+                                Text(
+                                    text = stringResource(id = R.string.country),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            FiltersUi.YEAR -> {
+                                Text(
+                                    text = stringResource(id = R.string.year),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
                         }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-                    actionIconContentColor = MaterialTheme.colorScheme.primary
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                when (filtersState().filtersUi) {
+                                    FiltersUi.ALL -> {
+                                        filtersUiEvent(DiscoverFiltersUiEvent.OnNavigateBack)
+                                    }
+                                    FiltersUi.COUNTRY -> {
+                                        filtersUiEvent(DiscoverFiltersUiEvent.SetFiltersUi(FiltersUi.ALL))
+                                    }
+                                    FiltersUi.YEAR -> {
+                                        filtersUiEvent(DiscoverFiltersUiEvent.SetFiltersUi(FiltersUi.ALL))
+                                    }
+                                }
+                            }
+                        )  {
+                            Icon(
+                                painter = painterResource(R.drawable.icon_arrow_back_fill0_wght400),
+                                contentDescription = "Go back"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    windowInsets = WindowInsets.statusBars.union(WindowInsets.displayCutout)
                 )
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface
-    ) { innerPadding ->
-        Row(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            FilterTabs(
-                modifier = Modifier
-                    .width(120.dp)
-                    .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
-                    .verticalScroll(rememberScrollState()),
-                filtersState = filtersState,
-                filtersUiEvent = filtersUiEvent
-            )
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            contentWindowInsets = WindowInsets.safeDrawing.exclude(WindowInsets.ime)
+        ) { innerPadding ->
             AnimatedContent(
-                modifier = Modifier.weight(1f),
-                targetState = filtersState().filtersUi,
-                label = "FilterUiTabSwitchAnimation"
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                targetState = filtersState().filtersUi
             ) { ui ->
                 when (ui) {
-                    FiltersUi.RATING -> {
-                        RatingFilter(
+                    FiltersUi.COUNTRY -> {
+                        CountryFilter(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
+                                .fillMaxSize()
+                                .padding(start = 16.dp, top = 8.dp, end = 16.dp),
                             filtersState = filtersState,
-                            filtersUiEvent = filtersUiEvent
+                            filtersUiEvent = filtersUiEvent,
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedContentScope = this@AnimatedContent
                         )
                     }
-                    FiltersUi.AIR_DATES -> {
-                        AirDatesFilter(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            filtersState = filtersState,
-                            filtersUiEvent = filtersUiEvent
-                        )
+                    FiltersUi.ALL -> {
+                        Column(
+                            modifier = modifier.fillMaxSize()
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .verticalScroll(rememberScrollState())
+                                    .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Filters(
+                                    filtersState = filtersState,
+                                    filtersUiEvent = filtersUiEvent,
+                                    sharedTransitionScope = this@SharedTransitionLayout,
+                                    animatedContentScope = this@AnimatedContent
+                                )
+                                SortBy(
+                                    filtersState = filtersState,
+                                    filtersUiEvent = filtersUiEvent
+                                )
+                            }
+                            Row(
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Button(
+                                    onClick = {
+                                        filtersUiEvent(DiscoverFiltersUiEvent.ResetFilters)
+                                    },
+                                    shape = CircleShape,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                        contentColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledContentColor = MaterialTheme.colorScheme.surfaceContainer
+                                    ),
+                                    contentPadding = PaddingValues(
+                                        horizontal = 32.dp,
+                                        vertical = 12.dp
+                                    )
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.reset),
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                }
+                                Button(
+                                    modifier = Modifier.weight(1f),
+                                    onClick = {
+                                        filtersUiEvent(DiscoverFiltersUiEvent.ApplyFilters)
+                                    },
+                                    shape = CircleShape,
+                                    contentPadding = PaddingValues(
+                                        horizontal = 32.dp,
+                                        vertical = 12.dp
+                                    )
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.apply),
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                }
+                            }
+                        }
                     }
-                    FiltersUi.RUNTIME -> {
-                        RuntimeFilter(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            filtersState = filtersState,
-                            filtersUiEvent = filtersUiEvent
-                        )
-                    }
-                    FiltersUi.INCLUDE_ADULT -> {
-                        IncludeAdultFilter(
-                            modifier = Modifier.fillMaxWidth(),
-                            filtersState = filtersState,
-                            filtersUiEvent = filtersUiEvent
-                        )
-                    }
-                    FiltersUi.CONTENT_ORIGIN -> {
-                        ContentOriginFilter(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            filtersState = filtersState,
-                            filtersUiEvent = filtersUiEvent
-                        )
+                    FiltersUi.YEAR -> {
+
                     }
                 }
             }

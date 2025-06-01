@@ -23,7 +23,7 @@ import com.personal.tmdb.discover.presentation.discover_filters.DiscoverFiltersU
 import com.personal.tmdb.discover.presentation.discover_filters.FiltersState
 
 @Composable
-fun RuntimeFilter(
+fun MinVoteCountFilter(
     modifier: Modifier = Modifier,
     filtersState: () -> FiltersState,
     filtersUiEvent: (DiscoverFiltersUiEvent) -> Unit
@@ -36,18 +36,17 @@ fun RuntimeFilter(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = stringResource(id = R.string.runtime),
+            text = stringResource(id = R.string.minimumVoteCount),
             style = MaterialTheme.typography.titleMedium
         )
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = filtersState().startRuntime,
+            value = filtersState().minimumVoteCount,
             onValueChange = {
-                filtersUiEvent(DiscoverFiltersUiEvent.SetStartRuntime(it))
+                filtersUiEvent(DiscoverFiltersUiEvent.SetMinVoteCount(it))
             },
-            placeholder = { Text(text = FiltersState().startRuntimeDefault.toString()) },
+            placeholder = { Text(text = FiltersState().minimumVoteCountDefault.toString()) },
             prefix = { Text(modifier = Modifier.padding(end = 8.dp), text = stringResource(id = R.string.from)) },
-            suffix = { Text(modifier = Modifier.padding(start = 8.dp), text = stringResource(id = R.string.min)) },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f),
                 unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f),
@@ -59,37 +58,7 @@ fun RuntimeFilter(
                 focusedPrefixColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedPrefixColor = MaterialTheme.colorScheme.surfaceVariant,
                 focusedPlaceholderColor = MaterialTheme.colorScheme.surfaceVariant,
-                unfocusedPlaceholderColor = MaterialTheme.colorScheme.surfaceVariant,
-                focusedSuffixColor = MaterialTheme.colorScheme.surfaceVariant,
-                unfocusedSuffixColor = MaterialTheme.colorScheme.surfaceVariant
-            ),
-            singleLine = true,
-            shape = MaterialTheme.shapes.medium,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next)
-        )
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = filtersState().endRuntime,
-            onValueChange = {
-                filtersUiEvent(DiscoverFiltersUiEvent.SetEndRuntime(it))
-            },
-            placeholder = { Text(text = FiltersState().endRuntimeDefault.toString()) },
-            prefix = { Text(modifier = Modifier.padding(end = 8.dp), text = stringResource(id = R.string.to)) },
-            suffix = { Text(modifier = Modifier.padding(start = 8.dp), text = stringResource(id = R.string.min)) },
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f),
-                unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                cursorColor = MaterialTheme.colorScheme.onSurface,
-                focusedPrefixColor = MaterialTheme.colorScheme.surfaceVariant,
-                unfocusedPrefixColor = MaterialTheme.colorScheme.surfaceVariant,
-                focusedPlaceholderColor = MaterialTheme.colorScheme.surfaceVariant,
-                unfocusedPlaceholderColor = MaterialTheme.colorScheme.surfaceVariant,
-                focusedSuffixColor = MaterialTheme.colorScheme.surfaceVariant,
-                unfocusedSuffixColor = MaterialTheme.colorScheme.surfaceVariant
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.surfaceVariant
             ),
             singleLine = true,
             shape = MaterialTheme.shapes.medium,

@@ -1,8 +1,5 @@
 package com.personal.tmdb.discover.presentation.discover
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,15 +11,10 @@ import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.convertMediaType
 import com.personal.tmdb.core.domain.util.fold
-import com.personal.tmdb.core.domain.util.formatAirDateRequest
-import com.personal.tmdb.core.domain.util.sortTypeToRequestString
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.detail.domain.models.GenresInfo
 import com.personal.tmdb.discover.domain.repository.DiscoverRepository
-import com.personal.tmdb.discover.presentation.discover_filters.AirDateType
-import com.personal.tmdb.discover.presentation.discover_filters.ContentOriginType
 import com.personal.tmdb.discover.presentation.discover_filters.FiltersState
-import com.personal.tmdb.discover.presentation.discover_filters.hasChangesComparedTo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,12 +38,14 @@ class DiscoverViewModel @Inject constructor(
         )
     )
     val discoverState = _discoverState.asStateFlow()
-    private var filtersState by mutableStateOf(FiltersState())
+
+    private val _filtersState = MutableStateFlow(FiltersState())
+    val filtersState = _filtersState.asStateFlow()
 
     init {
         discover(
             mediaType = routeData.mediaType,
-            filters = filtersState
+            filters = _filtersState.value
         )
     }
 
@@ -102,45 +96,27 @@ class DiscoverViewModel @Inject constructor(
             mediaType = mediaType,
             language = language,
             includeAdult = filters.includeAdult,
-            airDateYear = filters.yearAirDate.takeIf {
-                filters.airDateType == AirDateType.YEAR
-            } ?: "",
-            fromAirDate = formatAirDateRequest(filters.fromAirDate?.takeIf {
-                filters.airDateType == AirDateType.RANGE
-            }),
-            toAirDate = formatAirDateRequest(filters.toAirDate?.takeIf {
-                filters.airDateType == AirDateType.RANGE
-            }),
-            sortBy = sortTypeToRequestString(
-                value = _discoverState.value.sortBy,
-                mediaType = convertMediaType(mediaType)
-            ),
-            fromRating = filters.fromRating.takeIf { it.isNotEmpty() }?.toFloatOrNull()
-                ?: filters.fromRatingDefault.toFloat(),
-            toRating = filters.toRating.takeIf { it.isNotEmpty() }?.toFloatOrNull()
-                ?: filters.toRatingDefault.toFloat(),
+            airDateYear = "",
+            fromAirDate = "",
+            toAirDate = "",
+            sortBy = "",
+            fromRating = 0f,
+            toRating = 0f,
             minRatingCount = filters.minimumVoteCount.takeIf { it.isNotEmpty() }?.toFloatOrNull()
                 ?: filters.minimumVoteCountDefault.toFloat(),
             withGenre = _discoverState.value.selectedGenre?.id?.toString() ?: "",
-            withOriginCountry = filters.selectedCountry?.code?.takeIf {
-                filters.contentOriginType == ContentOriginType.COUNTRY
-            } ?: "",
-            withOriginalLanguage = filters.selectedLanguage?.code?.takeIf {
-                filters.contentOriginType == ContentOriginType.LANGUAGE
-            } ?: "",
-            fromRuntime = filters.fromRuntime.takeIf { it.isNotEmpty() }?.toIntOrNull()
-                ?: filters.fromRuntimeDefault,
-            toRuntime = filters.toRuntime.takeIf { it.isNotEmpty() }?.toIntOrNull()
-                ?: filters.toRuntimeDefault
+            withOriginCountry = "",
+            withOriginalLanguage = "",
+            fromRuntime = filters.startRuntimeDefault,
+            toRuntime = filters.endRuntimeDefault
         )
     }
 
     private suspend fun getGenres(mediaType: String, language: String?): GenresInfo? {
-        return discoverRepository.getGenres(mediaType, language)
-            .fold(
-                onSuccess = { it },
-                onError = { null }
-            )
+        return discoverRepository.getGenres(mediaType, language).fold(
+            onSuccess = { it },
+            onError = { null }
+        )
     }
 
     fun discoverUiEvent(event: DiscoverUiEvent) {
@@ -151,24 +127,13 @@ class DiscoverViewModel @Inject constructor(
                 _discoverState.update { it.copy(showGenres = event.state) }
             }
             is DiscoverUiEvent.SetFilters -> {
-                val filters = event.filters
-                val filtersApplied = filters.ratingApplied || filters.airDateApplied
-                        || filters.runtimeApplied || filters.includeAdult
-                        || filters.contentOriginApplied
-                _discoverState.update { it.copy(filtersApplied = filtersApplied) }
-                if (filtersApplied && filters.hasChangesComparedTo(filtersState)) {
-                    filtersState = filters
-                    discover(
-                        mediaType = routeData.mediaType,
-                        filters = filtersState
-                    )
-                }
+                _filtersState.update { event.filters }
             }
             is DiscoverUiEvent.SetGenre -> {
                 _discoverState.update { it.copy(selectedGenre = event.genre) }
                 discover(
                     mediaType = routeData.mediaType,
-                    filters = filtersState
+                    filters = _filtersState.value
                 )
             }
         }

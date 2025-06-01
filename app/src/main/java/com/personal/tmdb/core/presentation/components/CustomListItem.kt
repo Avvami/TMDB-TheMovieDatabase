@@ -28,6 +28,7 @@ fun CustomListItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(12.dp),
     headlineContent: @Composable () -> Unit,
     leadingContent: @Composable (() -> Unit)? = null,
     trailingContent: @Composable (() -> Unit)? = null,
@@ -51,7 +52,7 @@ fun CustomListItem(
     ) {
         Row(
             modifier = Modifier.padding(contentPadding),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = horizontalArrangement,
             verticalAlignment = Alignment.CenterVertically
         ) {
             leadingContent?.let {

@@ -256,7 +256,7 @@ fun MediaPoster(
     onSelect: () -> Unit = {},
     onLongClick: (() -> Unit)? = null,
     shape: Shape = MaterialTheme.shapes.medium,
-    height: Dp = 170.dp,
+    height: Dp = 200.dp,
     mediaInfo: MediaInfo,
     mediaType: MediaType?,
     showTitle: Boolean,
@@ -265,7 +265,7 @@ fun MediaPoster(
     val haptic = LocalHapticFeedback.current
     Column(
         modifier = Modifier.width(IntrinsicSize.Min),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -398,7 +398,6 @@ fun MediaPoster(
                     text = name,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
                     minLines = 2,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
@@ -412,12 +411,12 @@ fun MediaPoster(
 fun MediaPosterShimmer(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.medium,
-    height: Dp = 170.dp,
+    height: Dp = 200.dp,
     showTitle: Boolean
 ) {
     Column(
         modifier = Modifier.width(IntrinsicSize.Min),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(

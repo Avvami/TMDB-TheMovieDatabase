@@ -56,8 +56,6 @@ fun formatEpisodesCount(numberOfEpisodes: Int): String {
     }
 }
 
-fun formatAirDateRequest(localDate: LocalDate?): String = localDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) ?: ""
-
 fun formatDate(localDate: LocalDate, pattern: String = "MMM d, yyyy"): String = localDate.format(DateTimeFormatter.ofPattern(pattern))
 
 fun formatDateTime(localDateTime: LocalDateTime): UiText {
@@ -155,5 +153,15 @@ fun formatListVisibility(isPublic: Boolean): UiText {
 fun capitalizeFirstLetter(input: String): String {
     return input.replaceFirstChar {
         if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+    }
+}
+
+fun formatYearFilter(
+    startYear: Int?, endYear: Int?
+): UiText? {
+    return when {
+        startYear == null && endYear == null -> null
+        startYear != null && endYear == null -> UiText.DynamicString(startYear.toString())
+        else -> UiText.DynamicString("$startYear - $endYear")
     }
 }

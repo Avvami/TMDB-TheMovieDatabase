@@ -6,13 +6,10 @@ import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.Result
 import com.personal.tmdb.detail.domain.models.GenresInfo
 import com.personal.tmdb.discover.domain.models.Country
-import com.personal.tmdb.discover.domain.models.Language
 
 interface DiscoverRepository {
 
     suspend fun getCountries(): Result<List<Country>, DataError.Remote>
-
-    suspend fun getLanguages(): Result<List<Language>, DataError.Remote>
 
     suspend fun getPopularPeople(language: String? = null): Pager<Int, MediaInfo>
 
