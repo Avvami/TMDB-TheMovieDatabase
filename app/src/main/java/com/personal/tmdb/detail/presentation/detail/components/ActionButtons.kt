@@ -1,0 +1,250 @@
+package com.personal.tmdb.detail.presentation.detail.components
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.personal.tmdb.R
+import com.personal.tmdb.UserState
+import com.personal.tmdb.core.domain.util.getColorForVoteAverage
+import com.personal.tmdb.core.domain.util.shimmerEffect
+import com.personal.tmdb.core.navigation.Route
+import com.personal.tmdb.core.presentation.LoadState
+import com.personal.tmdb.detail.data.models.Rated
+import com.personal.tmdb.detail.presentation.detail.DetailState
+import com.personal.tmdb.detail.presentation.detail.DetailUiEvent
+
+@Composable
+fun ActionButtons(
+    modifier: Modifier = Modifier,
+    userState: () -> UserState,
+    detailState: DetailState,
+    detailUiEvent: (DetailUiEvent) -> Unit
+) {
+    /*TODO: Change buttons size with material expressive*/
+    AnimatedContent(
+        modifier = modifier,
+        targetState = detailState.loadState is LoadState.Loading && detailState.details == null,
+        transitionSpec = { fadeIn() togetherWith fadeOut() }
+    ) { loading ->
+        if (loading) {
+            CompositionLocalProvider(
+                LocalMinimumInteractiveComponentSize provides Dp.Unspecified
+            ) {
+                FlowRow(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    repeat(2) {
+                        Box(
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(CircleShape)
+                                .border(
+                                    border = BorderStroke(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(
+                                            alpha = .05f
+                                        )
+                                    ),
+                                    shape = CircleShape
+                                )
+                                .shimmerEffect()
+                        )
+                    }
+                }
+            }
+        } else {
+            CompositionLocalProvider(
+                LocalMinimumInteractiveComponentSize provides Dp.Unspecified
+            ) {
+                FlowRow(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    if (!userState().user?.sessionId.isNullOrEmpty()) {
+                        Button(
+                            modifier = Modifier.defaultMinSize(
+                                minWidth = 56.dp,
+                                minHeight = 56.dp
+                            ),
+                            onClick = { detailUiEvent(DetailUiEvent.ShowRatingSheet(true)) },
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = when (val rated = detailState.accountState?.rated) {
+                                    is Rated.Value -> getColorForVoteAverage(rated.value.toFloat())
+                                    else -> MaterialTheme.colorScheme.surfaceContainer
+                                },
+                                contentColor = MaterialTheme.colorScheme.onSurface
+                            ),
+                            border = BorderStroke(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f)
+                            )
+                        ) {
+                            when (val rated = detailState.accountState?.rated) {
+                                is Rated.Value -> {
+                                    when {
+                                        rated.value < 5 -> {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.icon_thumb_down_fill1_wght400),
+                                                contentDescription = null
+                                            )
+                                        }
+                                        rated.value < 7 -> {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.icon_thumbs_up_down_fill1_wght400),
+                                                contentDescription = null
+                                            )
+                                        }
+                                        else -> {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.icon_thumb_up_fill1_wght400),
+                                                contentDescription = null
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
+                                    Text(
+                                        text = rated.value.toString(),
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                                else -> {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.icon_thumbs_up_down_fill0_wght400),
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    if (!userState().user?.sessionId.isNullOrEmpty()) {
+                        OutlinedIconButton(
+                            modifier = Modifier.size(56.dp),
+                            onClick = {
+                                detailUiEvent(
+                                    DetailUiEvent.OnNavigateTo(
+                                        route = detailState.accountState?.let {
+                                            Route.AddToList(
+                                                mediaType = detailState.mediaType.name.lowercase(),
+                                                mediaId = detailState.mediaId,
+                                                watchlist = it.watchlist,
+                                                favorite = it.favorite
+                                            )
+                                        } ?: Route.Lost
+                                    )
+                                )
+                            },
+                            colors = IconButtonDefaults.outlinedIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                            ),
+                            border = BorderStroke(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f)
+                            )
+                        ) {
+                            AnimatedContent(
+                                targetState = detailState.accountState?.watchlist == true,
+                                transitionSpec = {
+                                    if (targetState) {
+                                        fadeIn(animationSpec = spring()) + scaleIn(
+                                            animationSpec = spring(
+                                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                stiffness = Spring.StiffnessMediumLow
+                                            ),
+                                            initialScale = .4f
+                                        ) togetherWith ExitTransition.None
+                                    } else {
+                                        EnterTransition.None togetherWith ExitTransition.None
+                                    }
+                                }
+                            ) { inWatchlist ->
+                                if (inWatchlist) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.icon_bookmarks_fill1_wght400),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                } else {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.icon_bookmarks_fill0_wght400),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    OutlinedIconButton(
+                        modifier = Modifier.size(56.dp),
+                        onClick = { detailUiEvent(DetailUiEvent.Share) },
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            contentColor = MaterialTheme.colorScheme.onSurface
+                        ),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f)
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_share_fill0_wght400),
+                            contentDescription = null
+                        )
+                    }
+                    OutlinedIconButton(
+                        modifier = Modifier.size(56.dp),
+                        onClick = { detailUiEvent(DetailUiEvent.Share) },
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            contentColor = MaterialTheme.colorScheme.onSurface
+                        ),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f)
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_more_horiz_fill0_wght400),
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

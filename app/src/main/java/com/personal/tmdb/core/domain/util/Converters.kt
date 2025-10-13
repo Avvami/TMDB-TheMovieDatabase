@@ -1,6 +1,10 @@
 package com.personal.tmdb.core.domain.util
 
+import androidx.compose.ui.graphics.Color
 import com.personal.tmdb.R
+import com.personal.tmdb.ui.theme.ratingHigh
+import com.personal.tmdb.ui.theme.ratingLow
+import com.personal.tmdb.ui.theme.ratingMid
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -50,3 +54,11 @@ fun DataError.toUiText(): UiText {
 }
 
 fun Int?.toBoolean(): Boolean = this == 1
+
+fun getColorForVoteAverage(voteAverage: Float): Color {
+    return when {
+        voteAverage < 5f -> ratingLow
+        voteAverage < 7f -> ratingMid
+        else -> ratingHigh
+    }
+}

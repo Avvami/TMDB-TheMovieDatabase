@@ -3,6 +3,8 @@ package com.personal.tmdb.detail.presentation.detail
 import com.personal.tmdb.core.data.remote.CountryCode
 import com.personal.tmdb.core.domain.util.UiText
 import com.personal.tmdb.core.domain.util.MediaType
+import com.personal.tmdb.core.presentation.LoadState
+import com.personal.tmdb.detail.data.models.Image
 import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.CollectionInfo
 import com.personal.tmdb.detail.domain.models.CountryName
@@ -12,8 +14,10 @@ data class DetailState(
     val mediaType: MediaType,
     val mediaId: Int,
     val uiState: DetailUiState = DetailUiState.CONTENT,
+    val loadState: LoadState = LoadState.NotLoading,
     val accountState: AccountState? = null,
     val details: MediaDetailInfo? = null,
+    val logo: Image? = null,
     val collection: CollectionInfo? = null,
     val watchCountry: String = "",
     val watchCountries: Map<CountryCode, CountryName>? = null,

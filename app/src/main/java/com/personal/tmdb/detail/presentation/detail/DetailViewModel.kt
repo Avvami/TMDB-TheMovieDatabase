@@ -12,10 +12,12 @@ import com.personal.tmdb.core.domain.util.SnackbarController
 import com.personal.tmdb.core.domain.util.SnackbarEvent
 import com.personal.tmdb.core.domain.util.appendToResponse
 import com.personal.tmdb.core.domain.util.convertMediaType
+import com.personal.tmdb.core.domain.util.findLogoImageWithLanguage
 import com.personal.tmdb.core.domain.util.onError
 import com.personal.tmdb.core.domain.util.onSuccess
 import com.personal.tmdb.core.domain.util.toUiText
 import com.personal.tmdb.core.navigation.Route
+import com.personal.tmdb.core.presentation.LoadState
 import com.personal.tmdb.detail.data.models.Rated
 import com.personal.tmdb.detail.domain.models.CountryName
 import com.personal.tmdb.detail.domain.repository.DetailRepository
@@ -61,12 +63,7 @@ class DetailViewModel @Inject constructor(
         appendToResponse: String? = null
     ) {
         viewModelScope.launch {
-            _detailState.update {
-                it.copy(
-                    loading = true,
-                    errorMessage = null
-                )
-            }
+            _detailState.update { it.copy(loadState = LoadState.Loading) }
 
             val userCountry = userRepository.getUser()?.iso31661 ?: "US"
             val language = preferencesRepository.getLanguage()
@@ -76,10 +73,7 @@ class DetailViewModel @Inject constructor(
             detailRepository.getMediaDetail(mediaType, mediaId, sessionId, language, appendToResponse, includeImageLanguage)
                 .onError { error ->
                     _detailState.update {
-                        it.copy(
-                            loading = false,
-                            errorMessage = error.toUiText()
-                        )
+                        it.copy(loadState = LoadState.Error(error.toUiText()))
                     }
                 }
                 .onSuccess { result ->
@@ -98,9 +92,13 @@ class DetailViewModel @Inject constructor(
                         it.copy(
                             accountState = result.accountStates,
                             details = result,
+                            logo = result.images?.findLogoImageWithLanguage(
+                                preferred = language,
+                                fallback = result.originalLanguage
+                            ),
                             watchCountry = Locale("", userCountry).displayCountry,
                             watchCountries = watchCountries,
-                            loading = false
+                            loadState = LoadState.NotLoading
                         )
                     }
                 }
@@ -231,6 +229,8 @@ class DetailViewModel @Inject constructor(
             is DetailUiEvent.ShowRatingSheet -> {
                 _detailState.update { it.copy(showRatingSheet = event.state) }
             }
+            DetailUiEvent.RetryRequest -> Unit
+            DetailUiEvent.Share -> Unit
         }
     }
 }
