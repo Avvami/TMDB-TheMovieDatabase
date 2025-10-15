@@ -54,6 +54,7 @@
     <string name="episodes">Episodes</string>
     <string name="available">Available</string>
     <string name="overview">Overview</string>
+    <string name="no_overview">We don\'t have an overview for %s</string>
     <string name="no_episodes">There are no episodes added to this season.</string>
     <string name="similar">Similar</string>
     <string name="no_similar">No similar content was found.</string>

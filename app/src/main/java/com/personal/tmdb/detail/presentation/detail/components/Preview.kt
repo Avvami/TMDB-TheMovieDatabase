@@ -74,7 +74,7 @@ fun Preview(
         )
         AnimatedContent(
             modifier = Modifier.fillMaxWidth(),
-            targetState = detailState.loadState is LoadState.Loading,
+            targetState = detailState.loadState is LoadState.Loading && detailState.details == null,
             transitionSpec = { fadeIn() togetherWith fadeOut() },
             contentAlignment = Alignment.Center
         ) { loading ->

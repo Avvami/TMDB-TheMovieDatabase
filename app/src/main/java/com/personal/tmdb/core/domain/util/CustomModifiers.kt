@@ -6,7 +6,9 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -112,4 +114,17 @@ fun Modifier.fadingEdges(
                 )
             }
         }
+}
+
+fun Modifier.clickableNoIndication(
+    onClick: () -> Unit
+): Modifier = composed {
+    this.clickable(
+        enabled = true,
+        onClickLabel = null,
+        role = null,
+        onClick = onClick,
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null
+    )
 }
