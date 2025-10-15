@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.offset
 
 @Composable
 fun Modifier.shimmerEffect(
-    primaryColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
+    primaryColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     secondaryColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ): Modifier = composed {
     var size by remember {

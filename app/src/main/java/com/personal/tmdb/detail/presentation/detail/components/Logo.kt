@@ -19,6 +19,7 @@ import coil3.compose.SubcomposeAsyncImageContent
 import com.personal.tmdb.core.domain.util.TMDB
 import com.personal.tmdb.core.presentation.components.AutoResizedText
 import com.personal.tmdb.detail.presentation.detail.DetailState
+import com.personal.tmdb.ui.theme.onSurfaceDark
 
 @Composable
 fun Logo(
@@ -47,7 +48,7 @@ fun Logo(
                     style = MaterialTheme.typography.titleLarge.copy(
                         textAlign = TextAlign.Center
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = onSurfaceDark
                 )
             }
             is AsyncImagePainter.State.Success -> {

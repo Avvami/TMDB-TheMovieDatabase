@@ -8,7 +8,7 @@ import com.personal.tmdb.detail.data.models.Image
 import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.CollectionInfo
 import com.personal.tmdb.detail.domain.models.CountryName
-import com.personal.tmdb.detail.domain.models.MediaDetailInfo
+import com.personal.tmdb.detail.domain.models.MediaDetail
 
 data class DetailState(
     val mediaType: MediaType,
@@ -16,7 +16,7 @@ data class DetailState(
     val uiState: DetailUiState = DetailUiState.CONTENT,
     val loadState: LoadState = LoadState.NotLoading,
     val accountState: AccountState? = null,
-    val details: MediaDetailInfo? = null,
+    val details: MediaDetail? = null,
     val logo: Image? = null,
     val collection: CollectionInfo? = null,
     val watchCountry: String = "",

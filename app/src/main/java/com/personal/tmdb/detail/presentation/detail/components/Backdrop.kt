@@ -8,7 +8,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,6 +24,8 @@ import com.personal.tmdb.core.domain.util.shimmerEffect
 import com.personal.tmdb.core.domain.util.toPxFloat
 import com.personal.tmdb.core.presentation.LoadState
 import com.personal.tmdb.detail.presentation.detail.DetailState
+import com.personal.tmdb.ui.theme.surfaceContainerDark
+import com.personal.tmdb.ui.theme.surfaceContainerHighDark
 import com.personal.tmdb.ui.theme.surfaceDark
 
 @Composable
@@ -44,7 +45,10 @@ fun Backdrop(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .shimmerEffect()
+                        .shimmerEffect(
+                            primaryColor = surfaceContainerHighDark,
+                            secondaryColor = surfaceContainerDark
+                        )
                 )
             } else {
                 val painter = rememberAsyncImagePainter(TMDB.backdropW1280(detailState.details?.backdropPath))
@@ -62,7 +66,7 @@ fun Backdrop(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                                .background(surfaceContainerHighDark)
                         )
                     }
                 }
@@ -73,8 +77,8 @@ fun Backdrop(
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(surfaceDark.copy(alpha = .2f), Color.Transparent),
-                        startY = 80.dp.toPxFloat()
+                        colors = listOf(surfaceDark.copy(alpha = .5f), Color.Transparent),
+                        endY = 80.dp.toPxFloat()
                     )
                 )
         )

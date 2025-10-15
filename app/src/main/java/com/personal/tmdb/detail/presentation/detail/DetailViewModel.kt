@@ -231,6 +231,7 @@ class DetailViewModel @Inject constructor(
             }
             DetailUiEvent.RetryRequest -> Unit
             DetailUiEvent.Share -> Unit
+            is DetailUiEvent.OpenYTVideo -> Unit
         }
     }
 }

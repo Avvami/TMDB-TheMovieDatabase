@@ -41,6 +41,9 @@ import com.personal.tmdb.core.domain.util.shimmerEffect
 import com.personal.tmdb.core.presentation.LoadState
 import com.personal.tmdb.detail.presentation.detail.DetailState
 import com.personal.tmdb.detail.presentation.detail.DetailUiEvent
+import com.personal.tmdb.ui.theme.onSurfaceDark
+import com.personal.tmdb.ui.theme.surfaceContainerDark
+import com.personal.tmdb.ui.theme.surfaceContainerHighDark
 import com.personal.tmdb.ui.theme.surfaceDark
 
 @Composable
@@ -130,12 +133,18 @@ private fun PreviewShimmer(
                     .height(64.dp)
                     .width(240.dp)
                     .clip(MaterialTheme.shapes.medium)
-                    .shimmerEffect()
+                    .shimmerEffect(
+                        primaryColor = surfaceContainerHighDark,
+                        secondaryColor = surfaceContainerDark
+                    )
             )
             Text(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.medium)
-                    .shimmerEffect(),
+                    .shimmerEffect(
+                        primaryColor = surfaceContainerHighDark,
+                        secondaryColor = surfaceContainerDark
+                    ),
                 text = buildAnnotatedString {
                     withStyle(
                         style = MaterialTheme.typography.labelLarge.toSpanStyle()
@@ -149,7 +158,10 @@ private fun PreviewShimmer(
             FlowRow(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.medium)
-                    .shimmerEffect(),
+                    .shimmerEffect(
+                        primaryColor = surfaceContainerHighDark,
+                        secondaryColor = surfaceContainerDark
+                    ),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -184,13 +196,14 @@ private fun PreviewShimmer(
                             .border(
                                 border = BorderStroke(
                                     width = 1.dp,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(
-                                        alpha = .05f
-                                    )
+                                    color = onSurfaceDark.copy(alpha = .05f)
                                 ),
                                 shape = CircleShape
                             )
-                            .shimmerEffect()
+                            .shimmerEffect(
+                                primaryColor = surfaceContainerHighDark,
+                                secondaryColor = surfaceContainerDark
+                            )
                     )
                 }
             }

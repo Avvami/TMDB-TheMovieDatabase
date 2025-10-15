@@ -19,7 +19,7 @@ import com.personal.tmdb.detail.domain.models.CollectionInfo
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeDetailsInfo
 import com.personal.tmdb.detail.domain.models.GenresInfo
-import com.personal.tmdb.detail.domain.models.MediaDetailInfo
+import com.personal.tmdb.detail.domain.models.MediaDetail
 import com.personal.tmdb.detail.domain.models.PersonInfo
 import com.personal.tmdb.detail.domain.models.ReviewsResponseInfo
 import com.personal.tmdb.detail.domain.models.SeasonInfo
@@ -36,7 +36,7 @@ class DetailRepositoryImpl @Inject constructor(
         language: String?,
         appendToResponse: String?,
         includeImageLanguage: String?
-    ): Result<MediaDetailInfo, DataError.Remote> {
+    ): Result<MediaDetail, DataError.Remote> {
         return safeApiCall {
             tmdbApi.getMovieTvDetail(
                 mediaType = mediaType,

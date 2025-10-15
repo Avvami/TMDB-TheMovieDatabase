@@ -1,9 +1,7 @@
 package com.personal.tmdb.core.presentation.components
 
 import android.os.Build
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.LocalOverscrollConfiguration
-import androidx.compose.foundation.OverscrollConfiguration
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberPlatformOverscrollFactory
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
@@ -20,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaCarousel(
     modifier: Modifier = Modifier,
@@ -43,7 +41,9 @@ fun MediaCarousel(
             }
         }
         CompositionLocalProvider(
-            LocalOverscrollConfiguration provides if (Build.VERSION.SDK_INT > 30) OverscrollConfiguration() else null
+            LocalOverscrollFactory provides if (Build.VERSION.SDK_INT > 30) {
+                rememberPlatformOverscrollFactory()
+            } else null
         ) {
             LazyRow(
                 contentPadding = contentPadding,

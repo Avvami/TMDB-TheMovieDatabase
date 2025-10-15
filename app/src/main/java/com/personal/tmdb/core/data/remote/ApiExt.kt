@@ -2,6 +2,7 @@ package com.personal.tmdb.core.data.remote
 
 import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.Result
+import com.squareup.moshi.JsonDataException
 import org.json.JSONObject
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
@@ -17,6 +18,8 @@ suspend inline fun <T> safeApiCall(
         Result.Error(DataError.Remote.RequestTimeout)
     } catch (e: UnknownHostException) {
         Result.Error(DataError.Remote.NoInternet)
+    } catch (e: JsonDataException) {
+        Result.Error(DataError.Remote.Serialization)
     } catch (e: HttpException) {
         val errorBody = e.response()?.errorBody()?.string()
         val statusMessage = extractStatusMessage(errorBody)

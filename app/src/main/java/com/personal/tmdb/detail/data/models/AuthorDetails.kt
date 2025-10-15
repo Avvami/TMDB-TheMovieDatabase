@@ -11,7 +11,7 @@ data class AuthorDetails(
     @Json(name = "name")
     val name: String?,
     @Json(name = "rating")
-    val rating: Int?,
+    val rating: Double?,
     @Json(name = "username")
     val username: String?
 )

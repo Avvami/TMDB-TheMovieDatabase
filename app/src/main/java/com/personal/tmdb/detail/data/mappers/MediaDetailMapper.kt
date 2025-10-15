@@ -2,20 +2,23 @@ package com.personal.tmdb.detail.data.mappers
 
 import com.personal.tmdb.core.data.mappers.toMediaResponseInfo
 import com.personal.tmdb.core.domain.util.convertStringToDate
+import com.personal.tmdb.core.domain.util.convertISO8601toLocalDate
 import com.personal.tmdb.detail.data.models.AccountStates
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeToAir
 import com.personal.tmdb.detail.data.models.MediaDetailDto
+import com.personal.tmdb.detail.data.models.VideoDto
+import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeToAirInfo
-import com.personal.tmdb.detail.domain.models.MediaDetailInfo
-import com.personal.tmdb.detail.domain.models.AccountState
+import com.personal.tmdb.detail.domain.models.MediaDetail
+import com.personal.tmdb.detail.domain.models.Video
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-fun MediaDetailDto.toMediaDetailInfo(): MediaDetailInfo {
-    return MediaDetailInfo(
+fun MediaDetailDto.toMediaDetailInfo(): MediaDetail {
+    return MediaDetail(
         accountStates = accountStates?.toAccountState(),
         aggregateCredits = aggregateCredits,
         backdropPath = backdropPath,
@@ -34,7 +37,7 @@ fun MediaDetailDto.toMediaDetailInfo(): MediaDetailInfo {
         numberOfEpisodes = numberOfEpisodes,
         numberOfSeasons = numberOfSeasons,
         originCountry = originCountry,
-        originalLanguage = try { Locale(originalLanguage ?: "").displayLanguage } catch (e: Exception) { null },
+        originalLanguage = try { Locale.forLanguageTag(originalLanguage ?: "").displayLanguage } catch (e: Exception) { null },
         originalName = originalName,
         overview = if (overview.isNullOrEmpty()) null else overview,
         posterPath = posterPath,
@@ -50,7 +53,20 @@ fun MediaDetailDto.toMediaDetailInfo(): MediaDetailInfo {
         tagline = if (tagline.isNullOrEmpty()) null else tagline,
         voteAverage = voteAverage?.toFloat(),
         voteCount = voteCount,
+        videos = videosDto?.results?.takeIf { it.isNotEmpty() }?.map { it.toVideo() }
+            ?.filter { it.official },
         watchProviders = watchProviders?.watchProvidersResults?.mapKeys { (countryCode, _) -> Locale("", countryCode).displayCountry }
+    )
+}
+
+fun VideoDto.toVideo(): Video {
+    return Video(
+        id = id,
+        key = key,
+        name = name?.takeIf { it.isNotEmpty() },
+        official = official,
+        publishedAt = convertISO8601toLocalDate(publishedAt),
+        type = type
     )
 }
 

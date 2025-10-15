@@ -23,6 +23,8 @@ import com.personal.tmdb.core.domain.util.formatTvShowRuntime
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.detail.presentation.detail.DetailState
 import com.personal.tmdb.detail.presentation.detail.DetailUiEvent
+import com.personal.tmdb.ui.theme.onSurfaceDark
+import com.personal.tmdb.ui.theme.surfaceVariantDark
 
 @Composable
 fun AttributeChips(
@@ -59,14 +61,14 @@ fun AttributeChips(
                                 )
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
-                                containerColor = MaterialTheme.colorScheme.onSurface.copy(
+                                containerColor = onSurfaceDark.copy(
                                     alpha = .02f
                                 ),
-                                labelColor = MaterialTheme.colorScheme.surfaceVariant
+                                labelColor = surfaceVariantDark
                             ),
                             border = BorderStroke(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .02f)
+                                color = onSurfaceDark.copy(alpha = .02f)
                             ),
                             shape = CircleShape
                         )
@@ -84,14 +86,14 @@ fun AttributeChips(
                                 )
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
-                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(
+                                disabledContainerColor = onSurfaceDark.copy(
                                     alpha = .02f
                                 ),
-                                disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant
+                                disabledLabelColor = surfaceVariantDark
                             ),
                             border = BorderStroke(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .02f)
+                                color = onSurfaceDark.copy(alpha = .02f)
                             ),
                             shape = CircleShape
                         )
@@ -109,14 +111,14 @@ fun AttributeChips(
                                 )
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
-                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(
+                                disabledContainerColor = onSurfaceDark.copy(
                                     alpha = .02f
                                 ),
-                                disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant
+                                disabledLabelColor = surfaceVariantDark
                             ),
                             border = BorderStroke(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .02f)
+                                color = onSurfaceDark.copy(alpha = .02f)
                             ),
                             shape = CircleShape
                         )
@@ -134,14 +136,14 @@ fun AttributeChips(
                                 )
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
-                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(
+                                disabledContainerColor = onSurfaceDark.copy(
                                     alpha = .02f
                                 ),
-                                disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant
+                                disabledLabelColor = surfaceVariantDark
                             ),
                             border = BorderStroke(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .02f)
+                                color = onSurfaceDark.copy(alpha = .02f)
                             ),
                             shape = CircleShape
                         )
@@ -159,14 +161,14 @@ fun AttributeChips(
                                 )
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
-                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(
+                                disabledContainerColor = onSurfaceDark.copy(
                                     alpha = .02f
                                 ),
-                                disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant
+                                disabledLabelColor = surfaceVariantDark
                             ),
                             border = BorderStroke(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .02f)
+                                color = onSurfaceDark.copy(alpha = .02f)
                             ),
                             shape = CircleShape
                         )
@@ -187,14 +189,14 @@ fun AttributeChips(
                                 )
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
-                                disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(
+                                disabledContainerColor = onSurfaceDark.copy(
                                     alpha = .02f
                                 ),
-                                disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant
+                                disabledLabelColor = surfaceVariantDark
                             ),
                             border = BorderStroke(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .02f)
+                                color = onSurfaceDark.copy(alpha = .02f)
                             ),
                             shape = CircleShape
                         )

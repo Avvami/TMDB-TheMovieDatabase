@@ -1,6 +1,5 @@
 package com.personal.tmdb.detail.data.models
 
-
 import com.personal.tmdb.core.data.models.MediaResponseDto
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -97,6 +96,8 @@ data class MediaDetailDto(
     val voteAverage: Double?,
     @Json(name = "vote_count")
     val voteCount: Int?,
+    @Json(name = "videos")
+    val videosDto: VideosDto?,
     @Json(name = "watch/providers")
     val watchProviders: WatchProviders?
 )

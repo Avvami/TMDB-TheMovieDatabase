@@ -7,7 +7,7 @@ import com.personal.tmdb.detail.domain.models.CollectionInfo
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeDetailsInfo
 import com.personal.tmdb.detail.domain.models.GenresInfo
-import com.personal.tmdb.detail.domain.models.MediaDetailInfo
+import com.personal.tmdb.detail.domain.models.MediaDetail
 import com.personal.tmdb.detail.domain.models.PersonInfo
 import com.personal.tmdb.detail.domain.models.ReviewsResponseInfo
 import com.personal.tmdb.detail.domain.models.SeasonInfo
@@ -22,7 +22,7 @@ interface DetailRepository {
         language: String? = null,
         appendToResponse: String? = null,
         includeImageLanguage: String? = null
-    ): Result<MediaDetailInfo, DataError.Remote>
+    ): Result<MediaDetail, DataError.Remote>
 
     suspend fun getAccountStates(mediaType: String, mediaId: Int, sessionId: String?): Result<AccountState, DataError.Remote>
 

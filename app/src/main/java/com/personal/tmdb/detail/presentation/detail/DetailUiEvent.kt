@@ -14,4 +14,5 @@ sealed interface DetailUiEvent {
     data class ShowRatingSheet(val state: Boolean): DetailUiEvent
     data object Share: DetailUiEvent
     data object RetryRequest: DetailUiEvent
+    data class OpenYTVideo(val url: String): DetailUiEvent
 }

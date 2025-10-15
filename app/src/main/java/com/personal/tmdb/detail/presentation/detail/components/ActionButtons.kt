@@ -38,6 +38,8 @@ import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.detail.data.models.Rated
 import com.personal.tmdb.detail.presentation.detail.DetailState
 import com.personal.tmdb.detail.presentation.detail.DetailUiEvent
+import com.personal.tmdb.ui.theme.onSurfaceDark
+import com.personal.tmdb.ui.theme.surfaceContainerDark
 
 @Composable
 fun ActionButtons(
@@ -66,13 +68,13 @@ fun ActionButtons(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = when (val rated = detailState.accountState?.rated) {
                             is Rated.Value -> getColorForVoteAverage(rated.value.toFloat())
-                            else -> MaterialTheme.colorScheme.surfaceContainer
+                            else -> surfaceContainerDark
                         },
-                        contentColor = MaterialTheme.colorScheme.onSurface
+                        contentColor = onSurfaceDark
                     ),
                     border = BorderStroke(
                         width = 1.dp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f)
+                        color = surfaceContainerDark
                     )
                 ) {
                     when (val rated = detailState.accountState?.rated) {
@@ -131,11 +133,11 @@ fun ActionButtons(
                         )
                     },
                     colors = IconButtonDefaults.outlinedIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                        containerColor = surfaceContainerDark
                     ),
                     border = BorderStroke(
                         width = 1.dp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f)
+                        color = surfaceContainerDark
                     )
                 ) {
                     AnimatedContent(
@@ -164,7 +166,7 @@ fun ActionButtons(
                             Icon(
                                 painter = painterResource(id = R.drawable.icon_bookmarks_fill0_wght400),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurface
+                                tint = onSurfaceDark
                             )
                         }
                     }
@@ -174,12 +176,12 @@ fun ActionButtons(
                 modifier = Modifier.size(56.dp),
                 onClick = { detailUiEvent(DetailUiEvent.Share) },
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    contentColor = MaterialTheme.colorScheme.onSurface
+                    containerColor = surfaceContainerDark,
+                    contentColor = onSurfaceDark
                 ),
                 border = BorderStroke(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f)
+                    color = surfaceContainerDark
                 )
             ) {
                 Icon(
@@ -191,12 +193,12 @@ fun ActionButtons(
                 modifier = Modifier.size(56.dp),
                 onClick = { detailUiEvent(DetailUiEvent.Share) },
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    contentColor = MaterialTheme.colorScheme.onSurface
+                    containerColor = surfaceContainerDark,
+                    contentColor = onSurfaceDark
                 ),
                 border = BorderStroke(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f)
+                    color = surfaceContainerDark
                 )
             ) {
                 Icon(

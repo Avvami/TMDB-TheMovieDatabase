@@ -15,7 +15,7 @@ import com.personal.tmdb.detail.data.models.ReleaseDates
 import com.personal.tmdb.detail.data.models.Season
 import java.time.LocalDate
 
-data class MediaDetailInfo(
+data class MediaDetail(
     val accountStates: AccountState?,
     val aggregateCredits: Credits?,
     val backdropPath: String?,
@@ -50,6 +50,7 @@ data class MediaDetailInfo(
     val tagline: String?,
     val voteAverage: Float?,
     val voteCount: Int?,
+    val videos: List<Video>?,
     val watchProviders: Map<CountryName, Available>?,
 )
 

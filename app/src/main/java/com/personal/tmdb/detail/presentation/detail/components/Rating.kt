@@ -11,6 +11,8 @@ import com.personal.tmdb.core.domain.util.compactDecimalFormat
 import com.personal.tmdb.core.domain.util.formatVoteAverage
 import com.personal.tmdb.core.domain.util.getColorForVoteAverage
 import com.personal.tmdb.detail.presentation.detail.DetailState
+import com.personal.tmdb.ui.theme.onSurfaceDark
+import com.personal.tmdb.ui.theme.surfaceVariantDark
 
 @Composable
 fun Rating(
@@ -33,7 +35,7 @@ fun Rating(
                 details.voteCount?.takeIf { it != 0 }?.let { voteCount ->
                     withStyle(
                         style = MaterialTheme.typography.labelLarge.copy(
-                            color = MaterialTheme.colorScheme.surfaceVariant
+                            color = surfaceVariantDark
                         ).toSpanStyle()
                     ) {
                         append(" (${compactDecimalFormat(voteCount.toLong())})")
@@ -42,7 +44,7 @@ fun Rating(
                 details.originalName.takeIf { it != details.name }?.let { originalName ->
                     withStyle(
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = onSurfaceDark
                         ).toSpanStyle()
                     ) {
                         append("  $originalName")
