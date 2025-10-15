@@ -2,7 +2,7 @@ package com.personal.tmdb.detail.domain.models
 
 import java.time.LocalDate
 
-data class EpisodeToAirInfo(
+data class EpisodeToAir(
     val airDate: LocalDate?,
     val episodeNumber: Int,
     val episodeType: String?,

@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class EpisodeToAir(
+data class EpisodeToAirDto(
     @Json(name = "air_date")
     val airDate: String?,
     @Json(name = "episode_number")

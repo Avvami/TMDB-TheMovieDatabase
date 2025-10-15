@@ -9,7 +9,7 @@ import com.personal.tmdb.detail.data.mappers.toCollectionInfo
 import com.personal.tmdb.detail.data.mappers.toCreditsInfo
 import com.personal.tmdb.detail.data.mappers.toEpisodeDetailsInfo
 import com.personal.tmdb.detail.data.mappers.toGenresInfo
-import com.personal.tmdb.detail.data.mappers.toMediaDetailInfo
+import com.personal.tmdb.detail.data.mappers.toMediaDetail
 import com.personal.tmdb.detail.data.mappers.toPersonInfo
 import com.personal.tmdb.detail.data.mappers.toReviewsResponseInfo
 import com.personal.tmdb.detail.data.mappers.toSeasonInfo
@@ -45,7 +45,7 @@ class DetailRepositoryImpl @Inject constructor(
                 language = language,
                 appendToResponse = appendToResponse,
                 includeImageLanguage = includeImageLanguage
-            ).toMediaDetailInfo()
+            ).toMediaDetail()
         }
     }
 

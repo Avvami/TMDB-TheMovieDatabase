@@ -2,7 +2,7 @@ package com.personal.tmdb.detail.data.mappers
 
 import com.personal.tmdb.core.domain.models.MediaInfo
 import com.personal.tmdb.core.domain.util.convertMediaType
-import com.personal.tmdb.core.domain.util.convertStringToDate
+import com.personal.tmdb.core.domain.util.convertDateTimeToLocalDate
 import com.personal.tmdb.detail.data.models.CombinedCastCrew
 import com.personal.tmdb.detail.data.models.CombinedCredits
 import com.personal.tmdb.detail.domain.models.CombinedCastCrewInfo
@@ -57,8 +57,8 @@ fun List<CombinedCastCrew>?.toGroupedCastCrewInfo(): Map<String?, Map<Int, List<
                             name = item.title ?: item.name,
                             overview = if (item.overview.isNullOrEmpty()) null else item.overview,
                             posterPath = item.posterPath,
-                            releaseDate = convertStringToDate(
-                                dateString = item.firstAirDate?.takeIf { it.isNotBlank() } ?: item.releaseDate?.takeIf { it.isNotBlank() }
+                            releaseDate = convertDateTimeToLocalDate(
+                                value = item.firstAirDate?.takeIf { it.isNotBlank() } ?: item.releaseDate?.takeIf { it.isNotBlank() }
                             )
                         )
                     }
@@ -78,8 +78,8 @@ fun CombinedCastCrew.toMediaInfo(): MediaInfo {
         originalLanguage = originalLanguage,
         overview = if (overview.isNullOrEmpty()) null else overview,
         posterPath = posterPath,
-        releaseDate = convertStringToDate(
-            dateString = firstAirDate?.takeIf { it.isNotBlank() } ?: releaseDate?.takeIf { it.isNotBlank() }
+        releaseDate = convertDateTimeToLocalDate(
+            value = firstAirDate?.takeIf { it.isNotBlank() } ?: releaseDate?.takeIf { it.isNotBlank() }
         ),
         voteAverage = voteAverage?.toFloat()
     )

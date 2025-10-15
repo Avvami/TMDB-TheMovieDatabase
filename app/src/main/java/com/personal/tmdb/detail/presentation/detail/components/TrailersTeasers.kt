@@ -79,7 +79,7 @@ fun TrailersTeasers(
                         contentAlignment = Alignment.Center
                     ) {
                         AsyncImage(
-                            modifier = Modifier.fillParentMaxSize(),
+                            modifier = Modifier.matchParentSize(),
                             model = C.YT_THUMB_URL.format(video.key),
                             contentDescription = null,
                             contentScale = ContentScale.Crop
@@ -101,7 +101,8 @@ fun TrailersTeasers(
                         video.publishedAt?.let { publishedAt ->
                             Text(
                                 text = formatDate(publishedAt),
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.surfaceVariant
                             )
                         }
                     }

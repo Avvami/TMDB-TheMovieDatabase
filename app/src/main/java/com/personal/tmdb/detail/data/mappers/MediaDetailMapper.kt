@@ -1,23 +1,21 @@
 package com.personal.tmdb.detail.data.mappers
 
 import com.personal.tmdb.core.data.mappers.toMediaResponseInfo
-import com.personal.tmdb.core.domain.util.convertStringToDate
-import com.personal.tmdb.core.domain.util.convertISO8601toLocalDate
+import com.personal.tmdb.core.domain.util.convertDateTimeToLocalDate
+import com.personal.tmdb.core.domain.util.convertOffsetDateTimeToLocalDate
 import com.personal.tmdb.detail.data.models.AccountStates
 import com.personal.tmdb.detail.data.models.Credits
-import com.personal.tmdb.detail.data.models.EpisodeToAir
+import com.personal.tmdb.detail.data.models.EpisodeToAirDto
 import com.personal.tmdb.detail.data.models.MediaDetailDto
 import com.personal.tmdb.detail.data.models.VideoDto
 import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.CreditsInfo
-import com.personal.tmdb.detail.domain.models.EpisodeToAirInfo
+import com.personal.tmdb.detail.domain.models.EpisodeToAir
 import com.personal.tmdb.detail.domain.models.MediaDetail
 import com.personal.tmdb.detail.domain.models.Video
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-fun MediaDetailDto.toMediaDetailInfo(): MediaDetail {
+fun MediaDetailDto.toMediaDetail(): MediaDetail {
     return MediaDetail(
         accountStates = accountStates?.toAccountState(),
         aggregateCredits = aggregateCredits,
@@ -30,10 +28,10 @@ fun MediaDetailDto.toMediaDetailInfo(): MediaDetail {
         genres = genres,
         id = id,
         images = images,
-        lastEpisodeToAir = lastEpisodeToAir?.toEpisodeToAirInfo(),
+        lastEpisodeToAir = lastEpisodeToAir?.toEpisodeToAir(),
         name = title ?: name,
         networks = networks,
-        nextEpisodeToAir = nextEpisodeToAir?.toEpisodeToAirInfo(),
+        nextEpisodeToAir = nextEpisodeToAir?.toEpisodeToAir(),
         numberOfEpisodes = numberOfEpisodes,
         numberOfSeasons = numberOfSeasons,
         originCountry = originCountry,
@@ -43,7 +41,7 @@ fun MediaDetailDto.toMediaDetailInfo(): MediaDetail {
         posterPath = posterPath,
         productionCompanies = productionCompanies,
         recommendations = recommendations?.toMediaResponseInfo(),
-        releaseDate = convertStringToDate(firstAirDate?.takeIf { it.isNotBlank() } ?: releaseDate?.takeIf { it.isNotBlank() }),
+        releaseDate = convertDateTimeToLocalDate(firstAirDate?.takeIf { it.isNotBlank() } ?: releaseDate?.takeIf { it.isNotBlank() }),
         releaseDates = releaseDates,
         reviews = reviews?.toReviewsResponseInfo(),
         runtime = if (runtime == 0) null else runtime,
@@ -53,8 +51,8 @@ fun MediaDetailDto.toMediaDetailInfo(): MediaDetail {
         tagline = if (tagline.isNullOrEmpty()) null else tagline,
         voteAverage = voteAverage?.toFloat(),
         voteCount = voteCount,
-        videos = videosDto?.results?.takeIf { it.isNotEmpty() }?.map { it.toVideo() }
-            ?.filter { it.official },
+        videos = videosDto?.results?.map { it.toVideo() }?.filter { it.official }
+            ?.takeIf { it.isNotEmpty() },
         watchProviders = watchProviders?.watchProvidersResults?.mapKeys { (countryCode, _) -> Locale("", countryCode).displayCountry }
     )
 }
@@ -65,7 +63,7 @@ fun VideoDto.toVideo(): Video {
         key = key,
         name = name?.takeIf { it.isNotEmpty() },
         official = official,
-        publishedAt = convertISO8601toLocalDate(publishedAt),
+        publishedAt = convertOffsetDateTimeToLocalDate(publishedAt),
         type = type
     )
 }
@@ -82,23 +80,16 @@ fun Credits.toCreditsInfo(): CreditsInfo {
     )
 }
 
-fun EpisodeToAir.toEpisodeToAirInfo(): EpisodeToAirInfo {
-    val airDate = try {
-        airDate?.let { string ->
-            LocalDate.parse(string, DateTimeFormatter.ISO_LOCAL_DATE)
-        }
-    } catch (e: Exception) {
-        null
-    }
-    return EpisodeToAirInfo(
-        airDate = airDate,
+fun EpisodeToAirDto.toEpisodeToAir(): EpisodeToAir {
+    return EpisodeToAir(
+        airDate = convertDateTimeToLocalDate(airDate),
         episodeNumber = episodeNumber,
         episodeType = episodeType,
         id = id,
-        name = if (name.isNullOrEmpty()) null else name,
-        overview = if (overview.isNullOrEmpty()) null else overview,
+        name = name?.takeIf { it.isNotEmpty() },
+        overview = overview?.takeIf { it.isNotEmpty() },
         productionCode = productionCode,
-        runtime = if (runtime == 0) null else runtime,
+        runtime = runtime?.takeIf { it != 0 },
         seasonNumber = seasonNumber,
         showId = showId,
         stillPath = stillPath,

@@ -12,7 +12,15 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-fun convertISO8601toLocalDate(value: String?): LocalDate? {
+/**
+ * Parses a string in ISO 8601 offset datetime format (e.g. "2019-10-16T01:47:56.000Z")
+ * and returns the corresponding [LocalDate].
+ * Returns null if parsing fails or input is null.
+ *
+ * @param value The ISO 8601 datetime string with offset.
+ * @return [LocalDate] extracted from the datetime or null if invalid input.
+ */
+fun convertOffsetDateTimeToLocalDate(value: String?): LocalDate? {
     return try {
         value?.let { string ->
             OffsetDateTime.parse(string).toLocalDate()
@@ -22,9 +30,17 @@ fun convertISO8601toLocalDate(value: String?): LocalDate? {
     }
 }
 
-fun convertStringToDate(dateString: String?): LocalDate? {
+/**
+ * Parses a string in ISO 8601 local date format (e.g. "2024-02-01")
+ * and returns the corresponding [LocalDate].
+ * Returns null if parsing fails or input is null.
+ *
+ * @param value The ISO 8601 date string without time.
+ * @return [LocalDate] representing the parsed date or null if invalid input.
+ */
+fun convertDateTimeToLocalDate(value: String?): LocalDate? {
     return try {
-        dateString?.let { string ->
+        value?.let { string ->
             LocalDate.parse(string, DateTimeFormatter.ISO_LOCAL_DATE)
         }
     } catch (e: Exception) {
@@ -32,6 +48,14 @@ fun convertStringToDate(dateString: String?): LocalDate? {
     }
 }
 
+/**
+ * Parses a date-time string with pattern "yyyy-MM-dd HH:mm:ss z" including a timezone (e.g. "2025-02-03 05:18:34 UTC"),
+ * converts it to the system default timezone, and returns the LocalDateTime.
+ * Returns null if parsing fails or input is null.
+ *
+ * @param value The custom formatted date-time string with timezone abbreviation.
+ * @return LocalDateTime converted to system default timezone or null if invalid input.
+ */
 fun convertStringToDateTime(dateString: String?): LocalDateTime? {
     return try {
         dateString?.let { string ->
