@@ -15,4 +15,5 @@ sealed interface DetailUiEvent {
     data object Share: DetailUiEvent
     data object RetryRequest: DetailUiEvent
     data class OpenYTVideo(val url: String): DetailUiEvent
+    data class DimTopAppBar(val state: Boolean): DetailUiEvent
 }

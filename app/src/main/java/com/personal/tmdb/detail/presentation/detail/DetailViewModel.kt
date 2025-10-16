@@ -232,6 +232,9 @@ class DetailViewModel @Inject constructor(
             DetailUiEvent.RetryRequest -> Unit
             DetailUiEvent.Share -> Unit
             is DetailUiEvent.OpenYTVideo -> Unit
+            is DetailUiEvent.DimTopAppBar -> {
+                _detailState.update { it.copy(dimTopAppBar = event.state) }
+            }
         }
     }
 }

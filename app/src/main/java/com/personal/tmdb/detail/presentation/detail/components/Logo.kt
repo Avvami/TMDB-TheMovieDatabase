@@ -48,7 +48,8 @@ fun Logo(
                     style = MaterialTheme.typography.titleLarge.copy(
                         textAlign = TextAlign.Center
                     ),
-                    color = onSurfaceDark
+                    color = onSurfaceDark,
+                    maxLines = 2
                 )
             }
             is AsyncImagePainter.State.Success -> {

@@ -18,6 +18,7 @@ data class DetailState(
     val accountState: AccountState? = null,
     val details: MediaDetail? = null,
     val logo: Image? = null,
+    val dimTopAppBar: Boolean = false,
     val collection: CollectionInfo? = null,
     val watchCountry: String = "",
     val watchCountries: Map<CountryCode, CountryName>? = null,
