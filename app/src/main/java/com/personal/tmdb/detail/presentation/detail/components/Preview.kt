@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -51,6 +53,7 @@ fun Preview(
     modifier: Modifier = Modifier,
     userState: () -> UserState,
     detailState: DetailState,
+    lazyListState: LazyListState,
     detailUiEvent: (DetailUiEvent) -> Unit
 ) {
     val dividerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)
@@ -72,7 +75,14 @@ fun Preview(
         Backdrop(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(400.dp),
+                .height(400.dp)
+                .graphicsLayer {
+                    if (lazyListState.firstVisibleItemIndex == 0) {
+                        val scrollOffset = lazyListState.firstVisibleItemScrollOffset.toFloat()
+                        val dissolve = 1f - (scrollOffset / 400.dp.toPx()).coerceIn(0f, 1f)
+                        alpha = dissolve
+                    }
+                },
             detailState = detailState
         )
         AnimatedContent(

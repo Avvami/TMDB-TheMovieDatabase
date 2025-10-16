@@ -31,7 +31,7 @@ import com.personal.tmdb.ui.theme.surfaceDark
 @Composable
 fun Backdrop(
     modifier: Modifier = Modifier,
-    detailState: DetailState,
+    detailState: DetailState
 ) {
     Box(
         modifier = modifier,

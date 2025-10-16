@@ -42,6 +42,7 @@ fun ContentPage(
                 },
                 userState = userState,
                 detailState = detailState,
+                lazyListState = lazyListState,
                 detailUiEvent = detailUiEvent
             )
         }
