@@ -1,11 +1,10 @@
 package com.personal.tmdb.detail.data.models
 
-
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class Network(
+data class ProductionCompanyDto(
     @Json(name = "id")
     val id: Int,
     @Json(name = "logo_path")

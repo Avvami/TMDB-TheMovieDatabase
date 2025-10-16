@@ -72,7 +72,7 @@ fun ContentPage(
                     )
                 }
             }
-            details.recommendations?.results?.let { recommendations ->
+            details.recommendations?.let { recommendations ->
                 item {
                     MediaCarousel(
                         titleContent = {

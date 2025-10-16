@@ -12,12 +12,14 @@ import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import com.personal.tmdb.UserState
+import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.formatRuntime
 import com.personal.tmdb.core.domain.util.formatTvShowRuntime
 import com.personal.tmdb.core.navigation.Route
@@ -38,11 +40,22 @@ fun AttributeChips(
     ) {
         detailState.details?.let { details ->
             val userCountryCode = userState().user?.iso31661 ?: "US"
-            val tvShowContentRating = details.contentRatings?.contentRatingsResults
-                ?.firstOrNull { it.iso31661 == userCountryCode }?.rating?.takeIf { it.isNotEmpty() }
-            val movieContentRating = details.releaseDates?.releaseDatesResults
-                ?.firstOrNull { it.iso31661 == userCountryCode }?.releaseDates
-                ?.firstOrNull { it.certification.isNotEmpty() }?.certification?.takeIf { it.isNotEmpty() }
+            val contentRating = remember {
+                when (detailState.mediaType) {
+                    MediaType.TV -> {
+                        details.contentRatings?.contentRatingsResults
+                            ?.firstOrNull { it.iso31661 == userCountryCode }?.rating
+                            ?.takeIf { it.isNotEmpty() }
+                    }
+                    MediaType.MOVIE -> {
+                        details.releaseDates?.releaseDatesResults
+                            ?.firstOrNull { it.iso31661 == userCountryCode }?.releaseDates
+                            ?.firstOrNull { it.certification.isNotEmpty() }?.certification
+                            ?.takeIf { it.isNotEmpty() }
+                    }
+                    else -> null
+                }
+            }
 
             buildList<@Composable FlowRowScope.() -> Unit> {
                 details.genres?.firstOrNull()?.let { genre ->
@@ -99,39 +112,14 @@ fun AttributeChips(
                         )
                     }
                 }
-                tvShowContentRating?.let { tvShowRating ->
+                contentRating?.let { contentRating ->
                     add {
                         SuggestionChip(
                             enabled = false,
                             onClick = {},
                             label = {
                                 Text(
-                                    text = tvShowRating,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            },
-                            colors = SuggestionChipDefaults.suggestionChipColors(
-                                disabledContainerColor = onSurfaceDark.copy(
-                                    alpha = .02f
-                                ),
-                                disabledLabelColor = surfaceVariantDark
-                            ),
-                            border = BorderStroke(
-                                width = 1.dp,
-                                color = onSurfaceDark.copy(alpha = .02f)
-                            ),
-                            shape = CircleShape
-                        )
-                    }
-                }
-                movieContentRating?.let { movieRating ->
-                    add {
-                        SuggestionChip(
-                            enabled = false,
-                            onClick = {},
-                            label = {
-                                Text(
-                                    text = movieRating,
+                                    text = contentRating,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             },

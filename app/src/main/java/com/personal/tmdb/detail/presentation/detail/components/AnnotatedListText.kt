@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
@@ -93,25 +94,23 @@ fun AnnotatedListTextWithLinks(
 @Composable
 fun AnnotatedListText(
     modifier: Modifier = Modifier,
-    titlePrefix: String? = null,
+    prefix: String? = null,
+    prefixStyle: TextStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.surfaceVariant),
     items: List<String>,
-    titlePrefixStyle: SpanStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.surfaceVariant).toSpanStyle(),
-    itemsStyle: SpanStyle = MaterialTheme.typography.bodyLarge.toSpanStyle()
+    itemsStyle: TextStyle = MaterialTheme.typography.bodyLarge
 ) {
     val annotatedString by remember {
         derivedStateOf {
             buildAnnotatedString {
-                titlePrefix?.let {
-                    withStyle(style = titlePrefixStyle) {
-                        append("$titlePrefix: ")
+                prefix?.let {
+                    withStyle(style = prefixStyle.toSpanStyle()) {
+                        append("$prefix: ")
                     }
                 }
                 items.fastForEachIndexed { index, item ->
-                    withStyle(style = itemsStyle) {
+                    withStyle(style = itemsStyle.toSpanStyle()) {
                         append(item)
-                    }
-                    if (index != items.lastIndex) {
-                        withStyle(style = itemsStyle) {
+                        if (index != items.lastIndex) {
                             append(", ")
                         }
                     }

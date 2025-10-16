@@ -1,6 +1,6 @@
 package com.personal.tmdb.detail.domain.models
 
-import com.personal.tmdb.core.domain.models.MediaResponseInfo
+import com.personal.tmdb.core.domain.models.MediaInfo
 import com.personal.tmdb.detail.data.models.Available
 import com.personal.tmdb.detail.data.models.BelongsToCollection
 import com.personal.tmdb.detail.data.models.Cast
@@ -9,8 +9,6 @@ import com.personal.tmdb.detail.data.models.CreatedBy
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.Genre
 import com.personal.tmdb.detail.data.models.Images
-import com.personal.tmdb.detail.data.models.Network
-import com.personal.tmdb.detail.data.models.ProductionCompany
 import com.personal.tmdb.detail.data.models.ReleaseDates
 import com.personal.tmdb.detail.data.models.Season
 import java.time.LocalDate
@@ -20,6 +18,7 @@ data class MediaDetail(
     val aggregateCredits: Credits?,
     val backdropPath: String?,
     val belongsToCollection: BelongsToCollection?,
+    val budget: Long?,
     val cast: List<Cast>?,
     val contentRatings: ContentRatings?,
     val createdBy: List<CreatedBy>?,
@@ -39,13 +38,13 @@ data class MediaDetail(
     val overview: String?,
     val posterPath: String?,
     val productionCompanies: List<ProductionCompany>?,
-    val recommendations: MediaResponseInfo?,
+    val recommendations: List<MediaInfo>?,
     val releaseDate: LocalDate?,
     val releaseDates: ReleaseDates?,
+    val revenue: Long?,
     val reviews: ReviewsResponseInfo?,
     val runtime: Int?,
     val seasons: List<Season>?,
-    val similar: MediaResponseInfo?,
     val status: String?,
     val tagline: String?,
     val voteAverage: Float?,

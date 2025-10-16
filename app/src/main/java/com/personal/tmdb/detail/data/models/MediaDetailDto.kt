@@ -16,6 +16,8 @@ data class MediaDetailDto(
     val backdropPath: String?,
     @Json(name = "belongs_to_collection")
     val belongsToCollection: BelongsToCollection?,
+    @Json(name = "budget")
+    val budget: Double?,
     @Json(name = "content_ratings")
     val contentRatings: ContentRatings?,
     @Json(name = "created_by")
@@ -45,7 +47,7 @@ data class MediaDetailDto(
     @Json(name = "name")
     val name: String?,
     @Json(name = "networks")
-    val networks: List<Network>?,
+    val networksDto: List<NetworkDto>?,
     @Json(name = "next_episode_to_air")
     val nextEpisodeToAir: EpisodeToAirDto?,
     @Json(name = "number_of_episodes")
@@ -55,7 +57,7 @@ data class MediaDetailDto(
     @Json(name = "origin_country")
     val originCountry: List<String>?,
     @Json(name = "original_language")
-    val originalLanguage: String?,
+    val originalLanguageCode: String?,
     @Json(name = "original_name")
     val originalName: String?,
     @Json(name = "overview")
@@ -65,7 +67,7 @@ data class MediaDetailDto(
     @Json(name = "poster_path")
     val posterPath: String?,
     @Json(name = "production_companies")
-    val productionCompanies: List<ProductionCompany>?,
+    val productionCompaniesDto: List<ProductionCompanyDto>?,
     @Json(name = "production_countries")
     val productionCountries: List<ProductionCountry>?,
     @Json(name = "recommendations")
@@ -74,6 +76,8 @@ data class MediaDetailDto(
     val releaseDate: String?,
     @Json(name = "release_dates")
     val releaseDates: ReleaseDates?,
+    @Json(name = "revenue")
+    val revenue: Double?,
     @Json(name = "reviews")
     val reviews: Reviews?,
     @Json(name = "runtime")
