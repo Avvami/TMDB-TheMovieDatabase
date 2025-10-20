@@ -16,6 +16,7 @@ import com.personal.tmdb.core.domain.models.LogoutRequestBody
 import com.personal.tmdb.core.domain.models.MediaRequest
 import com.personal.tmdb.core.domain.models.UpdateListMediaRequest
 import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
+import com.personal.tmdb.core.domain.util.LanguageCode
 import com.personal.tmdb.detail.data.models.AccountStates
 import com.personal.tmdb.detail.data.models.CollectionDto
 import com.personal.tmdb.detail.data.models.Credits
@@ -355,6 +356,3 @@ interface TmdbApi {
         @Query("with_runtime.lte") toRuntime: Int,
     ): MediaResponseDto
 }
-
-typealias LanguageCode = String
-typealias CountryCode = String

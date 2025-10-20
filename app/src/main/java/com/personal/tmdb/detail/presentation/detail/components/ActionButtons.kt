@@ -40,6 +40,7 @@ import com.personal.tmdb.detail.presentation.detail.DetailState
 import com.personal.tmdb.detail.presentation.detail.DetailUiEvent
 import com.personal.tmdb.ui.theme.onSurfaceDark
 import com.personal.tmdb.ui.theme.surfaceContainerDark
+import java.time.LocalDate
 
 @Composable
 fun ActionButtons(
@@ -57,7 +58,8 @@ fun ActionButtons(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            if (!userState().user?.sessionId.isNullOrEmpty()) {
+            if (!userState().user?.sessionId.isNullOrEmpty() &&
+                detailState.details?.releaseDate?.isBefore(LocalDate.now()) == true) {
                 Button(
                     modifier = Modifier.defaultMinSize(
                         minWidth = 56.dp,

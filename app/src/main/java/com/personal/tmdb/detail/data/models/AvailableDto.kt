@@ -4,17 +4,17 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class Available(
+data class AvailableDto(
     @Json(name = "link")
     val link: String,
     @Json(name = "ads")
-    val ads: List<Provider>? = null,
+    val ads: List<ProviderDto>?,
     @Json(name = "flatrate")
-    val flatrate: List<Provider>? = null,
+    val flatrate: List<ProviderDto>?,
     @Json(name = "free")
-    val free: List<Provider>? = null,
+    val free: List<ProviderDto>?,
     @Json(name = "buy")
-    val buy: List<Provider>? = null,
+    val buy: List<ProviderDto>?,
     @Json(name = "rent")
-    val rent: List<Provider>? = null
+    val rent: List<ProviderDto>?
 )

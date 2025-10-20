@@ -51,7 +51,7 @@ import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.core.presentation.components.MessageContainer
 import com.personal.tmdb.detail.presentation.detail.components.ContentPage
 import com.personal.tmdb.detail.presentation.detail.components.DetailedDescription
-import com.personal.tmdb.detail.presentation.detail.components.DetailWatchProviders
+import com.personal.tmdb.detail.presentation.detail.components.WatchProviders
 import com.personal.tmdb.detail.presentation.detail.components.RatingBottomSheet
 import com.personal.tmdb.ui.theme.onSurfaceDark
 import com.personal.tmdb.ui.theme.surfaceDark
@@ -116,12 +116,14 @@ private fun DetailScreen(
                     AnimatedVisibility(
                         visible = detailState.uiState == DetailUiState.CONTENT,
                         enter = slideInVertically(initialOffsetY = { -it / 5 }) + fadeIn(),
-                        exit = slideOutVertically(targetOffsetY = { -it / 5 }) + fadeOut()
+                        exit = slideOutVertically(targetOffsetY = { -it / 5 })
+                                + fadeOut(animationSpec = tween(90))
                     ) {
                         AnimatedVisibility(
                             visible = detailState.dimTopAppBar,
                             enter = slideInVertically(initialOffsetY = { it / 5 }) + fadeIn(),
-                            exit = slideOutVertically(targetOffsetY = { -it / 5 }) + fadeOut()
+                            exit = slideOutVertically(targetOffsetY = { -it / 5 })
+                                    + fadeOut(animationSpec = tween(90))
                         ) {
                             Text(
                                 text = detailState.details?.name ?: "",
@@ -133,26 +135,70 @@ private fun DetailScreen(
                     }
                 },
                 navigationIcon = {
-                    FilledIconButton(
-                        onClick = {
-                            when (detailState.uiState) {
-                                DetailUiState.CONTENT -> detailUiEvent(DetailUiEvent.OnNavigateBack)
-                                else -> detailUiEvent(DetailUiEvent.SetUiState(DetailUiState.CONTENT))
+                    AnimatedContent(
+                        targetState = detailState.uiState,
+                        transitionSpec = {
+                            when (targetState) {
+                                DetailUiState.CONTENT -> {
+                                    slideIntoContainer(
+                                        towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                        initialOffset = { it / 5 }
+                                    ) + fadeIn() togetherWith fadeOut(animationSpec = tween(90))
+                                }
+                                else -> {
+                                    slideIntoContainer(
+                                        towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                                        initialOffset = { it / 5 }
+                                    ) + fadeIn() togetherWith fadeOut(animationSpec = tween(90))
+                                }
                             }
-                        },
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = surfaceDark,
-                            contentColor = if (detailState.dimTopAppBar) {
-                                MaterialTheme.colorScheme.onSurface
-                            } else {
-                                onSurfaceDark
+                        }
+                    ) { uiState ->
+                        when (uiState) {
+                            DetailUiState.CONTENT -> {
+                                FilledIconButton(
+                                    onClick = {
+                                        detailUiEvent(DetailUiEvent.OnNavigateBack)
+                                    },
+                                    colors = IconButtonDefaults.filledIconButtonColors(
+                                        containerColor = if (detailState.dimTopAppBar) {
+                                            MaterialTheme.colorScheme.surface
+                                        } else {
+                                            surfaceDark
+                                        },
+                                        contentColor = if (detailState.dimTopAppBar) {
+                                            MaterialTheme.colorScheme.onSurface
+                                        } else {
+                                            onSurfaceDark
+                                        }
+                                    )
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.icon_arrow_back_fill0_wght400),
+                                        contentDescription = null
+                                    )
+                                }
                             }
-                        )
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.icon_arrow_back_fill0_wght400),
-                            contentDescription = null
-                        )
+                            else -> {
+                                IconButton(
+                                    onClick = {
+                                        detailUiEvent(DetailUiEvent.SetUiState(DetailUiState.CONTENT))
+                                    },
+                                    colors = IconButtonDefaults.iconButtonColors(
+                                        contentColor = if (detailState.dimTopAppBar) {
+                                            MaterialTheme.colorScheme.onSurface
+                                        } else {
+                                            onSurfaceDark
+                                        }
+                                    )
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.icon_close_fill0_wght400),
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+                        }
                     }
                 },
                 actions = {
@@ -239,9 +285,9 @@ private fun DetailScreen(
             ) { uiState ->
                 when (uiState) {
                     DetailUiState.WATCH_PROVIDERS -> {
-                        DetailWatchProviders(
+                        WatchProviders(
                             modifier = Modifier.padding(innerPadding),
-                            detailState = { detailState },
+                            detailState = detailState,
                             detailUiEvent = detailUiEvent
                         )
                     }

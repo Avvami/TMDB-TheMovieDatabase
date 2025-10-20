@@ -1,6 +1,6 @@
 package com.personal.tmdb.settings.data.mappers
 
-import com.personal.tmdb.core.data.remote.LanguageCode
+import com.personal.tmdb.core.domain.util.LanguageCode
 import com.personal.tmdb.settings.data.models.LanguageInfo
 import java.util.Locale
 

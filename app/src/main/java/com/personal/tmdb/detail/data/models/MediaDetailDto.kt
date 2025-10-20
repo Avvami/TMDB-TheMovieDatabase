@@ -103,5 +103,5 @@ data class MediaDetailDto(
     @Json(name = "videos")
     val videosDto: VideosDto?,
     @Json(name = "watch/providers")
-    val watchProviders: WatchProviders?
+    val watchProviders: WatchProvidersDto?
 )

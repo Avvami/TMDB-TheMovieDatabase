@@ -37,7 +37,7 @@ fun ContentPage(
     ) {
         item {
             Preview(
-                modifier = Modifier.onVisibilityChanged(minFractionVisible = .2f) { visible ->
+                modifier = Modifier.onVisibilityChanged(minFractionVisible = .25f) { visible ->
                     detailUiEvent(DetailUiEvent.DimTopAppBar(!visible))
                 },
                 userState = userState,
@@ -70,6 +70,17 @@ fun ContentPage(
                         seasons = seasons,
                         detailUiEvent = detailUiEvent
                     )
+                }
+            }
+            detailState.selectedCountry?.let { (countryCode, _) ->
+                details.watchProviders?.get(countryCode)?.let { available ->
+                    item {
+                        WatchNow(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            available = available,
+                            detailUiEvent = detailUiEvent
+                        )
+                    }
                 }
             }
             details.recommendations?.let { recommendations ->

@@ -4,9 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.personal.tmdb.core.data.remote.CountryCode
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.repository.UserRepository
+import com.personal.tmdb.core.domain.util.CountryCode
+import com.personal.tmdb.core.domain.util.CountryName
 import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.SnackbarController
 import com.personal.tmdb.core.domain.util.SnackbarEvent
@@ -19,14 +20,12 @@ import com.personal.tmdb.core.domain.util.toUiText
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.LoadState
 import com.personal.tmdb.detail.data.models.Rated
-import com.personal.tmdb.detail.domain.models.CountryName
 import com.personal.tmdb.detail.domain.repository.DetailRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -66,11 +65,11 @@ class DetailViewModel @Inject constructor(
             _detailState.update { it.copy(loadState = LoadState.Loading) }
 
             val userCountry = userRepository.getUser()?.iso31661 ?: "US"
-            val language = preferencesRepository.getLanguage()
-            val includeImageLanguage = "$language,en,null"
+            val languageTag = preferencesRepository.getLanguage()
+            val includeImageLanguageTags = "$languageTag,en,null"
             val sessionId = userRepository.getUser()?.sessionId
 
-            detailRepository.getMediaDetail(mediaType, mediaId, sessionId, language, appendToResponse, includeImageLanguage)
+            detailRepository.getMediaDetail(mediaType, mediaId, sessionId, languageTag, appendToResponse, includeImageLanguageTags)
                 .onError { error ->
                     _detailState.update {
                         it.copy(loadState = LoadState.Error(error.toUiText()))
@@ -80,24 +79,19 @@ class DetailViewModel @Inject constructor(
                     result.belongsToCollection?.let { collection ->
                         getCollection(collectionId = collection.id)
                     }
-                    watchCountries = result.watchProviders?.keys
-                        ?.mapNotNull { countryName ->
-                            val code = Locale.getISOCountries().find { code ->
-                                Locale("", code).displayCountry == countryName
-                            }
-                            code?.let { it to countryName }
-                        }
-                        ?.toMap()
+                    watchCountries = result.watchCountries
                     _detailState.update {
                         it.copy(
                             accountState = result.accountStates,
                             details = result,
                             logo = result.images?.findLogoImageWithLanguage(
-                                preferred = language,
+                                preferred = languageTag,
                                 fallback = result.originalLanguage
                             ),
-                            watchCountry = Locale("", userCountry).displayCountry,
                             watchCountries = watchCountries,
+                            selectedCountry = watchCountries?.entries
+                                ?.firstOrNull { (code, _) -> code == userCountry }
+                                ?: watchCountries?.entries?.firstOrNull(),
                             loadState = LoadState.NotLoading
                         )
                     }
@@ -197,7 +191,7 @@ class DetailViewModel @Inject constructor(
             is DetailUiEvent.SetSelectedCountry -> {
                 _detailState.update {
                     it.copy(
-                        watchCountry = event.country,
+                        selectedCountry = event.selectedCountry,
                         watchCountries = watchCountries
                     )
                 }
@@ -235,6 +229,7 @@ class DetailViewModel @Inject constructor(
             is DetailUiEvent.DimTopAppBar -> {
                 _detailState.update { it.copy(dimTopAppBar = event.state) }
             }
+            is DetailUiEvent.OpenUrl -> Unit
         }
     }
 }

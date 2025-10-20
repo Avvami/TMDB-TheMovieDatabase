@@ -1,11 +1,11 @@
 package com.personal.tmdb.detail.data.models
 
-import com.personal.tmdb.core.data.remote.CountryCode
+import com.personal.tmdb.core.domain.util.CountryCode
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class WatchProviders(
+data class WatchProvidersDto(
     @Json(name = "results")
-    val watchProvidersResults: Map<CountryCode, Available>
+    val results: Map<CountryCode, AvailableDto>?
 )

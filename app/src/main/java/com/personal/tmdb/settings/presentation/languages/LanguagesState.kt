@@ -1,6 +1,6 @@
 package com.personal.tmdb.settings.presentation.languages
 
-import com.personal.tmdb.core.data.remote.LanguageCode
+import com.personal.tmdb.core.domain.util.LanguageCode
 import com.personal.tmdb.core.domain.util.UiText
 import com.personal.tmdb.settings.data.models.LanguageInfo
 

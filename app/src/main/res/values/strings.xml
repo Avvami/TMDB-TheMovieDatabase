@@ -70,7 +70,7 @@
     <string name="with_ads">With Ads</string>
     <string name="rent_buy_available">Available to Rent or Buy</string>
     <string name="watch_now">Watch Now</string>
-    <string name="watch_link_not_provided">Please note: Actual streaming links aren’t available via the TMDB API. Visit the official TMDB website.</string>
+    <string name="watch_link_not_provided">Actual streaming links aren’t available via the TMDB API. Visit the official TMDB website.</string>
     <string name="genres">Genres</string>
     <string name="genres_list">Genres:</string>
     <string name="cast">Cast</string>

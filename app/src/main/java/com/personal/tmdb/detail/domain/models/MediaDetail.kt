@@ -1,7 +1,8 @@
 package com.personal.tmdb.detail.domain.models
 
 import com.personal.tmdb.core.domain.models.MediaInfo
-import com.personal.tmdb.detail.data.models.Available
+import com.personal.tmdb.core.domain.util.CountryCode
+import com.personal.tmdb.core.domain.util.CountryName
 import com.personal.tmdb.detail.data.models.BelongsToCollection
 import com.personal.tmdb.detail.data.models.Cast
 import com.personal.tmdb.detail.data.models.ContentRatings
@@ -50,7 +51,6 @@ data class MediaDetail(
     val voteAverage: Float?,
     val voteCount: Int?,
     val videos: List<Video>?,
-    val watchProviders: Map<CountryName, Available>?,
+    val watchProviders: Map<CountryCode, Available>?,
+    val watchCountries: Map<CountryCode, CountryName>?,
 )
-
-typealias CountryName = String

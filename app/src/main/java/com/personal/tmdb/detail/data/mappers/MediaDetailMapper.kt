@@ -1,32 +1,43 @@
 package com.personal.tmdb.detail.data.mappers
 
 import com.personal.tmdb.core.data.mappers.toMediaInfo
+import com.personal.tmdb.core.domain.util.CountryCode
 import com.personal.tmdb.core.domain.util.convertDateTimeToLocalDate
 import com.personal.tmdb.core.domain.util.convertOffsetDateTimeToLocalDate
 import com.personal.tmdb.detail.data.models.AccountStates
+import com.personal.tmdb.detail.data.models.AvailableDto
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeToAirDto
 import com.personal.tmdb.detail.data.models.MediaDetailDto
 import com.personal.tmdb.detail.data.models.NetworkDto
 import com.personal.tmdb.detail.data.models.ProductionCompanyDto
+import com.personal.tmdb.detail.data.models.ProviderDto
 import com.personal.tmdb.detail.data.models.VideoDto
+import com.personal.tmdb.detail.data.models.WatchProvidersDto
 import com.personal.tmdb.detail.domain.models.AccountState
+import com.personal.tmdb.detail.domain.models.Available
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeToAir
 import com.personal.tmdb.detail.domain.models.MediaDetail
 import com.personal.tmdb.detail.domain.models.Network
 import com.personal.tmdb.detail.domain.models.ProductionCompany
+import com.personal.tmdb.detail.domain.models.Provider
 import com.personal.tmdb.detail.domain.models.Video
 import java.util.Locale
 
 fun MediaDetailDto.toMediaDetail(): MediaDetail {
-    val originalLanguage = try { Locale.forLanguageTag(originalLanguageCode ?: "").displayLanguage } catch (e: Exception) { null }
+    val originalLanguage = try {
+        Locale.forLanguageTag(originalLanguageCode ?: "").displayLanguage
+    } catch (e: Exception) {
+        null
+    }
+    val watchProviders = watchProviders?.toWatchProviders()
     return MediaDetail(
         accountStates = accountStates?.toAccountState(),
         aggregateCredits = aggregateCredits,
         backdropPath = backdropPath,
         belongsToCollection = belongsToCollection,
-        budget = budget?.toLong(),
+        budget = budget?.toLong()?.takeIf { it != 0L },
         cast = aggregateCredits?.cast?.take(15) ?: credits?.cast?.take(15),
         contentRatings = contentRatings,
         createdBy = createdBy?.take(2),
@@ -52,7 +63,7 @@ fun MediaDetailDto.toMediaDetail(): MediaDetail {
             firstAirDate?.takeIf { it.isNotBlank() } ?: releaseDate?.takeIf { it.isNotBlank() }
         ),
         releaseDates = releaseDates,
-        revenue = revenue?.toLong(),
+        revenue = revenue?.toLong()?.takeIf { it != 0L },
         reviews = reviews?.toReviewsResponseInfo(),
         runtime = if (runtime == 0) null else runtime,
         seasons = seasons,
@@ -61,7 +72,11 @@ fun MediaDetailDto.toMediaDetail(): MediaDetail {
         voteAverage = voteAverage?.toFloat()?.takeIf { it != 0f },
         voteCount = voteCount?.takeIf { it != 0 },
         videos = videosDto?.results?.toVideos(),
-        watchProviders = watchProviders?.watchProvidersResults?.mapKeys { (countryCode, _) -> Locale("", countryCode).displayCountry }
+        watchProviders = watchProviders,
+        watchCountries = watchProviders?.keys?.associate { countryCode ->
+            val countryName = Locale.Builder().setRegion(countryCode).build().displayCountry
+            countryCode to countryName
+        }
     )
 }
 
@@ -98,6 +113,32 @@ fun List<VideoDto>?.toVideos(): List<Video>? {
             type = videoDto.type
         )
     }?.filter { it.official }?.takeIf { it.isNotEmpty() }
+}
+
+fun WatchProvidersDto.toWatchProviders(): Map<CountryCode, Available>? {
+    return results?.mapValues { (_, value) ->
+        value.toAvailable()
+    }?.takeIf { it.isNotEmpty() }
+}
+
+fun AvailableDto.toAvailable(): Available {
+    return Available(
+        link = link,
+        ads = ads?.map { it.toProvider() }?.takeIf { it.isNotEmpty() },
+        streaming = flatrate?.map { it.toProvider() }?.takeIf { it.isNotEmpty() },
+        free = free?.map { it.toProvider() }?.takeIf { it.isNotEmpty() },
+        buy = buy?.map { it.toProvider() }?.takeIf { it.isNotEmpty() },
+        rent = rent?.map { it.toProvider() }?.takeIf { it.isNotEmpty() }
+    )
+}
+
+fun ProviderDto.toProvider(): Provider {
+    return Provider(
+        displayPriority = displayPriority,
+        logoPath = logoPath,
+        providerId = providerId,
+        providerName = providerName
+    )
 }
 
 fun AccountStates.toAccountState(): AccountState {
