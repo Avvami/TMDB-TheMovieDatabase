@@ -64,7 +64,7 @@ fun MediaDetailDto.toMediaDetail(): MediaDetail {
         ),
         releaseDates = releaseDates,
         revenue = revenue?.toLong()?.takeIf { it != 0L },
-        reviews = reviews?.toReviewsResponseInfo(),
+        reviews = reviews?.toReviewsResponse()?.results?.takeIf { it.isNotEmpty() },
         runtime = if (runtime == 0) null else runtime,
         seasons = seasons,
         status = status,

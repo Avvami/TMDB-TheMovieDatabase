@@ -9,7 +9,7 @@ import com.personal.tmdb.detail.domain.models.EpisodeDetailsInfo
 import com.personal.tmdb.detail.domain.models.GenresInfo
 import com.personal.tmdb.detail.domain.models.MediaDetail
 import com.personal.tmdb.detail.domain.models.PersonInfo
-import com.personal.tmdb.detail.domain.models.ReviewsResponseInfo
+import com.personal.tmdb.detail.domain.models.ReviewsResponse
 import com.personal.tmdb.detail.domain.models.SeasonInfo
 import com.personal.tmdb.detail.domain.models.AccountState
 
@@ -47,7 +47,7 @@ interface DetailRepository {
 
     suspend fun getImages(path: String, language: String? = null, includeImageLanguage: String? = null): Result<Images, DataError.Remote>
 
-    suspend fun getReviews(mediaType: String, mediaId: Int, page: Int, language: String?): Result<ReviewsResponseInfo, DataError.Remote>
+    suspend fun getReviews(mediaType: String, mediaId: Int, page: Int, language: String?): Result<ReviewsResponse, DataError.Remote>
 
     suspend fun getGenres(mediaType: String, language: String?): Result<GenresInfo, DataError.Remote>
 }

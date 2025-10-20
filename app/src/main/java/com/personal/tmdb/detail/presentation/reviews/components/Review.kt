@@ -23,13 +23,13 @@ import androidx.compose.ui.unit.dp
 import com.personal.tmdb.R
 import com.personal.tmdb.core.presentation.components.HtmlTextContainer
 import com.personal.tmdb.core.domain.util.formatDate
-import com.personal.tmdb.detail.domain.models.ReviewInfo
+import com.personal.tmdb.detail.domain.models.Review
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Review(
     modifier: Modifier = Modifier,
-    review: ReviewInfo
+    review: Review
 ) {
     Column(
         modifier = modifier,

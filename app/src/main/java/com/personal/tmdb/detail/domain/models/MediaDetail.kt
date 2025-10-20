@@ -43,7 +43,7 @@ data class MediaDetail(
     val releaseDate: LocalDate?,
     val releaseDates: ReleaseDates?,
     val revenue: Long?,
-    val reviews: ReviewsResponseInfo?,
+    val reviews: List<Review>?,
     val runtime: Int?,
     val seasons: List<Season>?,
     val status: String?,

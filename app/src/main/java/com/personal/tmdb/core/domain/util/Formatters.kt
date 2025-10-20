@@ -42,6 +42,13 @@ fun formatVoteAverage(voteAverage: Float): String {
     }
 }
 
+fun formatVoteCount(voteCount: Int): String {
+    return when (voteCount) {
+        1 -> "$voteCount Rating"
+        else -> "$voteCount Ratings"
+    }
+}
+
 fun formatTvShowRuntime(numberOfSeasons: Int, numberOfEpisodes: Int): String {
     return when (numberOfSeasons) {
         1 -> formatEpisodesCount(numberOfEpisodes)

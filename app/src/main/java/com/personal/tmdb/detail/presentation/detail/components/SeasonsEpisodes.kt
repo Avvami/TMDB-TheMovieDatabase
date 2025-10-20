@@ -98,7 +98,7 @@ fun SeasonsEpisodes(
 }
 
 @Composable
-fun EpisodeToAir(
+private fun EpisodeToAir(
     modifier: Modifier = Modifier,
     onNavigateTo: (route: Route) -> Unit,
     episodeToAir: EpisodeToAir,

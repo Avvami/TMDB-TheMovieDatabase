@@ -11,7 +11,7 @@ import com.personal.tmdb.detail.data.mappers.toEpisodeDetailsInfo
 import com.personal.tmdb.detail.data.mappers.toGenresInfo
 import com.personal.tmdb.detail.data.mappers.toMediaDetail
 import com.personal.tmdb.detail.data.mappers.toPersonInfo
-import com.personal.tmdb.detail.data.mappers.toReviewsResponseInfo
+import com.personal.tmdb.detail.data.mappers.toReviewsResponse
 import com.personal.tmdb.detail.data.mappers.toSeasonInfo
 import com.personal.tmdb.detail.data.models.Images
 import com.personal.tmdb.detail.domain.models.AccountState
@@ -21,7 +21,7 @@ import com.personal.tmdb.detail.domain.models.EpisodeDetailsInfo
 import com.personal.tmdb.detail.domain.models.GenresInfo
 import com.personal.tmdb.detail.domain.models.MediaDetail
 import com.personal.tmdb.detail.domain.models.PersonInfo
-import com.personal.tmdb.detail.domain.models.ReviewsResponseInfo
+import com.personal.tmdb.detail.domain.models.ReviewsResponse
 import com.personal.tmdb.detail.domain.models.SeasonInfo
 import com.personal.tmdb.detail.domain.repository.DetailRepository
 import javax.inject.Inject
@@ -152,9 +152,9 @@ class DetailRepositoryImpl @Inject constructor(
         mediaId: Int,
         page: Int,
         language: String?
-    ): Result<ReviewsResponseInfo, DataError.Remote> {
+    ): Result<ReviewsResponse, DataError.Remote> {
         return safeApiCall {
-            tmdbApi.getReviews(mediaType, mediaId, page, language).toReviewsResponseInfo()
+            tmdbApi.getReviews(mediaType, mediaId, page, language).toReviewsResponse()
         }
     }
 

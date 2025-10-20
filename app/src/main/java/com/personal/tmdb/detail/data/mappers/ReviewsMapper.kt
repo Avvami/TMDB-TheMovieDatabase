@@ -1,35 +1,40 @@
 package com.personal.tmdb.detail.data.mappers
 
-import com.personal.tmdb.detail.data.models.Review
+import com.personal.tmdb.core.domain.util.convertOffsetDateTimeToLocalDate
+import com.personal.tmdb.detail.data.models.ReviewAuthorDetailsDto
+import com.personal.tmdb.detail.data.models.ReviewDto
 import com.personal.tmdb.detail.data.models.Reviews
-import com.personal.tmdb.detail.domain.models.ReviewInfo
-import com.personal.tmdb.detail.domain.models.ReviewsResponseInfo
-import java.time.LocalDate
-import java.time.OffsetDateTime
+import com.personal.tmdb.detail.domain.models.Review
+import com.personal.tmdb.detail.domain.models.ReviewAuthorDetails
+import com.personal.tmdb.detail.domain.models.ReviewsResponse
 
-fun Reviews.toReviewsResponseInfo(): ReviewsResponseInfo {
-    return ReviewsResponseInfo(
+fun Reviews.toReviewsResponse(): ReviewsResponse {
+    return ReviewsResponse(
         page = page,
-        results = results.map { it.toReviewInfo() },
+        results = results.map { it.toReview() },
         totalPages = totalPages,
         totalResults = totalResults
     )
 }
 
-fun Review.toReviewInfo(): ReviewInfo {
-    val createdAt: LocalDate? = try {
-        createdAt?.takeIf { it.isNotBlank() }?.let { string ->
-            OffsetDateTime.parse(string).toLocalDate()
-        }
-    } catch (e: Exception) {
-        null
-    }
-    return ReviewInfo(
+fun ReviewDto.toReview(): Review {
+    val authorDetails = authorDetailsDto?.toReviewAuthorDetails()
+    return Review(
         author = author,
+        rating = authorDetails?.rating,
         authorDetails = authorDetails,
-        content = if (content.isNullOrEmpty()) null else content,
-        createdAt = createdAt,
+        content = content?.takeIf { it.isNotEmpty() },
+        createdAt = convertOffsetDateTimeToLocalDate(createdAt),
         id = id,
         url = url
+    )
+}
+
+fun ReviewAuthorDetailsDto.toReviewAuthorDetails(): ReviewAuthorDetails {
+    return ReviewAuthorDetails(
+        avatarPath = avatarPath,
+        name = name,
+        rating = rating?.toFloat(),
+        username = username
     )
 }

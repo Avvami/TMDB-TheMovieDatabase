@@ -4,6 +4,7 @@ import com.personal.tmdb.core.domain.util.CountryCode
 import com.personal.tmdb.core.domain.util.CountryName
 import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.navigation.Route
+import com.personal.tmdb.detail.domain.models.Review
 
 sealed interface DetailUiEvent {
     data object OnNavigateBack: DetailUiEvent
@@ -19,4 +20,5 @@ sealed interface DetailUiEvent {
     data class OpenYTVideo(val url: String): DetailUiEvent
     data class DimTopAppBar(val state: Boolean): DetailUiEvent
     data class OpenUrl(val url: String): DetailUiEvent
+    data class OpenReview(val review: Review): DetailUiEvent
 }

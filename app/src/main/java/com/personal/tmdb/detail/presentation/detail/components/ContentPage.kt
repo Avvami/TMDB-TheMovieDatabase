@@ -83,6 +83,15 @@ fun ContentPage(
                     }
                 }
             }
+            detailState.details.voteAverage?.let {
+                item {
+                    RatingReviews(
+                        detailState = detailState,
+                        userState = userState,
+                        detailUiEvent = detailUiEvent
+                    )
+                }
+            }
             details.recommendations?.let { recommendations ->
                 item {
                     MediaCarousel(

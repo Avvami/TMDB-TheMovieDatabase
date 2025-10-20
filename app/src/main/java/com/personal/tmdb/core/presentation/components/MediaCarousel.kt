@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,18 +27,20 @@ fun MediaCarousel(
     horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(8.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(8.dp),
     userScrollEnabled: Boolean = true,
-    titleContent: @Composable () -> Unit = {},
+    titleContent: @Composable (() -> Unit)? = null,
     items: LazyListScope.() -> Unit
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = verticalArrangement
     ) {
-        ProvideTextStyle(
-            value = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium, fontSize = 20.sp)
-        ) {
-            Box(modifier = Modifier.padding(contentPadding)) {
-                titleContent()
+        titleContent?.let {
+            ProvideTextStyle(
+                value = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium, fontSize = 20.sp)
+            ) {
+                Box(modifier = Modifier.padding(contentPadding)) {
+                    it()
+                }
             }
         }
         CompositionLocalProvider(
@@ -48,6 +51,7 @@ fun MediaCarousel(
             LazyRow(
                 contentPadding = contentPadding,
                 horizontalArrangement = horizontalArrangement,
+                verticalAlignment = Alignment.CenterVertically,
                 userScrollEnabled = userScrollEnabled
             ) {
                 items()

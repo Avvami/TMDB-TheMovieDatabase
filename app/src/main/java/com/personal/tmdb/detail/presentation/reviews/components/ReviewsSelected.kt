@@ -18,12 +18,12 @@ import androidx.compose.ui.unit.dp
 import com.personal.tmdb.R
 import com.personal.tmdb.core.presentation.components.HtmlSelectableTextContainer
 import com.personal.tmdb.core.domain.util.formatDate
-import com.personal.tmdb.detail.domain.models.ReviewInfo
+import com.personal.tmdb.detail.domain.models.Review
 
 @Composable
 fun ReviewsSelected(
     modifier: Modifier = Modifier,
-    review: ReviewInfo
+    review: Review
 ) {
     with(review) {
         Column(
@@ -75,7 +75,7 @@ fun ReviewsSelected(
 @Composable
 private fun ReviewAnnotatedText(
     modifier: Modifier = Modifier,
-    review: ReviewInfo
+    review: Review
 ) {
     val accentStyle = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary).toSpanStyle()
     val textStyle = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.surfaceVariant).toSpanStyle()
