@@ -20,5 +20,5 @@ sealed interface DetailUiEvent {
     data class OpenYTVideo(val url: String): DetailUiEvent
     data class DimTopAppBar(val state: Boolean): DetailUiEvent
     data class OpenUrl(val url: String): DetailUiEvent
-    data class OpenReview(val review: Review): DetailUiEvent
+    data class OpenReview(val review: Review?): DetailUiEvent
 }

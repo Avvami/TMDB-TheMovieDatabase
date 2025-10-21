@@ -281,7 +281,12 @@ private fun Review(
             )
         }
         Column(
-            modifier = Modifier.padding(top = 16.dp, end = 16.dp, bottom = 16.dp),
+            modifier = Modifier.padding(
+                start = if (review.rating == null) 16.dp else 0.dp,
+                top = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp
+            ),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             buildList<@Composable FlowRowScope.() -> Unit> {
@@ -322,16 +327,14 @@ private fun Review(
                     }
                 }
             }
-            review.content?.let { content ->
-                Text(
-                    text = content,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    minLines = 4,
-                    maxLines = 4,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            Text(
+                text = review.content ?: stringResource(R.string.empty_review),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                minLines = 4,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

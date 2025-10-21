@@ -230,7 +230,9 @@ class DetailViewModel @Inject constructor(
                 _detailState.update { it.copy(dimTopAppBar = event.state) }
             }
             is DetailUiEvent.OpenUrl -> Unit
-            is DetailUiEvent.OpenReview -> { /*TODO*/ }
+            is DetailUiEvent.OpenReview -> {
+                _detailState.update { it.copy(selectedReview = event.review) }
+            }
         }
     }
 }
