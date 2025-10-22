@@ -21,7 +21,7 @@ import com.personal.tmdb.detail.data.models.AccountStates
 import com.personal.tmdb.detail.data.models.CollectionDto
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeDetailsDto
-import com.personal.tmdb.detail.data.models.Genres
+import com.personal.tmdb.detail.data.models.GenresDto
 import com.personal.tmdb.detail.data.models.ImagesDto
 import com.personal.tmdb.detail.data.models.MediaDetailDto
 import com.personal.tmdb.detail.data.models.PersonDto
@@ -192,7 +192,7 @@ interface TmdbApi {
     suspend fun getGenres(
         @Path("media_type") mediaType: String,
         @Query("language") language: String?
-    ): Genres
+    ): GenresDto
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @GET("4/account/{account_object_id}/{media_type}/watchlist?")

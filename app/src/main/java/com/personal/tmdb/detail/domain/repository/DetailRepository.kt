@@ -6,7 +6,7 @@ import com.personal.tmdb.detail.data.models.ImagesDto
 import com.personal.tmdb.detail.domain.models.CollectionInfo
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeDetailsInfo
-import com.personal.tmdb.detail.domain.models.GenresInfo
+import com.personal.tmdb.detail.domain.models.Genres
 import com.personal.tmdb.detail.domain.models.MediaDetail
 import com.personal.tmdb.detail.domain.models.PersonInfo
 import com.personal.tmdb.detail.domain.models.ReviewsResponse
@@ -49,5 +49,5 @@ interface DetailRepository {
 
     suspend fun getReviews(mediaType: String, mediaId: Int, page: Int, language: String?): Result<ReviewsResponse, DataError.Remote>
 
-    suspend fun getGenres(mediaType: String, language: String?): Result<GenresInfo, DataError.Remote>
+    suspend fun getGenres(mediaType: String, language: String?): Result<Genres, DataError.Remote>
 }

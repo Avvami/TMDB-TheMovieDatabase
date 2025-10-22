@@ -8,7 +8,7 @@ import com.personal.tmdb.detail.data.mappers.toAccountState
 import com.personal.tmdb.detail.data.mappers.toCollectionInfo
 import com.personal.tmdb.detail.data.mappers.toCreditsInfo
 import com.personal.tmdb.detail.data.mappers.toEpisodeDetailsInfo
-import com.personal.tmdb.detail.data.mappers.toGenresInfo
+import com.personal.tmdb.detail.data.mappers.toGenres
 import com.personal.tmdb.detail.data.mappers.toMediaDetail
 import com.personal.tmdb.detail.data.mappers.toPersonInfo
 import com.personal.tmdb.detail.data.mappers.toReviewsResponse
@@ -18,7 +18,7 @@ import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.CollectionInfo
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeDetailsInfo
-import com.personal.tmdb.detail.domain.models.GenresInfo
+import com.personal.tmdb.detail.domain.models.Genres
 import com.personal.tmdb.detail.domain.models.MediaDetail
 import com.personal.tmdb.detail.domain.models.PersonInfo
 import com.personal.tmdb.detail.domain.models.ReviewsResponse
@@ -161,9 +161,9 @@ class DetailRepositoryImpl @Inject constructor(
     override suspend fun getGenres(
         mediaType: String,
         language: String?
-    ): Result<GenresInfo, DataError.Remote> {
+    ): Result<Genres, DataError.Remote> {
         return safeApiCall {
-            tmdbApi.getGenres(mediaType, language).toGenresInfo()
+            tmdbApi.getGenres(mediaType, language).toGenres()
         }
     }
 }

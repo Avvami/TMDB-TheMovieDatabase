@@ -8,28 +8,36 @@ import com.personal.tmdb.detail.data.models.AccountStates
 import com.personal.tmdb.detail.data.models.AvailableDto
 import com.personal.tmdb.detail.data.models.BelongsToCollectionDto
 import com.personal.tmdb.detail.data.models.CastDto
+import com.personal.tmdb.detail.data.models.ContentRatingDto
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeToAirDto
+import com.personal.tmdb.detail.data.models.GenreDto
+import com.personal.tmdb.detail.data.models.GenresDto
 import com.personal.tmdb.detail.data.models.ImageDto
 import com.personal.tmdb.detail.data.models.ImagesDto
 import com.personal.tmdb.detail.data.models.MediaDetailDto
 import com.personal.tmdb.detail.data.models.NetworkDto
 import com.personal.tmdb.detail.data.models.ProductionCompanyDto
 import com.personal.tmdb.detail.data.models.ProviderDto
+import com.personal.tmdb.detail.data.models.ReleaseDatesResultsDto
 import com.personal.tmdb.detail.data.models.VideoDto
 import com.personal.tmdb.detail.data.models.WatchProvidersDto
 import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.Available
 import com.personal.tmdb.detail.domain.models.BelongsToCollection
 import com.personal.tmdb.detail.domain.models.Cast
+import com.personal.tmdb.detail.domain.models.ContentRating
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeToAir
+import com.personal.tmdb.detail.domain.models.Genre
+import com.personal.tmdb.detail.domain.models.Genres
 import com.personal.tmdb.detail.domain.models.Image
 import com.personal.tmdb.detail.domain.models.Images
 import com.personal.tmdb.detail.domain.models.MediaDetail
 import com.personal.tmdb.detail.domain.models.Network
 import com.personal.tmdb.detail.domain.models.ProductionCompany
 import com.personal.tmdb.detail.domain.models.Provider
+import com.personal.tmdb.detail.domain.models.ReleaseDate
 import com.personal.tmdb.detail.domain.models.Video
 import java.util.Locale
 
@@ -49,11 +57,10 @@ fun MediaDetailDto.toMediaDetail(): MediaDetail {
         budget = budget?.toLong()?.takeIf { it != 0L },
         cast = aggregateCredits?.cast?.takeIf { it.isNotEmpty() }?.map { it.toCast() }
             ?: credits?.cast?.takeIf { it.isNotEmpty() }?.map { it.toCast() },
-        contentRatings = contentRatings,
-        createdBy = createdBy?.take(2),
-        credits = credits,
-        genres = genres?.takeIf { it.isNotEmpty() },
+        contentRatings = contentRatingsDto?.contentRatingsDto?.toContentRatings(),
+        genres = genresDto?.map { it.toGenre() }?.takeIf { it.isNotEmpty() },
         id = id,
+        inProduction = inProduction,
         images = images?.toImages(),
         lastEpisodeToAir = lastEpisodeToAir?.toEpisodeToAir(),
         name = title ?: name,
@@ -72,7 +79,7 @@ fun MediaDetailDto.toMediaDetail(): MediaDetail {
         releaseDate = convertDateTimeToLocalDate(
             firstAirDate?.takeIf { it.isNotBlank() } ?: releaseDate?.takeIf { it.isNotBlank() }
         ),
-        releaseDates = releaseDates,
+        releaseDates = releaseDatesResultsDto?.toReleaseDates(),
         revenue = revenue?.toLong()?.takeIf { it != 0L },
         reviews = reviews?.toReviewsResponse()?.results?.takeIf { it.isNotEmpty() },
         runtime = if (runtime == 0) null else runtime,
@@ -109,6 +116,28 @@ fun CastDto.toCast(): Cast {
         name = name?.takeIf { it.isNotEmpty() } ?: originalName?.takeIf { it.isNotEmpty() },
         popularity = popularity,
         profilePath = profilePath,
+    )
+}
+
+fun List<ContentRatingDto>.toContentRatings(): List<ContentRating> {
+    return this.map {
+        ContentRating(
+            iso31661 = it.iso31661,
+            rating = it.rating?.takeIf { rating -> rating.isNotEmpty() }
+        )
+    }
+}
+
+fun GenresDto.toGenres(): Genres {
+    return Genres(
+        genres = genres?.map { it.toGenre() }?.takeIf { it.isNotEmpty() }
+    )
+}
+
+fun GenreDto.toGenre(): Genre {
+    return Genre(
+        id = id,
+        name = name
     )
 }
 
@@ -154,6 +183,17 @@ fun List<ProductionCompanyDto>?.toProductionCompanies(): List<ProductionCompany>
             originCountry = it.originCountry
         )
     }?.filter { it.name.isNotEmpty() }?.takeIf { it.isNotEmpty() }
+}
+
+fun ReleaseDatesResultsDto.toReleaseDates(): List<ReleaseDate>? {
+    return this.releaseDatesResultsDto?.map {
+        ReleaseDate(
+            iso31661 = it.iso31661,
+            certification = it.releaseDates?.firstOrNull { releaseDate ->
+                !releaseDate.certification.isNullOrEmpty()
+            }?.certification
+        )
+    }
 }
 
 fun List<VideoDto>?.toVideos(): List<Video>? {

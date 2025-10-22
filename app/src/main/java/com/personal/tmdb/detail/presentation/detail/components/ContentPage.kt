@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -45,6 +46,15 @@ fun ContentPage(
                 lazyListState = lazyListState,
                 detailUiEvent = detailUiEvent
             )
+        }
+        if (detailState.details?.inProduction == true) {
+            item {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = stringResource(R.string.another_season_coming),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
         }
         item {
             Overview(

@@ -43,15 +43,14 @@ fun AttributeChips(
             val contentRating = remember {
                 when (detailState.mediaType) {
                     MediaType.TV -> {
-                        details.contentRatings?.contentRatingsResults
-                            ?.firstOrNull { it.iso31661 == userCountryCode }?.rating
-                            ?.takeIf { it.isNotEmpty() }
+                        details.contentRatings
+                            ?.firstOrNull { it.iso31661 == userCountryCode }
+                            ?.rating
                     }
                     MediaType.MOVIE -> {
-                        details.releaseDates?.releaseDatesResults
-                            ?.firstOrNull { it.iso31661 == userCountryCode }?.releaseDates
-                            ?.firstOrNull { it.certification.isNotEmpty() }?.certification
-                            ?.takeIf { it.isNotEmpty() }
+                        details.releaseDates
+                            ?.firstOrNull { it.iso31661 == userCountryCode }
+                            ?.certification
                     }
                     else -> null
                 }

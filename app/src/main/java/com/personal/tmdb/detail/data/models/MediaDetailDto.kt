@@ -19,7 +19,7 @@ data class MediaDetailDto(
     @Json(name = "budget")
     val budget: Double?,
     @Json(name = "content_ratings")
-    val contentRatings: ContentRatings?,
+    val contentRatingsDto: ContentRatingsDto?,
     @Json(name = "created_by")
     val createdBy: List<CreatedBy>?,
     @Json(name = "credits")
@@ -29,7 +29,7 @@ data class MediaDetailDto(
     @Json(name = "first_air_date")
     val firstAirDate: String?,
     @Json(name = "genres")
-    val genres: List<Genre>?,
+    val genresDto: List<GenreDto>?,
     @Json(name = "homepage")
     val homepage: String?,
     @Json(name = "id")
@@ -75,7 +75,7 @@ data class MediaDetailDto(
     @Json(name = "release_date")
     val releaseDate: String?,
     @Json(name = "release_dates")
-    val releaseDates: ReleaseDates?,
+    val releaseDatesResultsDto: ReleaseDatesResultsDto?,
     @Json(name = "revenue")
     val revenue: Double?,
     @Json(name = "reviews")

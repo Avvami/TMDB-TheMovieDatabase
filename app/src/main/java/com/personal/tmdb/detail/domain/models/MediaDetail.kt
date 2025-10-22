@@ -3,11 +3,6 @@ package com.personal.tmdb.detail.domain.models
 import com.personal.tmdb.core.domain.models.MediaInfo
 import com.personal.tmdb.core.domain.util.CountryCode
 import com.personal.tmdb.core.domain.util.CountryName
-import com.personal.tmdb.detail.data.models.ContentRatings
-import com.personal.tmdb.detail.data.models.CreatedBy
-import com.personal.tmdb.detail.data.models.Credits
-import com.personal.tmdb.detail.data.models.Genre
-import com.personal.tmdb.detail.data.models.ReleaseDates
 import com.personal.tmdb.detail.data.models.Season
 import java.time.LocalDate
 
@@ -17,11 +12,10 @@ data class MediaDetail(
     val backdropPath: String?,
     val belongsToCollection: BelongsToCollection?,
     val budget: Long?,
-    val contentRatings: ContentRatings?,
-    val createdBy: List<CreatedBy>?,
-    val credits: Credits?,
+    val contentRatings: List<ContentRating>?,
     val genres: List<Genre>?,
     val id: Int,
+    val inProduction: Boolean?,
     val images: Images?,
     val lastEpisodeToAir: EpisodeToAir?,
     val name: String?,
@@ -29,7 +23,7 @@ data class MediaDetail(
     val nextEpisodeToAir: EpisodeToAir?,
     val numberOfEpisodes: Int?,
     val numberOfSeasons: Int?,
-    val originCountry: List<String>?,
+    val originCountry: List<CountryCode>?,
     val originalLanguage: String?,
     val originalName: String?,
     val overview: String?,
@@ -37,7 +31,7 @@ data class MediaDetail(
     val productionCompanies: List<ProductionCompany>?,
     val recommendations: List<MediaInfo>?,
     val releaseDate: LocalDate?,
-    val releaseDates: ReleaseDates?,
+    val releaseDates: List<ReleaseDate>?,
     val revenue: Long?,
     val reviews: List<Review>?,
     val runtime: Int?,
