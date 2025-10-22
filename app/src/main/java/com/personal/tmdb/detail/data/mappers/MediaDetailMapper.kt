@@ -6,6 +6,7 @@ import com.personal.tmdb.core.domain.util.convertDateTimeToLocalDate
 import com.personal.tmdb.core.domain.util.convertOffsetDateTimeToLocalDate
 import com.personal.tmdb.detail.data.models.AccountStates
 import com.personal.tmdb.detail.data.models.AvailableDto
+import com.personal.tmdb.detail.data.models.BelongsToCollectionDto
 import com.personal.tmdb.detail.data.models.CastDto
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeToAirDto
@@ -19,6 +20,7 @@ import com.personal.tmdb.detail.data.models.VideoDto
 import com.personal.tmdb.detail.data.models.WatchProvidersDto
 import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.Available
+import com.personal.tmdb.detail.domain.models.BelongsToCollection
 import com.personal.tmdb.detail.domain.models.Cast
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeToAir
@@ -43,7 +45,7 @@ fun MediaDetailDto.toMediaDetail(): MediaDetail {
     return MediaDetail(
         accountStates = accountStates?.toAccountState(),
         backdropPath = backdropPath,
-        belongsToCollection = belongsToCollection,
+        belongsToCollection = belongsToCollection?.toBelongsToCollection(),
         budget = budget?.toLong()?.takeIf { it != 0L },
         cast = aggregateCredits?.cast?.takeIf { it.isNotEmpty() }?.map { it.toCast() }
             ?: credits?.cast?.takeIf { it.isNotEmpty() }?.map { it.toCast() },
@@ -85,6 +87,14 @@ fun MediaDetailDto.toMediaDetail(): MediaDetail {
             val countryName = Locale.Builder().setRegion(countryCode).build().displayCountry
             countryCode to countryName
         }
+    )
+}
+
+fun BelongsToCollectionDto.toBelongsToCollection(): BelongsToCollection {
+    return BelongsToCollection(
+        backdropPath = backdropPath,
+        id = id,
+        name = name?.takeIf { it.isNotEmpty() }
     )
 }
 

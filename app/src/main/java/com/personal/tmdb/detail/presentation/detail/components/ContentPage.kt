@@ -62,6 +62,15 @@ fun ContentPage(
                     )
                 }
             }
+            details.belongsToCollection?.let { collection ->
+                item {
+                    Collection(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        collection = collection,
+                        detailUiEvent = detailUiEvent
+                    )
+                }
+            }
             details.seasons?.let { seasons ->
                 item {
                     SeasonsEpisodes(

@@ -73,11 +73,14 @@ fun BackdropsPosters(
                     modifier = Modifier.weight(1f),
                     text = stringResource(R.string.backdrops_posters)
                 )
-                Icon(
-                    painter = painterResource(R.drawable.icon_keyboard_arrow_right_fill0_wght400),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.surfaceVariant
-                )
+                if ((images.backdrops?.size ?: 0) > 10
+                    || (images.posters?.size ?: 0) > 10) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_keyboard_arrow_right_fill0_wght400),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                }
             }
         },
         items = {

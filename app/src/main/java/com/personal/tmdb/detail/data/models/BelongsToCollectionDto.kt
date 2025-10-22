@@ -1,11 +1,10 @@
 package com.personal.tmdb.detail.data.models
 
-
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class BelongsToCollection(
+data class BelongsToCollectionDto(
     @Json(name = "backdrop_path")
     val backdropPath: String?,
     @Json(name = "id")

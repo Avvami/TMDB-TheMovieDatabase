@@ -3,7 +3,6 @@ package com.personal.tmdb.detail.domain.models
 import com.personal.tmdb.core.domain.models.MediaInfo
 import com.personal.tmdb.core.domain.util.CountryCode
 import com.personal.tmdb.core.domain.util.CountryName
-import com.personal.tmdb.detail.data.models.BelongsToCollection
 import com.personal.tmdb.detail.data.models.ContentRatings
 import com.personal.tmdb.detail.data.models.CreatedBy
 import com.personal.tmdb.detail.data.models.Credits

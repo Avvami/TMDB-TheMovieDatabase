@@ -69,45 +69,35 @@ class DetailViewModel @Inject constructor(
             val includeImageLanguageTags = "$languageTag,en,null"
             val sessionId = userRepository.getUser()?.sessionId
 
-            detailRepository.getMediaDetail(mediaType, mediaId, sessionId, languageTag, appendToResponse, includeImageLanguageTags)
-                .onError { error ->
-                    _detailState.update {
-                        it.copy(loadState = LoadState.Error(error.toUiText()))
-                    }
+            detailRepository.getMediaDetail(
+                mediaType = mediaType,
+                mediaId = mediaId,
+                sessionId = sessionId,
+                language = languageTag,
+                appendToResponse = appendToResponse,
+                includeImageLanguage = includeImageLanguageTags
+            ).onError { error ->
+                _detailState.update {
+                    it.copy(loadState = LoadState.Error(error.toUiText()))
                 }
-                .onSuccess { result ->
-                    result.belongsToCollection?.let { collection ->
-                        getCollection(collectionId = collection.id)
-                    }
-                    watchCountries = result.watchCountries
-                    _detailState.update {
-                        it.copy(
-                            accountState = result.accountStates,
-                            details = result,
-                            logo = result.images?.findLogoImageWithLanguage(
-                                preferred = languageTag,
-                                fallback = result.originalLanguage
-                            ),
-                            watchCountries = watchCountries,
-                            selectedCountry = watchCountries?.entries
-                                ?.firstOrNull { (code, _) -> code == userCountry }
-                                ?: watchCountries?.entries?.firstOrNull(),
-                            loadState = LoadState.NotLoading
-                        )
-                    }
+            }.onSuccess { result ->
+                watchCountries = result.watchCountries
+                _detailState.update {
+                    it.copy(
+                        accountState = result.accountStates,
+                        details = result,
+                        logo = result.images?.findLogoImageWithLanguage(
+                            preferred = languageTag,
+                            fallback = result.originalLanguage
+                        ),
+                        watchCountries = watchCountries,
+                        selectedCountry = watchCountries?.entries
+                            ?.firstOrNull { (code, _) -> code == userCountry }
+                            ?: watchCountries?.entries?.firstOrNull(),
+                        loadState = LoadState.NotLoading
+                    )
                 }
-        }
-    }
-
-    private fun getCollection(collectionId: Int, language: String? = null) {
-        viewModelScope.launch {
-            detailRepository.getCollection(collectionId, language)
-                .onError { error ->
-                    println(error)
-                }
-                .onSuccess { result ->
-                    _detailState.update { it.copy(collection = result) }
-                }
+            }
         }
     }
 
