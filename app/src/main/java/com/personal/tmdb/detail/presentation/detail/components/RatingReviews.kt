@@ -104,7 +104,7 @@ fun RatingReviews(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(.35f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 detailState.details?.voteAverage?.let { voteAverage ->
@@ -130,8 +130,9 @@ fun RatingReviews(
                     LocalMinimumInteractiveComponentSize provides Dp.Unspecified
                 ) {
                     Button(
+                        modifier = Modifier.weight(.65f),
                         onClick = { detailUiEvent(DetailUiEvent.ShowRatingSheet(true)) },
-                        contentPadding = PaddingValues(horizontal = 32.dp, vertical = 12.dp),
+                        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .05f),
                             contentColor = MaterialTheme.colorScheme.onSurface
@@ -157,21 +158,24 @@ fun RatingReviews(
                                             Icon(
                                                 modifier = Modifier.size(16.dp),
                                                 painter = painterResource(id = R.drawable.icon_thumb_down_fill1_wght400),
-                                                contentDescription = null
+                                                contentDescription = null,
+                                                tint = onSurfaceDark
                                             )
                                         }
                                         rated.value < 7 -> {
                                             Icon(
                                                 modifier = Modifier.size(16.dp),
                                                 painter = painterResource(id = R.drawable.icon_thumbs_up_down_fill1_wght400),
-                                                contentDescription = null
+                                                contentDescription = null,
+                                                tint = onSurfaceDark
                                             )
                                         }
                                         else -> {
                                             Icon(
                                                 modifier = Modifier.size(16.dp),
                                                 painter = painterResource(id = R.drawable.icon_thumb_up_fill1_wght400),
-                                                contentDescription = null
+                                                contentDescription = null,
+                                                tint = onSurfaceDark
                                             )
                                         }
                                     }

@@ -186,11 +186,7 @@ private fun DetailScreen(
                                         detailUiEvent(DetailUiEvent.SetUiState(DetailUiState.CONTENT))
                                     },
                                     colors = IconButtonDefaults.iconButtonColors(
-                                        contentColor = if (detailState.dimTopAppBar) {
-                                            MaterialTheme.colorScheme.onSurface
-                                        } else {
-                                            onSurfaceDark
-                                        }
+                                        contentColor = MaterialTheme.colorScheme.onSurface
                                     )
                                 ) {
                                     Icon(

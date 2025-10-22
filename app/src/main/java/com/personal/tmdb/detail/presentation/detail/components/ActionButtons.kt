@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.personal.tmdb.R
 import com.personal.tmdb.UserState
 import com.personal.tmdb.core.domain.util.getColorForVoteAverage
-import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.detail.data.models.Rated
 import com.personal.tmdb.detail.presentation.detail.DetailState
 import com.personal.tmdb.detail.presentation.detail.DetailUiEvent
@@ -121,18 +120,11 @@ fun ActionButtons(
                 OutlinedIconButton(
                     modifier = Modifier.size(56.dp),
                     onClick = {
-                        detailUiEvent(
-                            DetailUiEvent.OnNavigateTo(
-                                route = detailState.accountState?.let {
-                                    Route.AddToList(
-                                        mediaType = detailState.mediaType.name.lowercase(),
-                                        mediaId = detailState.mediaId,
-                                        watchlist = it.watchlist,
-                                        favorite = it.favorite
-                                    )
-                                } ?: Route.Lost
+                        detailState.accountState?.let { accountState ->
+                            detailUiEvent(
+                                DetailUiEvent.AddToWatchlist(!accountState.watchlist)
                             )
-                        )
+                        }
                     },
                     colors = IconButtonDefaults.outlinedIconButtonColors(
                         containerColor = surfaceContainerDark
@@ -162,7 +154,7 @@ fun ActionButtons(
                             Icon(
                                 painter = painterResource(id = R.drawable.icon_bookmarks_fill1_wght400),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimary
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         } else {
                             Icon(
@@ -193,7 +185,7 @@ fun ActionButtons(
             }
             OutlinedIconButton(
                 modifier = Modifier.size(56.dp),
-                onClick = { detailUiEvent(DetailUiEvent.Share) },
+                onClick = { detailUiEvent(DetailUiEvent.ShowMoreSheet(true)) },
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = surfaceContainerDark,
                     contentColor = onSurfaceDark

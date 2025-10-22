@@ -25,5 +25,8 @@ data class DetailState(
     val loading: Boolean = false,
     val rating: Boolean = false,
     val showRatingSheet: Boolean = false,
-    val selectedReview: Review? = null
+    val selectedReview: Review? = null,
+    val showMoreSheet: Boolean = false,
+    val watchlistLoadState: LoadState = LoadState.NotLoading,
+    val favoriteLoadState: LoadState = LoadState.NotLoading
 )

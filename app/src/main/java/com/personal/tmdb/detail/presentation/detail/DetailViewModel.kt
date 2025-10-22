@@ -233,6 +233,12 @@ class DetailViewModel @Inject constructor(
             is DetailUiEvent.OpenReview -> {
                 _detailState.update { it.copy(selectedReview = event.review) }
             }
+            is DetailUiEvent.AddToWatchlist -> {
+
+            }
+            is DetailUiEvent.ShowMoreSheet -> {
+                _detailState.update { it.copy(showMoreSheet = event.state) }
+            }
         }
     }
 }

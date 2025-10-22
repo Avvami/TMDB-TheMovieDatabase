@@ -21,4 +21,6 @@ sealed interface DetailUiEvent {
     data class DimTopAppBar(val state: Boolean): DetailUiEvent
     data class OpenUrl(val url: String): DetailUiEvent
     data class OpenReview(val review: Review?): DetailUiEvent
+    data class AddToWatchlist(val state: Boolean): DetailUiEvent
+    data class ShowMoreSheet(val state: Boolean): DetailUiEvent
 }
