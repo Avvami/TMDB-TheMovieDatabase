@@ -83,7 +83,7 @@ fun ContentPage(
                     }
                 }
             }
-            detailState.details.voteAverage?.let {
+            details.voteAverage?.let {
                 item {
                     RatingReviews(
                         detailState = detailState,
@@ -92,13 +92,24 @@ fun ContentPage(
                     )
                 }
             }
-            detailState.details.cast?.let { castList ->
+            details.cast?.let { castList ->
                 item {
                     CastCrew(
                         detailState = detailState,
                         castList = castList,
                         detailUiEvent = detailUiEvent
                     )
+                }
+            }
+            details.images?.let { images ->
+                if (images.backdrops != null || images.posters != null) {
+                    item {
+                        BackdropsPosters(
+                            detailState = detailState,
+                            images = images,
+                            detailUiEvent = detailUiEvent
+                        )
+                    }
                 }
             }
             details.recommendations?.let { recommendations ->

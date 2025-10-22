@@ -4,9 +4,9 @@ import com.personal.tmdb.core.domain.util.CountryCode
 import com.personal.tmdb.core.domain.util.CountryName
 import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.presentation.LoadState
-import com.personal.tmdb.detail.data.models.Image
 import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.CollectionInfo
+import com.personal.tmdb.detail.domain.models.Image
 import com.personal.tmdb.detail.domain.models.MediaDetail
 import com.personal.tmdb.detail.domain.models.Review
 

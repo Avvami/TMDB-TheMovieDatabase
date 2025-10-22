@@ -17,7 +17,7 @@ data class EpisodeDetailsDto(
     @Json(name = "id")
     val id: Int,
     @Json(name = "images")
-    val images: Images?,
+    val images: ImagesDto?,
     @Json(name = "name")
     val name: String?,
     @Json(name = "overview")

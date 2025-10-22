@@ -24,10 +24,11 @@ import androidx.compose.ui.unit.sp
 fun MediaCarousel(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp),
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(8.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(8.dp),
     userScrollEnabled: Boolean = true,
     titleContent: @Composable (() -> Unit)? = null,
+    itemsHorizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(8.dp),
+    itemsVerticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     items: LazyListScope.() -> Unit
 ) {
     Column(
@@ -50,8 +51,8 @@ fun MediaCarousel(
         ) {
             LazyRow(
                 contentPadding = contentPadding,
-                horizontalArrangement = horizontalArrangement,
-                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = itemsHorizontalArrangement,
+                verticalAlignment = itemsVerticalAlignment,
                 userScrollEnabled = userScrollEnabled
             ) {
                 items()

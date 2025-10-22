@@ -9,6 +9,8 @@ import com.personal.tmdb.detail.data.models.AvailableDto
 import com.personal.tmdb.detail.data.models.CastDto
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeToAirDto
+import com.personal.tmdb.detail.data.models.ImageDto
+import com.personal.tmdb.detail.data.models.ImagesDto
 import com.personal.tmdb.detail.data.models.MediaDetailDto
 import com.personal.tmdb.detail.data.models.NetworkDto
 import com.personal.tmdb.detail.data.models.ProductionCompanyDto
@@ -20,6 +22,8 @@ import com.personal.tmdb.detail.domain.models.Available
 import com.personal.tmdb.detail.domain.models.Cast
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeToAir
+import com.personal.tmdb.detail.domain.models.Image
+import com.personal.tmdb.detail.domain.models.Images
 import com.personal.tmdb.detail.domain.models.MediaDetail
 import com.personal.tmdb.detail.domain.models.Network
 import com.personal.tmdb.detail.domain.models.ProductionCompany
@@ -48,7 +52,7 @@ fun MediaDetailDto.toMediaDetail(): MediaDetail {
         credits = credits,
         genres = genres?.takeIf { it.isNotEmpty() },
         id = id,
-        images = images,
+        images = images?.toImages(),
         lastEpisodeToAir = lastEpisodeToAir?.toEpisodeToAir(),
         name = title ?: name,
         networks = networksDto?.toNetworks(),
@@ -96,6 +100,28 @@ fun CastDto.toCast(): Cast {
         popularity = popularity,
         profilePath = profilePath,
     )
+}
+
+fun ImagesDto.toImages(): Images {
+    return Images(
+        profiles = profiles?.toImages(),
+        stills = stills?.toImages(),
+        backdrops = backdrops?.toImages(),
+        posters = posters?.toImages(),
+        logos = logos?.toImages()
+    )
+}
+
+fun List<ImageDto>?.toImages(): List<Image>? {
+    return this?.map {
+        Image(
+            aspectRatio = it.aspectRatio?.toFloat(),
+            filePath = it.filePath,
+            height = it.height,
+            iso6391 = it.iso6391,
+            width = it.width
+        )
+    }?.takeIf { it.isNotEmpty() }
 }
 
 fun List<NetworkDto>?.toNetworks(): List<Network>? {

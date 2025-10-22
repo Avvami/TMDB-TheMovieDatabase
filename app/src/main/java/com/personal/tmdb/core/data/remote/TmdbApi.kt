@@ -22,7 +22,7 @@ import com.personal.tmdb.detail.data.models.CollectionDto
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeDetailsDto
 import com.personal.tmdb.detail.data.models.Genres
-import com.personal.tmdb.detail.data.models.Images
+import com.personal.tmdb.detail.data.models.ImagesDto
 import com.personal.tmdb.detail.data.models.MediaDetailDto
 import com.personal.tmdb.detail.data.models.PersonDto
 import com.personal.tmdb.detail.data.models.Rated
@@ -168,7 +168,7 @@ interface TmdbApi {
         @Path("path") path: String,
         @Query("language") language: String?,
         @Query("include_image_language") includeImageLanguage: String?
-    ): Images
+    ): ImagesDto
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @GET("/3/{media_type}/{media_id}/reviews?")

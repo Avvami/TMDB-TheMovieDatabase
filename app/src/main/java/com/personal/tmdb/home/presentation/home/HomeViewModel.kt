@@ -12,7 +12,7 @@ import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.TimeWindow
 import com.personal.tmdb.core.domain.util.fold
 import com.personal.tmdb.core.domain.util.toUiText
-import com.personal.tmdb.detail.data.models.Image
+import com.personal.tmdb.detail.data.models.ImageDto
 import com.personal.tmdb.detail.domain.repository.DetailRepository
 import com.personal.tmdb.home.domain.models.TrendingResult
 import com.personal.tmdb.home.domain.repository.HomeRepository
@@ -101,7 +101,7 @@ class HomeViewModel @Inject constructor(
             )
     }
 
-    private suspend fun getRandomMediaLogos(randomMedia: MediaInfo, language: String): List<Image?> {
+    private suspend fun getRandomMediaLogos(randomMedia: MediaInfo, language: String): List<ImageDto?> {
         return detailRepository.getImages(
             path = C.MEDIA_IMAGES.format(randomMedia.mediaType?.name?.lowercase().toString(), randomMedia.id),
             includeImageLanguage = "${randomMedia.originalLanguage},$language,en"

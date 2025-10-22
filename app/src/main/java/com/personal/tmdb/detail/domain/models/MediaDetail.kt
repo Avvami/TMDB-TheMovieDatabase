@@ -8,7 +8,6 @@ import com.personal.tmdb.detail.data.models.ContentRatings
 import com.personal.tmdb.detail.data.models.CreatedBy
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.Genre
-import com.personal.tmdb.detail.data.models.Images
 import com.personal.tmdb.detail.data.models.ReleaseDates
 import com.personal.tmdb.detail.data.models.Season
 import java.time.LocalDate

@@ -2,7 +2,7 @@ package com.personal.tmdb.detail.domain.repository
 
 import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.Result
-import com.personal.tmdb.detail.data.models.Images
+import com.personal.tmdb.detail.data.models.ImagesDto
 import com.personal.tmdb.detail.domain.models.CollectionInfo
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeDetailsInfo
@@ -45,7 +45,7 @@ interface DetailRepository {
         includeImageLanguage: String? = null
     ): Result<EpisodeDetailsInfo, DataError.Remote>
 
-    suspend fun getImages(path: String, language: String? = null, includeImageLanguage: String? = null): Result<Images, DataError.Remote>
+    suspend fun getImages(path: String, language: String? = null, includeImageLanguage: String? = null): Result<ImagesDto, DataError.Remote>
 
     suspend fun getReviews(mediaType: String, mediaId: Int, page: Int, language: String?): Result<ReviewsResponse, DataError.Remote>
 

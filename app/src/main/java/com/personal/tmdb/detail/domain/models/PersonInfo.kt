@@ -1,7 +1,7 @@
 package com.personal.tmdb.detail.domain.models
 
 import com.personal.tmdb.detail.data.models.ExternalIds
-import com.personal.tmdb.detail.data.models.Images
+import com.personal.tmdb.detail.data.models.ImagesDto
 import java.time.LocalDate
 
 data class PersonInfo(
@@ -14,7 +14,7 @@ data class PersonInfo(
     val gender: Int,
     val homepage: String?,
     val id: Int,
-    val images: Images?,
+    val images: ImagesDto?,
     val imdbId: String?,
     val knownForDepartment: String?,
     val name: String,

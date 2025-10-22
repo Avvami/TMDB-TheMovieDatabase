@@ -3,8 +3,8 @@ package com.personal.tmdb.core.domain.util
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import com.personal.tmdb.detail.data.models.Image
-import com.personal.tmdb.detail.data.models.Images
+import com.personal.tmdb.detail.domain.models.Image
+import com.personal.tmdb.detail.domain.models.Images
 
 /**
  * Attempts to find a logo [Image] with the desired language preference.
@@ -15,8 +15,8 @@ import com.personal.tmdb.detail.data.models.Images
  */
 fun Images.findLogoImageWithLanguage(preferred: String?, fallback: String?): Image? {
     val logoList = logos?.takeIf { it.isNotEmpty() } ?: return null
-    return logoList.firstOrNull { it?.iso6391 == preferred }
-        ?: logoList.firstOrNull { it?.iso6391 == fallback }
+    return logoList.firstOrNull { it.iso6391 == preferred }
+        ?: logoList.firstOrNull { it.iso6391 == fallback }
         ?: logoList.firstOrNull()
 }
 

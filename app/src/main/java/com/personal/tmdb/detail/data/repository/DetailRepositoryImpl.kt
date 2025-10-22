@@ -13,7 +13,7 @@ import com.personal.tmdb.detail.data.mappers.toMediaDetail
 import com.personal.tmdb.detail.data.mappers.toPersonInfo
 import com.personal.tmdb.detail.data.mappers.toReviewsResponse
 import com.personal.tmdb.detail.data.mappers.toSeasonInfo
-import com.personal.tmdb.detail.data.models.Images
+import com.personal.tmdb.detail.data.models.ImagesDto
 import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.CollectionInfo
 import com.personal.tmdb.detail.domain.models.CreditsInfo
@@ -141,7 +141,7 @@ class DetailRepositoryImpl @Inject constructor(
         path: String,
         language: String?,
         includeImageLanguage: String?
-    ): Result<Images, DataError.Remote> {
+    ): Result<ImagesDto, DataError.Remote> {
         return safeApiCall {
             tmdbApi.getImages(path, language, includeImageLanguage)
         }

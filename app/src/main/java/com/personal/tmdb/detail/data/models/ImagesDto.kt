@@ -1,19 +1,18 @@
 package com.personal.tmdb.detail.data.models
 
-
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class Images(
+data class ImagesDto(
     @Json(name = "profiles")
-    val profiles: List<Image?>?,
+    val profiles: List<ImageDto>?,
     @Json(name = "stills")
-    val stills: List<Image?>?,
+    val stills: List<ImageDto>?,
     @Json(name = "backdrops")
-    val backdrops: List<Image?>?,
+    val backdrops: List<ImageDto>?,
     @Json(name = "posters")
-    val posters: List<Image?>?,
+    val posters: List<ImageDto>?,
     @Json(name = "logos")
-    val logos: List<Image?>?
+    val logos: List<ImageDto>?
 )

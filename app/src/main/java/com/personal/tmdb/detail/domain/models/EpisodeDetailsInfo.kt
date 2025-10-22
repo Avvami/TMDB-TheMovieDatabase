@@ -2,7 +2,7 @@ package com.personal.tmdb.detail.domain.models
 
 import com.personal.tmdb.detail.data.models.CastDto
 import com.personal.tmdb.detail.data.models.Crew
-import com.personal.tmdb.detail.data.models.Images
+import com.personal.tmdb.detail.data.models.ImagesDto
 import com.personal.tmdb.detail.data.models.Translations
 import java.time.LocalDate
 
@@ -12,7 +12,7 @@ data class EpisodeDetailsInfo(
     val episodeNumber: Int,
     val guestStars: List<CastDto>?,
     val id: Int,
-    val images: Images?,
+    val images: ImagesDto?,
     val name: String?,
     val overview: String?,
     val productionCode: String?,

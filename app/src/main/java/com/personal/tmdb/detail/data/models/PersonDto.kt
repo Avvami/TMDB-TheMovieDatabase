@@ -27,7 +27,7 @@ data class PersonDto(
     @Json(name = "id")
     val id: Int,
     @Json(name = "images")
-    val images: Images?,
+    val images: ImagesDto?,
     @Json(name = "imdb_id")
     val imdbId: String?,
     @Json(name = "known_for_department")

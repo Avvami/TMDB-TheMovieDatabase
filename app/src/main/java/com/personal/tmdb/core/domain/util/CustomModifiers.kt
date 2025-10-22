@@ -117,10 +117,11 @@ fun Modifier.fadingEdges(
 }
 
 fun Modifier.clickableNoIndication(
+    enabled: Boolean = true,
     onClick: () -> Unit
 ): Modifier = composed {
     this.clickable(
-        enabled = true,
+        enabled = enabled,
         onClickLabel = null,
         role = null,
         onClick = onClick,
