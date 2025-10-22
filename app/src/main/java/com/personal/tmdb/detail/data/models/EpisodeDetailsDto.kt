@@ -13,7 +13,7 @@ data class EpisodeDetailsDto(
     @Json(name = "episode_number")
     val episodeNumber: Int,
     @Json(name = "guest_stars")
-    val guestStars: List<Cast>?,
+    val guestStars: List<CastDto>?,
     @Json(name = "id")
     val id: Int,
     @Json(name = "images")

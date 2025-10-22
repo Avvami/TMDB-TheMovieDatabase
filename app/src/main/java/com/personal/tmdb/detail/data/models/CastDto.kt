@@ -1,11 +1,10 @@
 package com.personal.tmdb.detail.data.models
 
-
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class Cast(
+data class CastDto(
     @Json(name = "adult")
     val adult: Boolean,
     @Json(name = "character")
@@ -23,7 +22,7 @@ data class Cast(
     @Json(name = "known_for_department")
     val knownForDepartment: String?,
     @Json(name = "name")
-    val name: String,
+    val name: String?,
     @Json(name = "order")
     val order: Int?,
     @Json(name = "original_name")

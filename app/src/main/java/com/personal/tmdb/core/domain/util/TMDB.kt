@@ -6,4 +6,5 @@ object TMDB {
     fun stillW300(path: String?) = C.TMDB_IMAGES_BASE_URL + C.STILL_W300 + path
     fun imageOriginal(path: String?) = C.TMDB_IMAGES_BASE_URL + C.ORIGINAL + path
     fun logoW92(path: String?) = C.TMDB_IMAGES_BASE_URL + C.LOGO_W92 + path
+    fun profileW185(path: String?) = C.TMDB_IMAGES_BASE_URL + C.PROFILE_W185 + path
 }

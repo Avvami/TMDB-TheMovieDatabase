@@ -92,6 +92,15 @@ fun ContentPage(
                     )
                 }
             }
+            detailState.details.cast?.let { castList ->
+                item {
+                    CastCrew(
+                        detailState = detailState,
+                        castList = castList,
+                        detailUiEvent = detailUiEvent
+                    )
+                }
+            }
             details.recommendations?.let { recommendations ->
                 item {
                     MediaCarousel(

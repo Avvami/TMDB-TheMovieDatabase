@@ -6,6 +6,7 @@ import com.personal.tmdb.core.domain.util.convertDateTimeToLocalDate
 import com.personal.tmdb.core.domain.util.convertOffsetDateTimeToLocalDate
 import com.personal.tmdb.detail.data.models.AccountStates
 import com.personal.tmdb.detail.data.models.AvailableDto
+import com.personal.tmdb.detail.data.models.CastDto
 import com.personal.tmdb.detail.data.models.Credits
 import com.personal.tmdb.detail.data.models.EpisodeToAirDto
 import com.personal.tmdb.detail.data.models.MediaDetailDto
@@ -16,6 +17,7 @@ import com.personal.tmdb.detail.data.models.VideoDto
 import com.personal.tmdb.detail.data.models.WatchProvidersDto
 import com.personal.tmdb.detail.domain.models.AccountState
 import com.personal.tmdb.detail.domain.models.Available
+import com.personal.tmdb.detail.domain.models.Cast
 import com.personal.tmdb.detail.domain.models.CreditsInfo
 import com.personal.tmdb.detail.domain.models.EpisodeToAir
 import com.personal.tmdb.detail.domain.models.MediaDetail
@@ -32,13 +34,15 @@ fun MediaDetailDto.toMediaDetail(): MediaDetail {
         null
     }
     val watchProviders = watchProviders?.toWatchProviders()
+    println(aggregateCredits?.cast?.takeIf { it.isNotEmpty() }?.map { it.toCast() }
+        ?: credits?.cast?.takeIf { it.isNotEmpty() }?.map { it.toCast() })
     return MediaDetail(
         accountStates = accountStates?.toAccountState(),
-        aggregateCredits = aggregateCredits,
         backdropPath = backdropPath,
         belongsToCollection = belongsToCollection,
         budget = budget?.toLong()?.takeIf { it != 0L },
-        cast = aggregateCredits?.cast?.take(15) ?: credits?.cast?.take(15),
+        cast = aggregateCredits?.cast?.takeIf { it.isNotEmpty() }?.map { it.toCast() }
+            ?: credits?.cast?.takeIf { it.isNotEmpty() }?.map { it.toCast() },
         contentRatings = contentRatings,
         createdBy = createdBy?.take(2),
         credits = credits,
@@ -77,6 +81,20 @@ fun MediaDetailDto.toMediaDetail(): MediaDetail {
             val countryName = Locale.Builder().setRegion(countryCode).build().displayCountry
             countryCode to countryName
         }
+    )
+}
+
+fun CastDto.toCast(): Cast {
+    return Cast(
+        character = character?.takeIf { it.isNotEmpty() }
+            ?: roles?.firstOrNull()?.character?.takeIf { it.isNotEmpty() },
+        creditId = creditId,
+        gender = gender,
+        id = id,
+        knownForDepartment = knownForDepartment,
+        name = name?.takeIf { it.isNotEmpty() } ?: originalName?.takeIf { it.isNotEmpty() },
+        popularity = popularity,
+        profilePath = profilePath,
     )
 }
 

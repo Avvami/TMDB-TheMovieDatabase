@@ -4,7 +4,6 @@ import com.personal.tmdb.core.domain.models.MediaInfo
 import com.personal.tmdb.core.domain.util.CountryCode
 import com.personal.tmdb.core.domain.util.CountryName
 import com.personal.tmdb.detail.data.models.BelongsToCollection
-import com.personal.tmdb.detail.data.models.Cast
 import com.personal.tmdb.detail.data.models.ContentRatings
 import com.personal.tmdb.detail.data.models.CreatedBy
 import com.personal.tmdb.detail.data.models.Credits
@@ -16,11 +15,10 @@ import java.time.LocalDate
 
 data class MediaDetail(
     val accountStates: AccountState?,
-    val aggregateCredits: Credits?,
+    val cast: List<Cast>?,
     val backdropPath: String?,
     val belongsToCollection: BelongsToCollection?,
     val budget: Long?,
-    val cast: List<Cast>?,
     val contentRatings: ContentRatings?,
     val createdBy: List<CreatedBy>?,
     val credits: Credits?,

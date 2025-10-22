@@ -1,6 +1,6 @@
 package com.personal.tmdb.detail.domain.models
 
-import com.personal.tmdb.detail.data.models.Cast
+import com.personal.tmdb.detail.data.models.CastDto
 import com.personal.tmdb.detail.data.models.Crew
 import com.personal.tmdb.detail.data.models.Images
 import com.personal.tmdb.detail.data.models.Translations
@@ -10,7 +10,7 @@ data class EpisodeDetailsInfo(
     val airDate: LocalDate?,
     val crew: List<Crew>?,
     val episodeNumber: Int,
-    val guestStars: List<Cast>?,
+    val guestStars: List<CastDto>?,
     val id: Int,
     val images: Images?,
     val name: String?,
