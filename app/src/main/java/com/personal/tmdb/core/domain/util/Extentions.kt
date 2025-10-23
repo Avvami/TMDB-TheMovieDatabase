@@ -1,10 +1,12 @@
 package com.personal.tmdb.core.domain.util
 
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import com.personal.tmdb.detail.domain.models.Image
 import com.personal.tmdb.detail.domain.models.Images
+import kotlin.math.absoluteValue
 
 /**
  * Attempts to find a logo [Image] with the desired language preference.
@@ -36,3 +38,8 @@ fun Dp.toPxFloat(): Float {
     val density = LocalDensity.current
     return with(density) { this@toPxFloat.toPx() }
 }
+
+fun PagerState.offsetForPage(page: Int) = (currentPage - page) + currentPageOffsetFraction
+
+fun PagerState.indicatorOffsetForPage(page: Int) =
+    1f - offsetForPage(page).coerceIn(-1f, 1f).absoluteValue

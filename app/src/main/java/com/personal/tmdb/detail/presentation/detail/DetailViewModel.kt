@@ -8,9 +8,7 @@ import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.CountryCode
 import com.personal.tmdb.core.domain.util.CountryName
-import com.personal.tmdb.core.domain.util.MediaType
-import com.personal.tmdb.core.domain.util.SnackbarController
-import com.personal.tmdb.core.domain.util.SnackbarEvent
+import com.personal.tmdb.core.domain.util.ToastController
 import com.personal.tmdb.core.domain.util.appendToResponse
 import com.personal.tmdb.core.domain.util.convertMediaType
 import com.personal.tmdb.core.domain.util.findLogoImageWithLanguage
@@ -49,18 +47,10 @@ class DetailViewModel @Inject constructor(
     private var watchCountries: Map<CountryCode, CountryName>? = null
 
     init {
-        getMediaDetails(
-            mediaType = routeData.mediaType,
-            mediaId = routeData.mediaId,
-            appendToResponse = appendToResponse(routeData.mediaType)
-        )
+        getMediaDetails()
     }
 
-    private fun getMediaDetails(
-        mediaType: String,
-        mediaId: Int,
-        appendToResponse: String? = null
-    ) {
+    private fun getMediaDetails() {
         viewModelScope.launch {
             _detailState.update { it.copy(loadState = LoadState.Loading) }
 
@@ -70,11 +60,11 @@ class DetailViewModel @Inject constructor(
             val sessionId = userRepository.getUser()?.sessionId
 
             detailRepository.getMediaDetail(
-                mediaType = mediaType,
-                mediaId = mediaId,
+                mediaType = routeData.mediaType,
+                mediaId = routeData.mediaId,
                 sessionId = sessionId,
                 language = languageTag,
-                appendToResponse = appendToResponse,
+                appendToResponse = appendToResponse(routeData.mediaType),
                 includeImageLanguage = includeImageLanguageTags
             ).onError { error ->
                 _detailState.update {
@@ -101,44 +91,27 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    private fun getAccountState(mediaType: MediaType, mediaId: Int) {
+    private fun addRating(rating: Int) {
         viewModelScope.launch {
-            val sessionId = userRepository.getUser()?.sessionId
+            _detailState.update { it.copy(ratingLoadState = LoadState.Loading) }
 
-            detailRepository.getAccountStates(
-                mediaType = mediaType.name.lowercase(),
-                mediaId = mediaId,
-                sessionId = sessionId
-            ).onError { error ->
-                println(error.toUiText())
-            }.onSuccess { result ->
-                _detailState.update { it.copy(accountState = result) }
-            }
-        }
-    }
-
-    private fun addRating(mediaType: MediaType, mediaId: Int, rating: Int) {
-        viewModelScope.launch {
-            _detailState.update { it.copy(rating = true) }
-            val sessionId = userRepository.getUser()?.sessionId
+            val sessionId = userRepository.getUser()?.sessionId ?: ""
 
             userRepository.addRating(
-                mediaType = mediaType.name.lowercase(),
-                mediaId = mediaId,
-                sessionId = sessionId ?: "",
+                mediaType = routeData.mediaType,
+                mediaId = routeData.mediaId,
+                sessionId = sessionId,
                 ratingRequest = Rated.Value(rating)
             ).onError { error ->
-                SnackbarController.sendEvent(
-                    event = SnackbarEvent(message = error.toUiText())
-                )
-                _detailState.update { it.copy(rating = false) }
+                ToastController.sendMessage(error.toUiText())
+                _detailState.update { it.copy(ratingLoadState = LoadState.NotLoading) }
             }.onSuccess {
                 _detailState.update { state ->
                     val updatedAccountState = state.accountState?.copy(
                         rated = Rated.Value(rating)
                     )
                     state.copy(
-                        rating = false,
+                        ratingLoadState = LoadState.NotLoading,
                         accountState = updatedAccountState
                     )
                 }
@@ -146,27 +119,26 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    private fun removeRating(mediaType: MediaType, mediaId: Int) {
+    private fun removeRating() {
         viewModelScope.launch {
-            _detailState.update { it.copy(rating = true) }
-            val sessionId = userRepository.getUser()?.sessionId
+            _detailState.update { it.copy(ratingLoadState = LoadState.Loading) }
+
+            val sessionId = userRepository.getUser()?.sessionId ?: ""
 
             userRepository.removeRating(
-                mediaType = mediaType.name.lowercase(),
-                mediaId = mediaId,
-                sessionId = sessionId ?: ""
+                mediaType = routeData.mediaType,
+                mediaId = routeData.mediaId,
+                sessionId = sessionId
             ).onError { error ->
-                SnackbarController.sendEvent(
-                    event = SnackbarEvent(message = error.toUiText())
-                )
-                _detailState.update { it.copy(rating = false) }
+                ToastController.sendMessage(error.toUiText())
+                _detailState.update { it.copy(ratingLoadState = LoadState.NotLoading) }
             }.onSuccess {
                 _detailState.update { state ->
                     val updatedAccountState = state.accountState?.copy(
                         rated = Rated.NotRated
                     )
                     state.copy(
-                        rating = false,
+                        ratingLoadState = LoadState.NotLoading,
                         accountState = updatedAccountState
                     )
                 }
@@ -197,25 +169,20 @@ class DetailViewModel @Inject constructor(
             is DetailUiEvent.SetUiState -> {
                 _detailState.update { it.copy(uiState = event.state) }
             }
-            is DetailUiEvent.GetAccountState -> {
-                getAccountState(
-                    mediaType = event.mediaType,
-                    mediaId = event.mediaId
-                )
-            }
             is DetailUiEvent.SetRating -> {
                 if (event.rating == 0) {
-                    removeRating(event.mediaType, event.mediaId)
+                    removeRating()
                 } else {
-                    addRating(event.mediaType, event.mediaId, event.rating)
+                    addRating(event.rating)
                 }
             }
             is DetailUiEvent.ShowRatingSheet -> {
                 _detailState.update { it.copy(showRatingSheet = event.state) }
             }
-            DetailUiEvent.RetryRequest -> Unit
+            DetailUiEvent.RetryRequest -> {
+                getMediaDetails()
+            }
             DetailUiEvent.Share -> Unit
-            is DetailUiEvent.OpenYTVideo -> Unit
             is DetailUiEvent.DimTopAppBar -> {
                 _detailState.update { it.copy(dimTopAppBar = event.state) }
             }

@@ -48,7 +48,7 @@ fun TrailersTeasers(
         },
         items = {
             items(
-                items = videos,
+                items = videos.take(10),
                 key = { it.id }
             ) { video ->
                 val interactionSource = remember { MutableInteractionSource() }
@@ -60,9 +60,7 @@ fun TrailersTeasers(
                             indication = null
                         ) {
                             detailUiEvent(
-                                DetailUiEvent.OpenYTVideo(
-                                    url = C.YT_VIDEO_BASE_URL.format(video.key)
-                                )
+                                DetailUiEvent.OpenUrl(C.YT_VIDEO_BASE_URL.format(video.key))
                             )
                         },
                     verticalArrangement = Arrangement.spacedBy(4.dp)

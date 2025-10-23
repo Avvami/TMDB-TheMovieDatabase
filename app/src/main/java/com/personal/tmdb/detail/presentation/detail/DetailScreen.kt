@@ -312,7 +312,7 @@ private fun DetailScreen(
     }
     if (detailState.showRatingSheet) {
         RatingBottomSheet(
-            detailState = { detailState },
+            detailState = detailState,
             onDismissRequest = { detailUiEvent(DetailUiEvent.ShowRatingSheet(false)) },
             detailUiEvent = detailUiEvent
         )
