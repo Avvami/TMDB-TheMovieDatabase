@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,7 +47,14 @@ fun ReviewBottomSheet(
         modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
         onDismissRequest = onDismissRequest,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = { CustomDragHandleWithButton(onClick = onDismissRequest) },
+        dragHandle = {
+            CustomDragHandleWithButton(
+                onClick = onDismissRequest,
+                contentPadding = PaddingValues(
+                    start = 16.dp, top = 16.dp, end = 16.dp
+                )
+            )
+        },
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         contentColor = MaterialTheme.colorScheme.onSurface
     ) {

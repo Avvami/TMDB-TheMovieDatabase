@@ -62,7 +62,7 @@ sealed interface Route {
     data object Lost: Route
 
     @Serializable
-    data class AddToList(val mediaType: String, val mediaId: Int, val watchlist: Boolean, val favorite: Boolean): Route
+    data class AddToList(val mediaType: String, val mediaId: Int): Route
 
     @Serializable
     data object WelcomeBack: Route

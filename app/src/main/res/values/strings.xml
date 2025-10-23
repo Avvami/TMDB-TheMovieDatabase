@@ -261,4 +261,6 @@
     <string name="backdrops_posters">Backdrops &amp; Posters</string>
     <string name="collection">Collection</string>
     <string name="another_season_coming">Another Season Is Coming!</string>
+    <string name="in_favorite">In favorites</string>
+    <string name="add_to_list_lowercase">Add to list</string>
 </resources>

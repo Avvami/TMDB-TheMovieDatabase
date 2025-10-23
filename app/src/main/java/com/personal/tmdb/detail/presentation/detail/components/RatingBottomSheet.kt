@@ -99,7 +99,14 @@ fun RatingBottomSheet(
         modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         onDismissRequest = onDismissRequest,
-        dragHandle = { CustomDragHandleWithButton(onClick = onDismissRequest) },
+        dragHandle = {
+            CustomDragHandleWithButton(
+                onClick = onDismissRequest,
+                contentPadding = PaddingValues(
+                    start = 16.dp, top = 16.dp, end = 16.dp
+                )
+            )
+        },
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         contentColor = MaterialTheme.colorScheme.onSurface
     ) {

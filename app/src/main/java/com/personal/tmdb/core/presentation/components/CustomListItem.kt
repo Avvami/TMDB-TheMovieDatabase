@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 fun CustomListItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
     horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(12.dp),
     headlineContent: @Composable () -> Unit,
     leadingContent: @Composable (() -> Unit)? = null,

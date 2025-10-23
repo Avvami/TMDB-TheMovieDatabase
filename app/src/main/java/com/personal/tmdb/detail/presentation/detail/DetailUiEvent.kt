@@ -20,4 +20,5 @@ sealed interface DetailUiEvent {
     data class OpenReview(val review: Review?): DetailUiEvent
     data class AddToWatchlist(val state: Boolean): DetailUiEvent
     data class ShowMoreSheet(val state: Boolean): DetailUiEvent
+    data class AddToFavorites(val state: Boolean): DetailUiEvent
 }

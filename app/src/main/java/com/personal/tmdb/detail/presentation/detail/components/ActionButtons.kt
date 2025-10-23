@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -27,6 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -34,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import com.personal.tmdb.R
 import com.personal.tmdb.UserState
 import com.personal.tmdb.core.domain.util.getColorForVoteAverage
+import com.personal.tmdb.core.domain.util.shimmerEffect
+import com.personal.tmdb.core.presentation.LoadState
 import com.personal.tmdb.detail.data.models.Rated
 import com.personal.tmdb.detail.presentation.detail.DetailState
 import com.personal.tmdb.detail.presentation.detail.DetailUiEvent
@@ -118,16 +123,28 @@ fun ActionButtons(
             }
             if (!userState().user?.sessionId.isNullOrEmpty()) {
                 OutlinedIconButton(
-                    modifier = Modifier.size(56.dp),
+                    modifier = Modifier
+                        .size(56.dp)
+                        .then(
+                            if (detailState.watchlistLoadState is LoadState.Loading) {
+                                Modifier
+                                    .clip(CircleShape)
+                                    .shimmerEffect()
+                            } else Modifier
+                        ),
                     onClick = {
+                        if (detailState.watchlistLoadState is LoadState.Loading)
+                            return@OutlinedIconButton
                         detailState.accountState?.let { accountState ->
-                            detailUiEvent(
-                                DetailUiEvent.AddToWatchlist(!accountState.watchlist)
-                            )
+                            detailUiEvent(DetailUiEvent.AddToWatchlist(!accountState.watchlist))
                         }
                     },
                     colors = IconButtonDefaults.outlinedIconButtonColors(
-                        containerColor = surfaceContainerDark
+                        containerColor = if (detailState.watchlistLoadState is LoadState.Loading) {
+                            Color.Transparent
+                        } else {
+                            surfaceContainerDark
+                        }
                     ),
                     border = BorderStroke(
                         width = 1.dp,

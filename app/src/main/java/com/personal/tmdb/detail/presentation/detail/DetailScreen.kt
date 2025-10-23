@@ -52,6 +52,7 @@ import com.personal.tmdb.core.presentation.components.MessageContainer
 import com.personal.tmdb.detail.presentation.components.ReviewBottomSheet
 import com.personal.tmdb.detail.presentation.detail.components.ContentPage
 import com.personal.tmdb.detail.presentation.detail.components.DetailedDescription
+import com.personal.tmdb.detail.presentation.detail.components.MoreBottomSheet
 import com.personal.tmdb.detail.presentation.detail.components.WatchProviders
 import com.personal.tmdb.detail.presentation.detail.components.RatingBottomSheet
 import com.personal.tmdb.ui.theme.onSurfaceDark
@@ -321,6 +322,13 @@ private fun DetailScreen(
         ReviewBottomSheet(
             review = detailState.selectedReview,
             onDismissRequest = { detailUiEvent(DetailUiEvent.OpenReview(null)) }
+        )
+    }
+    if (detailState.showMoreSheet) {
+        MoreBottomSheet(
+            detailState = detailState,
+            onDismissRequest = { detailUiEvent(DetailUiEvent.ShowMoreSheet(false)) },
+            detailUiEvent = detailUiEvent
         )
     }
 }

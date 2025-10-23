@@ -35,8 +35,8 @@ class AddToListViewModel @Inject constructor(
 
     private val _addToListState = MutableStateFlow(
         AddToListState(
-            favorite = routeData.favorite,
-            watchlist = routeData.watchlist
+            favorite = false,
+            watchlist = false
         )
     )
     val addToListState = _addToListState.asStateFlow()

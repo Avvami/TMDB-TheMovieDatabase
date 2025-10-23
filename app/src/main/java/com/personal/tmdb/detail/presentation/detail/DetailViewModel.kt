@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.personal.tmdb.core.domain.models.MediaRequest
 import com.personal.tmdb.core.domain.repository.PreferencesRepository
 import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.CountryCode
@@ -146,6 +147,68 @@ class DetailViewModel @Inject constructor(
         }
     }
 
+    private fun addToWatchlist(add: Boolean) {
+        viewModelScope.launch {
+            _detailState.update { it.copy(watchlistLoadState = LoadState.Loading) }
+
+            val sessionId = userRepository.getUser()?.sessionId ?: ""
+            val accountId = userRepository.getUser()?.accountId ?: -1
+            val mediaRequest = MediaRequest(
+                mediaType = routeData.mediaType,
+                mediaId = routeData.mediaId,
+                watchlist = add
+            )
+
+            userRepository.updateWatchlistItem(
+                accountId = accountId,
+                sessionId = sessionId,
+                mediaRequest = mediaRequest
+            ).onError { error ->
+                ToastController.sendMessage(error.toUiText())
+                _detailState.update { it.copy(watchlistLoadState = LoadState.NotLoading) }
+            }.onSuccess {
+                _detailState.update { state ->
+                    val updatedAccountState = state.accountState?.copy(watchlist = add)
+                    state.copy(
+                        watchlistLoadState = LoadState.NotLoading,
+                        accountState = updatedAccountState
+                    )
+                }
+            }
+        }
+    }
+
+    private fun addToFavorites(add: Boolean) {
+        viewModelScope.launch {
+            _detailState.update { it.copy(favoriteLoadState = LoadState.Loading) }
+
+            val sessionId = userRepository.getUser()?.sessionId ?: ""
+            val accountId = userRepository.getUser()?.accountId ?: -1
+            val mediaRequest = MediaRequest(
+                mediaType = routeData.mediaType,
+                mediaId = routeData.mediaId,
+                favorite = add
+            )
+
+            userRepository.updateFavoriteItem(
+                accountId = accountId,
+                sessionId = sessionId,
+                mediaRequest = mediaRequest
+            ).onError { error ->
+                ToastController.sendMessage(error.toUiText())
+                _detailState.update { it.copy(favoriteLoadState = LoadState.NotLoading) }
+            }.onSuccess {
+                _detailState.update { state ->
+                    val updatedAccountState = state.accountState?.copy(favorite = add)
+                    state.copy(
+                        favoriteLoadState = LoadState.NotLoading,
+                        accountState = updatedAccountState
+                    )
+                }
+            }
+        }
+    }
+
     fun detailUiEvent(event: DetailUiEvent) {
         when (event) {
             DetailUiEvent.OnNavigateBack -> Unit
@@ -190,12 +253,11 @@ class DetailViewModel @Inject constructor(
             is DetailUiEvent.OpenReview -> {
                 _detailState.update { it.copy(selectedReview = event.review) }
             }
-            is DetailUiEvent.AddToWatchlist -> {
-
-            }
+            is DetailUiEvent.AddToWatchlist -> { addToWatchlist(event.state) }
             is DetailUiEvent.ShowMoreSheet -> {
                 _detailState.update { it.copy(showMoreSheet = event.state) }
             }
+            is DetailUiEvent.AddToFavorites -> { addToFavorites(event.state) }
         }
     }
 }
