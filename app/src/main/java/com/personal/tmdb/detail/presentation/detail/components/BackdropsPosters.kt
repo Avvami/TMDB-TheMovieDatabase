@@ -28,7 +28,7 @@ import coil3.compose.AsyncImage
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.util.C
 import com.personal.tmdb.core.domain.util.TMDB
-import com.personal.tmdb.core.domain.util.clickableNoIndication
+import com.personal.tmdb.core.domain.util.clickableWithOpaque
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.components.MediaCarousel
 import com.personal.tmdb.detail.domain.models.Images
@@ -48,7 +48,8 @@ fun BackdropsPosters(
         titleContent = {
             Row(
                 modifier = Modifier
-                    .clickableNoIndication(
+                    .clickableWithOpaque(
+                        color = MaterialTheme.colorScheme.surface,
                         enabled = (images.backdrops?.size ?: 0) > 10
                                 || (images.posters?.size ?: 0) > 10
                     ) {
@@ -143,7 +144,9 @@ fun BackdropsPosters(
                     Column(
                         modifier = Modifier
                             .clip(MaterialTheme.shapes.medium)
-                            .clickableNoIndication {
+                            .clickableWithOpaque(
+                                color = MaterialTheme.colorScheme.surface
+                            ) {
                                 detailUiEvent(
                                     DetailUiEvent.OnNavigateTo(
                                         Route.Images(

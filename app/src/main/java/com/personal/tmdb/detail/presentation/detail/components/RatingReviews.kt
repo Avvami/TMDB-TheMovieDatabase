@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.personal.tmdb.R
 import com.personal.tmdb.UserState
-import com.personal.tmdb.core.domain.util.clickableNoIndication
+import com.personal.tmdb.core.domain.util.clickableWithOpaque
 import com.personal.tmdb.core.domain.util.formatDate
 import com.personal.tmdb.core.domain.util.formatVoteAverage
 import com.personal.tmdb.core.domain.util.formatVoteCount
@@ -68,7 +68,10 @@ fun RatingReviews(
     ) {
         Row(
             modifier = Modifier
-                .clickableNoIndication {
+                .padding(horizontal = 16.dp)
+                .clickableWithOpaque(
+                    color = MaterialTheme.colorScheme.surface
+                ) {
                     detailUiEvent(
                         DetailUiEvent.OnNavigateTo(
                             Route.Reviews(
@@ -77,8 +80,7 @@ fun RatingReviews(
                             )
                         )
                     )
-                }
-                .padding(horizontal = 16.dp),
+                },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -224,7 +226,9 @@ fun RatingReviews(
                             Column(
                                 modifier = Modifier
                                     .clip(MaterialTheme.shapes.medium)
-                                    .clickableNoIndication {
+                                    .clickableWithOpaque(
+                                        color = MaterialTheme.colorScheme.surface
+                                    ) {
                                         detailUiEvent(
                                             DetailUiEvent.OnNavigateTo(
                                                 Route.Reviews(

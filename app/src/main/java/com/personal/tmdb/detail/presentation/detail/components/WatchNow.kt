@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.util.TMDB
-import com.personal.tmdb.core.domain.util.clickableNoIndication
+import com.personal.tmdb.core.domain.util.clickableWithOpaque
 import com.personal.tmdb.detail.domain.models.Available
 import com.personal.tmdb.detail.presentation.detail.DetailUiEvent
 import com.personal.tmdb.detail.presentation.detail.DetailUiState
@@ -45,7 +45,9 @@ fun WatchNow(
     ) {
         Row(
             modifier = Modifier
-                .clickableNoIndication {
+                .clickableWithOpaque(
+                    color = MaterialTheme.colorScheme.surface
+                ) {
                     detailUiEvent(DetailUiEvent.SetUiState(DetailUiState.WATCH_PROVIDERS))
                 },
             verticalAlignment = Alignment.CenterVertically,

@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.personal.tmdb.R
-import com.personal.tmdb.core.domain.util.clickableNoIndication
+import com.personal.tmdb.core.domain.util.clickableWithOpaque
 import com.personal.tmdb.core.domain.util.shimmerEffect
 import com.personal.tmdb.core.presentation.LoadState
 import com.personal.tmdb.detail.presentation.detail.DetailState
@@ -70,7 +70,9 @@ fun Overview(
             } else {
                 Column(
                     modifier = Modifier
-                        .clickableNoIndication {
+                        .clickableWithOpaque(
+                            color = MaterialTheme.colorScheme.surface
+                        ) {
                             detailUiEvent(DetailUiEvent.SetUiState(DetailUiState.MORE_DETAILS))
                         },
                     verticalArrangement = Arrangement.spacedBy(4.dp)

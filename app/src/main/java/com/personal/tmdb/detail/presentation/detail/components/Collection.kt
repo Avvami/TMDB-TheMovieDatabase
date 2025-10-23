@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.util.TMDB
-import com.personal.tmdb.core.domain.util.clickableNoIndication
+import com.personal.tmdb.core.domain.util.clickableWithOpaque
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.detail.domain.models.BelongsToCollection
 import com.personal.tmdb.detail.presentation.detail.DetailUiEvent
@@ -41,7 +41,9 @@ fun Collection(
         )
         Row(
             modifier = Modifier
-                .clickableNoIndication {
+                .clickableWithOpaque(
+                    color = MaterialTheme.colorScheme.surface
+                ) {
                     detailUiEvent(DetailUiEvent.OnNavigateTo(Route.Collection(collection.id)))
                 },
             verticalAlignment = Alignment.CenterVertically,

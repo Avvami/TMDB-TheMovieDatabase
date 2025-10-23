@@ -1,6 +1,5 @@
 package com.personal.tmdb.detail.presentation.detail.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,7 +28,7 @@ import coil3.compose.AsyncImage
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.util.TMDB
 import com.personal.tmdb.core.domain.util.UiText
-import com.personal.tmdb.core.domain.util.clickableNoIndication
+import com.personal.tmdb.core.domain.util.clickableWithOpaque
 import com.personal.tmdb.core.domain.util.formatDate
 import com.personal.tmdb.core.domain.util.formatRuntime
 import com.personal.tmdb.core.navigation.Route
@@ -53,7 +51,9 @@ fun SeasonsEpisodes(
     ) {
         Row(
             modifier = Modifier
-                .clickableNoIndication {
+                .clickableWithOpaque(
+                    color = MaterialTheme.colorScheme.surface
+                ) {
                     detailUiEvent(
                         DetailUiEvent.OnNavigateTo(
                             Route.Episodes(
@@ -106,16 +106,10 @@ private fun EpisodeToAir(
 ) {
     Row(
         modifier = modifier
-            .clip(
-                RoundedCornerShape(
-                    topStart = MaterialTheme.shapes.medium.topStart,
-                    topEnd = MaterialTheme.shapes.extraSmall.topEnd,
-                    bottomEnd = MaterialTheme.shapes.extraSmall.bottomEnd,
-                    bottomStart = MaterialTheme.shapes.medium.bottomStart
-                )
-            )
             .height(IntrinsicSize.Min)
-            .clickable {
+            .clickableWithOpaque(
+                color = MaterialTheme.colorScheme.surface
+            ) {
                 onNavigateTo(
                     Route.Episode(
                         mediaId = episodeToAir.showId,

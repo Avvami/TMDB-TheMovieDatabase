@@ -40,7 +40,7 @@ import androidx.compose.ui.util.fastForEach
 import coil3.compose.AsyncImage
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.util.TMDB
-import com.personal.tmdb.core.domain.util.clickableNoIndication
+import com.personal.tmdb.core.domain.util.clickableWithOpaque
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.detail.domain.models.Cast
 import com.personal.tmdb.detail.presentation.detail.DetailState
@@ -59,7 +59,9 @@ fun CastCrew(
     ) {
         Row(
             modifier = Modifier
-                .clickableNoIndication {
+                .clickableWithOpaque(
+                    color = MaterialTheme.colorScheme.surface
+                ) {
                     detailUiEvent(
                         DetailUiEvent.OnNavigateTo(
                             Route.Cast(
@@ -150,7 +152,9 @@ fun CastCrew(
                                 Column(
                                     modifier = Modifier
                                         .clip(MaterialTheme.shapes.medium)
-                                        .clickableNoIndication {
+                                        .clickableWithOpaque(
+                                            color = MaterialTheme.colorScheme.surface
+                                        ) {
                                             detailUiEvent(
                                                 DetailUiEvent.OnNavigateTo(
                                                     Route.Cast(
@@ -200,9 +204,10 @@ private fun CastMember(
 ) {
     Row(
         modifier = modifier
-            .clickableNoIndication {
-                onClick()
-            },
+            .clickableWithOpaque(
+                color = MaterialTheme.colorScheme.surface,
+                onClick = onClick
+            ),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

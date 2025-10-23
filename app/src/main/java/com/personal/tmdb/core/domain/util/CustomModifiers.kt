@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -128,4 +129,31 @@ fun Modifier.clickableNoIndication(
         interactionSource = remember { MutableInteractionSource() },
         indication = null
     )
+}
+
+fun Modifier.clickableWithOpaque(
+    color: Color = Color.White,
+    enabled: Boolean = true,
+    onClick: () -> Unit
+): Modifier {
+    return this.composed {
+        this.clickable(
+            enabled = enabled,
+            onClickLabel = null,
+            role = null,
+            onClick = onClick,
+            interactionSource = remember { MutableInteractionSource() },
+            indication = customRipple(
+                color = color,
+                radius = Dp.Unspecified,
+                bounded = true,
+                rippleAlpha = RippleAlpha(
+                    pressedAlpha = 0.4f,
+                    focusedAlpha = 0.4f,
+                    draggedAlpha = 0.4f,
+                    hoveredAlpha = 0.4f
+                )
+            )
+        )
+    }
 }

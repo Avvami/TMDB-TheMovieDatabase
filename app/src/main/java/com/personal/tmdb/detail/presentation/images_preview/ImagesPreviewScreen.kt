@@ -182,7 +182,9 @@ private fun ImagesPreviewScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = {}
+                        onClick = {
+                            imagesPreviewUiEvent(ImagesPreviewUiEvent.OnNavigateBack)
+                        }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.icon_arrow_back_fill0_wght400),
