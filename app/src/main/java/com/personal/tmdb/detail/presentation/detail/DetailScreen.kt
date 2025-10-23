@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,10 +30,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +48,7 @@ import com.personal.tmdb.MainActivity
 import com.personal.tmdb.R
 import com.personal.tmdb.UserState
 import com.personal.tmdb.core.domain.util.C
+import com.personal.tmdb.core.domain.util.applyStatusBarsTheme
 import com.personal.tmdb.core.domain.util.findActivity
 import com.personal.tmdb.core.domain.util.shareText
 import com.personal.tmdb.core.navigation.Route
@@ -55,8 +59,8 @@ import com.personal.tmdb.detail.presentation.components.ReviewBottomSheet
 import com.personal.tmdb.detail.presentation.detail.components.ContentPage
 import com.personal.tmdb.detail.presentation.detail.components.DetailedDescription
 import com.personal.tmdb.detail.presentation.detail.components.MoreBottomSheet
-import com.personal.tmdb.detail.presentation.detail.components.WatchProviders
 import com.personal.tmdb.detail.presentation.detail.components.RatingBottomSheet
+import com.personal.tmdb.detail.presentation.detail.components.WatchProviders
 import com.personal.tmdb.openLink
 import com.personal.tmdb.ui.theme.onSurfaceDark
 import com.personal.tmdb.ui.theme.surfaceDark
@@ -70,9 +74,29 @@ fun DetailScreenRoot(
     userState: () -> UserState,
     viewModel: DetailViewModel = hiltViewModel()
 ) {
+    val view = LocalView.current
     val context = LocalContext.current
     val activity = context.findActivity() as MainActivity
+    val isDark = preferencesState().darkTheme ?: isSystemInDarkTheme()
     val detailState by viewModel.detailState.collectAsStateWithLifecycle()
+    DisposableEffect(Unit, detailState.dimTopAppBar, detailState.uiState) {
+        applyStatusBarsTheme(
+            view = view,
+            context = context,
+            applyLightStatusBars = when {
+                detailState.dimTopAppBar -> isDark
+                detailState.uiState != DetailUiState.CONTENT -> isDark
+                else -> true
+            }
+        )
+        onDispose {
+            applyStatusBarsTheme(
+                view = view,
+                context = context,
+                applyLightStatusBars = isDark
+            )
+        }
+    }
     DetailScreen(
         bottomBarInsets = bottomBarInsets,
         preferencesState = preferencesState,
