@@ -24,7 +24,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
-import androidx.navigation.toRoute
 import com.personal.tmdb.UiEvent
 import com.personal.tmdb.UserState
 import com.personal.tmdb.core.domain.util.AdditionalNavigationItem
@@ -40,6 +39,7 @@ import com.personal.tmdb.detail.presentation.detail.DetailScreenRoot
 import com.personal.tmdb.detail.presentation.episode.EpisodeDetailsScreenRoot
 import com.personal.tmdb.detail.presentation.episodes.EpisodesScreenRoot
 import com.personal.tmdb.detail.presentation.image.ImageViewerScreenRoot
+import com.personal.tmdb.detail.presentation.images_preview.ImagesPreviewScreenRoot
 import com.personal.tmdb.detail.presentation.person.PersonScreenRoot
 import com.personal.tmdb.detail.presentation.reviews.ReviewsScreenRoot
 import com.personal.tmdb.discover.presentation.DiscoverSharedViewModel
@@ -497,7 +497,16 @@ fun ChildNavHost(
             }
             animatedComposable<Route.Genre> {}
             animatedComposable<Route.ImagesPreview> {
-                println(it.toRoute<Route.ImagesPreview>())
+                DisposableEffect(Unit) {
+                    setBottomBarVisible(false)
+                    onDispose {
+                        setBottomBarVisible(true)
+                    }
+                }
+                ImagesPreviewScreenRoot(
+                    onNavigateBack = onNavigateBack,
+                    preferencesState = preferencesState
+                )
             }
         }
     }

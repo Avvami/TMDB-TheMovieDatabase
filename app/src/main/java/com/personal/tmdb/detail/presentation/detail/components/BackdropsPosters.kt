@@ -97,6 +97,7 @@ fun BackdropsPosters(
                                 detailUiEvent(
                                     DetailUiEvent.OnNavigateTo(
                                         Route.ImagesPreview(
+                                            mediaName = detailState.details?.name ?: "",
                                             selectedIndex = index,
                                             images = backdrops.take(10).map { it.filePath } +
                                                     images.posters?.take(10)?.map { it.filePath }.orEmpty()
@@ -123,6 +124,7 @@ fun BackdropsPosters(
                                 detailUiEvent(
                                     DetailUiEvent.OnNavigateTo(
                                         Route.ImagesPreview(
+                                            mediaName = detailState.details?.name ?: "",
                                             selectedIndex = index + images.backdrops?.take(10).orEmpty().size,
                                             images = images.backdrops?.take(10)?.map { it.filePath }.orEmpty() +
                                                     posters.take(10).map { it.filePath }

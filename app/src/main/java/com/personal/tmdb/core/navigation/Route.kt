@@ -81,6 +81,7 @@ sealed interface Route {
 
     @Serializable
     data class ImagesPreview(
+        val mediaName: String,
         val selectedIndex: Int,
         val images: List<String?>
     ): Route
