@@ -1,9 +1,12 @@
 package com.personal.tmdb.core.domain.util
 
+import android.app.Activity
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.personal.tmdb.detail.domain.models.Image
 import com.personal.tmdb.detail.domain.models.Images
 import kotlin.math.absoluteValue
@@ -43,3 +46,13 @@ fun PagerState.offsetForPage(page: Int) = (currentPage - page) + currentPageOffs
 
 fun PagerState.indicatorOffsetForPage(page: Int) =
     1f - offsetForPage(page).coerceIn(-1f, 1f).absoluteValue
+
+fun Activity.showSystemBars() {
+    val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+    windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
+}
+
+fun Activity.hideSystemBars() {
+    val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+    windowInsetsController.hide(WindowInsetsCompat.Type.statusBars())
+}

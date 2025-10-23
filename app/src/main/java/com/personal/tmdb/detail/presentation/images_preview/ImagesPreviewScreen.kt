@@ -11,7 +11,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -52,7 +51,6 @@ import com.personal.tmdb.core.domain.util.findActivity
 import com.personal.tmdb.core.domain.util.hideSystemBars
 import com.personal.tmdb.core.domain.util.shareText
 import com.personal.tmdb.core.domain.util.showSystemBars
-import com.personal.tmdb.core.presentation.PreferencesState
 import com.personal.tmdb.ui.theme.onSurfaceDark
 import net.engawapg.lib.zoomable.ScrollGesturePropagation
 import net.engawapg.lib.zoomable.rememberZoomState
@@ -61,13 +59,11 @@ import net.engawapg.lib.zoomable.zoomable
 @Composable
 fun ImagesPreviewScreenRoot(
     onNavigateBack: () -> Unit,
-    preferencesState: () -> PreferencesState,
     viewModel: ImagesPreviewViewModel = hiltViewModel()
 ) {
     val view = LocalView.current
     val context = LocalContext.current
     val activity = context.findActivity() as MainActivity
-    val isDark = preferencesState().darkTheme ?: isSystemInDarkTheme()
     val imagesPreviewState by viewModel.imagesPreviewState.collectAsStateWithLifecycle()
     DisposableEffect(Unit) {
         applyStatusBarsTheme(
@@ -77,11 +73,6 @@ fun ImagesPreviewScreenRoot(
         )
         onDispose {
             activity.showSystemBars()
-            applyStatusBarsTheme(
-                view = view,
-                context = context,
-                applyLightStatusBars = isDark
-            )
         }
     }
     ImagesPreviewScreen(

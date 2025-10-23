@@ -504,8 +504,7 @@ fun ChildNavHost(
                     }
                 }
                 ImagesPreviewScreenRoot(
-                    onNavigateBack = onNavigateBack,
-                    preferencesState = preferencesState
+                    onNavigateBack = onNavigateBack
                 )
             }
         }
