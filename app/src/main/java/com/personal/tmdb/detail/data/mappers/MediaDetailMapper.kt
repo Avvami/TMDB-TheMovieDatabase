@@ -48,8 +48,6 @@ fun MediaDetailDto.toMediaDetail(): MediaDetail {
         null
     }
     val watchProviders = watchProviders?.toWatchProviders()
-    println(aggregateCredits?.cast?.takeIf { it.isNotEmpty() }?.map { it.toCast() }
-        ?: credits?.cast?.takeIf { it.isNotEmpty() }?.map { it.toCast() })
     return MediaDetail(
         accountStates = accountStates?.toAccountState(),
         backdropPath = backdropPath,

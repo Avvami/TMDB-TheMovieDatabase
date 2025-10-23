@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,7 +54,7 @@ fun BackdropsPosters(
                     ) {
                         detailUiEvent(
                             DetailUiEvent.OnNavigateTo(
-                                Route.Image(
+                                Route.Images(
                                     imageType = images.backdrops?.let { ImageType.BACKDROPS.name.lowercase() }
                                         ?: images.posters?.let { ImageType.POSTERS.name.lowercase() }
                                         ?: ImageType.UNKNOWN.name.lowercase(),
@@ -85,15 +85,25 @@ fun BackdropsPosters(
         },
         items = {
             images.backdrops?.let { backdrops ->
-                items(
+                itemsIndexed(
                     items = backdrops.take(10)
-                ) { backdrop ->
+                ) { index, backdrop ->
                     AsyncImage(
                         modifier = Modifier
                             .height(200.dp)
                             .aspectRatio(16 / 9f)
                             .clip(MaterialTheme.shapes.medium)
-                            .clickable { /*TODO*/ },
+                            .clickable {
+                                detailUiEvent(
+                                    DetailUiEvent.OnNavigateTo(
+                                        Route.ImagesPreview(
+                                            selectedIndex = index,
+                                            images = backdrops.take(10).map { it.filePath } +
+                                                    images.posters?.take(10)?.map { it.filePath }.orEmpty()
+                                        )
+                                    )
+                                )
+                            },
                         model = TMDB.backdropW1280(backdrop.filePath),
                         contentDescription = null,
                         contentScale = ContentScale.Crop
@@ -101,15 +111,25 @@ fun BackdropsPosters(
                 }
             }
             images.posters?.let { posters ->
-                items(
+                itemsIndexed(
                     items = posters.take(10)
-                ) { poster ->
+                ) { index, poster ->
                     AsyncImage(
                         modifier = Modifier
                             .height(200.dp)
                             .aspectRatio(2 / 3f)
                             .clip(MaterialTheme.shapes.medium)
-                            .clickable { /*TODO*/ },
+                            .clickable {
+                                detailUiEvent(
+                                    DetailUiEvent.OnNavigateTo(
+                                        Route.ImagesPreview(
+                                            selectedIndex = index + images.backdrops?.take(10).orEmpty().size,
+                                            images = images.backdrops?.take(10)?.map { it.filePath }.orEmpty() +
+                                                    posters.take(10).map { it.filePath }
+                                        )
+                                    )
+                                )
+                            },
                         model = TMDB.posterW300(poster.filePath),
                         contentDescription = null,
                         contentScale = ContentScale.Crop
@@ -124,7 +144,7 @@ fun BackdropsPosters(
                             .clickableNoIndication {
                                 detailUiEvent(
                                     DetailUiEvent.OnNavigateTo(
-                                        Route.Image(
+                                        Route.Images(
                                             imageType = images.backdrops?.let { ImageType.BACKDROPS.name.lowercase() }
                                                 ?: images.posters?.let { ImageType.POSTERS.name.lowercase() }
                                                 ?: ImageType.UNKNOWN.name.lowercase(),

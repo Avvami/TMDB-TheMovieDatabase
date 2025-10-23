@@ -41,9 +41,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.personal.tmdb.MainActivity
 import com.personal.tmdb.R
 import com.personal.tmdb.UserState
 import com.personal.tmdb.core.domain.util.C
+import com.personal.tmdb.core.domain.util.findActivity
 import com.personal.tmdb.core.domain.util.shareText
 import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.presentation.LoadState
@@ -55,6 +57,7 @@ import com.personal.tmdb.detail.presentation.detail.components.DetailedDescripti
 import com.personal.tmdb.detail.presentation.detail.components.MoreBottomSheet
 import com.personal.tmdb.detail.presentation.detail.components.WatchProviders
 import com.personal.tmdb.detail.presentation.detail.components.RatingBottomSheet
+import com.personal.tmdb.openLink
 import com.personal.tmdb.ui.theme.onSurfaceDark
 import com.personal.tmdb.ui.theme.surfaceDark
 
@@ -68,6 +71,7 @@ fun DetailScreenRoot(
     viewModel: DetailViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val activity = context.findActivity() as MainActivity
     val detailState by viewModel.detailState.collectAsStateWithLifecycle()
     DetailScreen(
         bottomBarInsets = bottomBarInsets,
@@ -85,6 +89,9 @@ fun DetailScreenRoot(
                             detailState.mediaId
                         )
                     )
+                }
+                is DetailUiEvent.OpenUrl -> {
+                    activity.openLink(event.url)
                 }
                 else -> Unit
             }

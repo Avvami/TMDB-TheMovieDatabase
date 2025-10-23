@@ -1,10 +1,8 @@
 package com.personal.tmdb.core.navigation
 
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -23,10 +21,10 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import com.personal.tmdb.UiEvent
 import com.personal.tmdb.UserState
 import com.personal.tmdb.core.domain.util.AdditionalNavigationItem
@@ -67,6 +65,7 @@ import kotlinx.coroutines.launch
 fun RootNavHost(
     rootNavController: NavHostController,
     navBarItemReselect: ((() -> Unit)?) -> Unit,
+    bottomBarInsets: WindowInsets,
     bottomBarPadding: Dp,
     setBottomBarVisible: (visible: Boolean) -> Unit,
     preferencesState: () -> PreferencesState,
@@ -94,6 +93,7 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
+                bottomBarInsets = bottomBarInsets,
                 navController = navController,
                 setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyListState,
@@ -119,6 +119,7 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
+                bottomBarInsets = bottomBarInsets,
                 navController = navController,
                 setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyGridState,
@@ -144,6 +145,7 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
+                bottomBarInsets = bottomBarInsets,
                 navController = navController,
                 setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyGridState,
@@ -169,6 +171,7 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
+                bottomBarInsets = bottomBarInsets,
                 navController = navController,
                 setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyGridState,
@@ -194,6 +197,7 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
+                bottomBarInsets = bottomBarInsets,
                 navController = navController,
                 setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyGridState,
@@ -219,6 +223,7 @@ fun RootNavHost(
                 }
             }
             ChildNavHost(
+                bottomBarInsets = bottomBarInsets,
                 navController = navController,
                 setBottomBarVisible = setBottomBarVisible,
                 scrollState = lazyListState,
@@ -239,6 +244,7 @@ fun ChildNavHost(
     setBottomBarVisible: (visible: Boolean) -> Unit,
     scrollState: Any,
     startDestination: Route,
+    bottomBarInsets: WindowInsets,
     bottomBarPadding: Dp,
     preferencesState: () -> PreferencesState,
     userState: () -> UserState,
@@ -249,13 +255,13 @@ fun ChildNavHost(
     }
     val onNavigateTo: (route: Route) -> Unit = { route ->
         navController.navigate(route = route) {
-            launchSingleTop = if (route is Route.Image || route is Route.AddToList || route is Route.DiscoverFilters) true else route !is Route.Detail
+            launchSingleTop = if (route is Route.Images || route is Route.AddToList || route is Route.DiscoverFilters) true else route !is Route.Detail
         }
     }
     SharedTransitionLayout {
         NavHost(
             navController = navController,
-            startDestination = startDestination::class
+            startDestination = startDestination
         ) {
             animatedComposable<Route.Home> {
                 HomeScreenRoot(
@@ -316,7 +322,7 @@ fun ChildNavHost(
             }
             animatedComposable<Route.Detail> {
                 DetailScreenRoot(
-                    bottomPadding = bottomBarPadding,
+                    bottomBarInsets = bottomBarInsets,
                     onNavigateBack = onNavigateBack,
                     onNavigateTo = onNavigateTo,
                     preferencesState = preferencesState,
@@ -443,7 +449,7 @@ fun ChildNavHost(
                     )
                 }
             }
-            animatedComposable<Route.Image> {
+            animatedComposable<Route.Images> {
                 DisposableEffect(Unit) {
                     setBottomBarVisible(false)
                     onDispose {
@@ -455,12 +461,7 @@ fun ChildNavHost(
                     preferencesState = preferencesState
                 )
             }
-            composable<Route.AddToList>(
-                enterTransition = { fadeIn(animationSpec = tween(durationMillis = 200)) },
-                exitTransition = { ExitTransition.None },
-                popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 200)) },
-                popExitTransition = { ExitTransition.None },
-            ) {
+            animatedComposable<Route.AddToList> {
                 DisposableEffect(Unit) {
                     setBottomBarVisible(false)
                     onDispose {
@@ -493,6 +494,10 @@ fun ChildNavHost(
                     onNavigateBack = onNavigateBack,
                     userState = userState
                 )
+            }
+            animatedComposable<Route.Genre> {}
+            animatedComposable<Route.ImagesPreview> {
+                println(it.toRoute<Route.ImagesPreview>())
             }
         }
     }

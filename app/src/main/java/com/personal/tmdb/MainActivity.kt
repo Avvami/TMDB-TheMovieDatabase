@@ -1,14 +1,21 @@
 package com.personal.tmdb
 
-import android.net.Uri
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -23,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
@@ -30,6 +38,7 @@ import com.personal.tmdb.core.domain.util.DialogController
 import com.personal.tmdb.core.domain.util.DialogEvent
 import com.personal.tmdb.core.domain.util.ObserveAsEvents
 import com.personal.tmdb.core.domain.util.SnackbarController
+import com.personal.tmdb.core.domain.util.ToastController
 import com.personal.tmdb.core.navigation.RootNavHost
 import com.personal.tmdb.core.presentation.components.BottomBar
 import com.personal.tmdb.core.presentation.components.CustomDialog
@@ -90,6 +99,9 @@ class MainActivity : ComponentActivity() {
                         )
                     )
                 }
+                ObserveAsEvents(flow = ToastController.events) { message ->
+                    Toast.makeText(this, message.asString(this), Toast.LENGTH_SHORT).show()
+                }
 
                 Scaffold(
                     bottomBar = {
@@ -119,10 +131,18 @@ class MainActivity : ComponentActivity() {
                     },
                     containerColor = MaterialTheme.colorScheme.surface
                 ) { innerPadding ->
+                    val animatedBottomBarPadding by animateDpAsState(
+                        targetValue = if (bottomBarVisible) {
+                            innerPadding.calculateBottomPadding()
+                        } else {
+                            WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                        }
+                    )
                     RootNavHost(
                         rootNavController = rootNavController,
                         navBarItemReselect = { navBarItemReselect = it },
                         setBottomBarVisible = { visible -> bottomBarVisible = visible },
+                        bottomBarInsets = WindowInsets(bottom = animatedBottomBarPadding),
                         bottomBarPadding = innerPadding.calculateBottomPadding(),
                         preferencesState = { preferencesState },
                         userState = { userState },
@@ -150,6 +170,18 @@ class MainActivity : ComponentActivity() {
             .setUrlBarHidingEnabled(true)
             .setShowTitle(true)
             .build()
-        chromeIntent.launchUrl(this, Uri.parse(url))
+        chromeIntent.launchUrl(this, url.toUri())
+    }
+}
+
+fun Activity.openLink(url: String) {
+    Intent(Intent.ACTION_VIEW).apply {
+        data = url.toUri()
+    }.also { intent ->
+        try {
+            startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.application_not_found, Toast.LENGTH_SHORT).show()
+        }
     }
 }

@@ -35,7 +35,7 @@ sealed interface Route {
     data class Person(val personName: String, val personId: Int): Route
 
     @Serializable
-    data class Image(val imageType: String, val imagesPath: String, val selectedImageIndex: Int? = null): Route
+    data class Images(val imageType: String, val imagesPath: String, val selectedImageIndex: Int? = null): Route
 
     @Serializable
     data object Settings: Route
@@ -75,4 +75,13 @@ sealed interface Route {
 
     @Serializable
     data object DiscoverFilters: Route
+
+    @Serializable
+    data class Genre(val mediaType: String, val genreId: Int): Route
+
+    @Serializable
+    data class ImagesPreview(
+        val selectedIndex: Int,
+        val images: List<String?>
+    ): Route
 }

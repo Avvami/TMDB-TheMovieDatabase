@@ -6,7 +6,7 @@ object C {
     const val GRAVATAR_IMAGES_BASE_URL = "https://gravatar.com/avatar/%s?s=185"
     const val FLAG_ICONS_URL = "https://flagicons.lipis.dev/flags/4x3/%s.svg"
     const val YT_THUMB_URL = "https://i3.ytimg.com/vi/%s/maxresdefault.jpg"
-    const val YT_VIDEO_BASE_URL = "https://www.youtube.com/watch?%s"
+    const val YT_VIDEO_BASE_URL = "https://www.youtube.com/watch?v=%s"
     const val REDIRECT_URL = "tmdb://auth/approved"
     const val ORIGINAL = "original"
     const val BACKDROP_W1280 = "w1280"

@@ -63,7 +63,11 @@ fun AttributeChips(
                             onClick = {
                                 detailUiEvent(
                                     DetailUiEvent.OnNavigateTo(
-                                        Route.Discover(detailState.mediaType.name.lowercase()))
+                                        Route.Genre(
+                                            mediaType = detailState.mediaType.name.lowercase(),
+                                            genreId = genre.id
+                                        )
+                                    )
                                 )
                             },
                             label = {
