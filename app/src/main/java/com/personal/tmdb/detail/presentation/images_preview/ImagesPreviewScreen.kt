@@ -11,14 +11,18 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberPlatformOverscrollFactory
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,14 +38,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
 import com.personal.tmdb.MainActivity
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.util.C
@@ -52,6 +63,8 @@ import com.personal.tmdb.core.domain.util.hideSystemBars
 import com.personal.tmdb.core.domain.util.shareText
 import com.personal.tmdb.core.domain.util.showSystemBars
 import com.personal.tmdb.ui.theme.onSurfaceDark
+import com.personal.tmdb.ui.theme.surfaceContainerDark
+import com.personal.tmdb.ui.theme.surfaceVariantDark
 import net.engawapg.lib.zoomable.ScrollGesturePropagation
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -126,7 +139,7 @@ private fun ImagesPreviewScreen(
                 pageSize = PageSize.Fill
             ) { page ->
                 val zoomState = rememberZoomState(maxScale = 4f)
-                AsyncImage(
+                SubcomposeAsyncImage(
                     modifier = Modifier
                         .navigationBarsPadding()
                         .fillMaxSize()
@@ -150,11 +163,50 @@ private fun ImagesPreviewScreen(
                             }
                         ),
                     model = TMDB.imageOriginal(imagesPreviewState().filePaths[page]),
-                    onSuccess = { state ->
-                        zoomState.setContentSize(state.painter.intrinsicSize)
-                    },
                     contentDescription = null
-                )
+                ) {
+                    val state by painter.state.collectAsStateWithLifecycle()
+                    when (state) {
+                        AsyncImagePainter.State.Empty, is AsyncImagePainter.State.Loading -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(48.dp),
+                                    color = onSurfaceDark,
+                                    strokeWidth = 3.dp,
+                                    trackColor = surfaceContainerDark,
+                                    strokeCap = StrokeCap.Round
+                                )
+                            }
+                        }
+                        is AsyncImagePainter.State.Error -> {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.failed_to_load_image),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = surfaceVariantDark
+                                )
+                                Text(
+                                    text = stringResource(R.string.tmdb),
+                                    style = MaterialTheme.typography.displayLarge,
+                                    fontWeight = FontWeight.Black,
+                                    fontStyle = FontStyle.Italic,
+                                    color = surfaceVariantDark
+                                )
+                            }
+                        }
+                        is AsyncImagePainter.State.Success -> {
+                            state.painter?.intrinsicSize?.let { zoomState.setContentSize(it) }
+                            SubcomposeAsyncImageContent()
+                        }
+                    }
+                }
                 val isVisible = page == pagerState.settledPage
                 LaunchedEffect(key1 = isVisible) {
                     if (!isVisible) {
@@ -177,7 +229,9 @@ private fun ImagesPreviewScreen(
                 title = {
                     Text(
                         text = imagesPreviewState().name,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 },
                 navigationIcon = {

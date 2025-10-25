@@ -264,4 +264,5 @@
     <string name="in_favorite">In favorites</string>
     <string name="add_to_list_lowercase">Add to list</string>
     <string name="application_not_found">Couldn\'t find suitable app to open the link</string>
+    <string name="failed_to_load_image">Failed to load image from</string>
 </resources>
