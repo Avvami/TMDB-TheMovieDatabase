@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.DisableSelection
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -58,66 +60,70 @@ fun ReviewBottomSheet(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         contentColor = MaterialTheme.colorScheme.onSurface
     ) {
-        Column(
-            modifier = modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+        SelectionContainer {
+            Column(
+                modifier = modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                review.rating?.let { rating ->
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .border(
-                                border = BorderStroke(
-                                    width = 2.dp,
-                                    color = getColorForVoteAverage(rating)
-                                ),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = formatVoteAverage(rating),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    review.author?.let { author ->
-                        Text(
-                            text = author,
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                    review.rating?.let { rating ->
+                        DisableSelection {
+                            Box(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .clip(CircleShape)
+                                    .border(
+                                        border = BorderStroke(
+                                            width = 2.dp,
+                                            color = getColorForVoteAverage(rating)
+                                        ),
+                                        shape = CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = formatVoteAverage(rating),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
+                        }
                     }
-                    review.createdAt?.let { createdAt ->
-                        Text(
-                            text = formatDate(createdAt),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.surfaceVariant
-                        )
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        review.author?.let { author ->
+                            Text(
+                                text = author,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                        review.createdAt?.let { createdAt ->
+                            Text(
+                                text = formatDate(createdAt),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        }
                     }
                 }
+                Text(
+                    modifier = Modifier
+                        .fadingEdges(
+                            state = scrollState,
+                            topEdgeHeight = 8.dp,
+                            bottomEdgeHeight = 8.dp
+                        )
+                        .verticalScroll(scrollState)
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                    text = review.content ?: stringResource(R.string.empty_review),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = .8f)
+                )
             }
-            Text(
-                modifier = Modifier
-                    .fadingEdges(
-                        state = scrollState,
-                        topEdgeHeight = 8.dp,
-                        bottomEdgeHeight = 8.dp
-                    )
-                    .verticalScroll(scrollState)
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                text = review.content ?: stringResource(R.string.empty_review),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .8f)
-            )
         }
     }
 }
