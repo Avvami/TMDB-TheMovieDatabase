@@ -1,31 +1,28 @@
 package com.personal.tmdb.core.data.mappers
 
 import com.personal.tmdb.core.data.models.ListDetailsDto
-import com.personal.tmdb.core.data.models.ListResult
-import com.personal.tmdb.core.data.models.ListsResponseDto
+import com.personal.tmdb.core.data.models.MyListDto
+import com.personal.tmdb.core.data.models.MyListsResponseDto
 import com.personal.tmdb.core.domain.models.ListDetailsInfo
-import com.personal.tmdb.core.domain.models.ListInfo
-import com.personal.tmdb.core.domain.models.ListsResponseInfo
+import com.personal.tmdb.core.domain.models.MyList
+import com.personal.tmdb.core.domain.models.MyListsResponse
 import com.personal.tmdb.core.domain.util.convertStringToDateTime
 import com.personal.tmdb.core.domain.util.toBoolean
 
-fun ListsResponseDto.toListsResponseInfo(): ListsResponseInfo {
-    return ListsResponseInfo(
+fun MyListsResponseDto.toMyListsResponse(): MyListsResponse {
+    return MyListsResponse(
         page = page,
-        results = results.map { it.toListInfo() },
+        results = results.map { it.toMyList() },
         totalPages = totalPages,
         totalResults = totalResults
     )
 }
 
-fun ListResult.toListInfo(): ListInfo {
-    return ListInfo(
-        adult = adult.toBoolean(),
-        averageRating = averageRating?.toFloat(),
-        backdropPath = backdropPath,
+fun MyListDto.toMyList(): MyList {
+    return MyList(
+        backdropPath = backdropPath?.takeIf { it.isNotEmpty() },
         createdAt = convertStringToDateTime(createdAt),
         description = description?.takeIf { it.isNotEmpty() },
-        featured = featured,
         id = id,
         iso31661 = iso31661,
         iso6391 = iso6391,
@@ -33,8 +30,6 @@ fun ListResult.toListInfo(): ListInfo {
         numberOfItems = numberOfItems ?: 0,
         posterPath = posterPath,
         public = public.toBoolean(),
-        revenue = revenue,
-        runtime = runtime?.toIntOrNull()?.takeIf { it != 0 },
         sortBy = sortBy,
         updatedAt = convertStringToDateTime(updatedAt)
     )

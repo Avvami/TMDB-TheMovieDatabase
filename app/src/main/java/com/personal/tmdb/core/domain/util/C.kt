@@ -11,12 +11,14 @@ object C {
     const val ORIGINAL = "original"
     const val BACKDROP_W1280 = "w1280"
     const val BACKDROP_W780 = "w780"
+    const val BACKDROP_W300 = "w300"
     const val POSTER_W300 = "w300"
     const val POSTER_W154 = "w154"
     const val STILL_W300 = "w300"
     const val LOGO_W92 = "w92"
     const val PROFILE_W185 = "w185"
     const val LOGO_W500 = "w500"
+    const val PAGE_SIZE = 20
 
     const val REVIEW = "review%d"
     const val PRIMARY_TRANSLATIONS = "af,ar,be,bg,bn,br,ca,ch,cs,cy,da,de,el,en,eo,es,et,eu,fa,fi,fr,ga,gd,gl,he,hi,hr,hu,id,it,ja,ka,kk,kn,ko,ku,ky,lt,lv,ml,mr,ms,nb,nl,no,pa,pl,pt,ro,ru,si,sk,sl,so,sq,sr,sv,sw,ta,te,th,tl,tr,uk,ur,uz,vi,zh,zu"

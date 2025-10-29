@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.personal.tmdb.R
-import com.personal.tmdb.core.domain.models.ListInfo
+import com.personal.tmdb.core.domain.models.MyList
 import com.personal.tmdb.core.domain.models.MediaInfo
 import com.personal.tmdb.core.domain.util.C
 import com.personal.tmdb.core.domain.util.MediaType
@@ -449,7 +449,7 @@ fun ListItem(
     onLongClick: (() -> Unit)? = null,
     shape: Shape = MaterialTheme.shapes.large,
     height: Dp = 200.dp,
-    listInfo: ListInfo
+    myList: MyList
 ) {
     val haptic = LocalHapticFeedback.current
     Box(
@@ -462,7 +462,7 @@ fun ListItem(
                     Modifier.combinedClickable(
                         onClick = {
                             onNavigateTo(
-                                Route.ListDetails(listId = listInfo.id)
+                                Route.ListDetails(listId = myList.id)
                             )
                         },
                         onLongClick = {
@@ -484,7 +484,7 @@ fun ListItem(
     ) {
         AsyncImage(
             modifier = Modifier.fillMaxSize(),
-            model = C.TMDB_IMAGES_BASE_URL + C.BACKDROP_W780 + listInfo.backdropPath,
+            model = C.TMDB_IMAGES_BASE_URL + C.BACKDROP_W780 + myList.backdropPath,
             placeholder = painterResource(id = R.drawable.placeholder),
             error = painterResource(id = R.drawable.placeholder),
             contentDescription = "Poster",
@@ -502,7 +502,7 @@ fun ListItem(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                listInfo.name?.let { name ->
+                myList.name?.let { name ->
                     Text(
                         text = name,
                         style = MaterialTheme.typography.titleLarge,
@@ -517,14 +517,14 @@ fun ListItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = formatNumberOfItems(listInfo.numberOfItems),
+                        text = formatNumberOfItems(myList.numberOfItems),
                         style = MaterialTheme.typography.labelLarge
                     )
                     SuggestionChip(
                         enabled = false,
                         onClick = {},
                         label = {
-                            Text(text = formatListVisibility(listInfo.public).asString().uppercase())
+                            Text(text = formatListVisibility(myList.public).asString().uppercase())
                         },
                         colors = SuggestionChipDefaults.suggestionChipColors(
                             disabledLabelColor = onSurfaceDark,
@@ -533,7 +533,7 @@ fun ListItem(
                         border = null
                     )
                 }
-                listInfo.updatedAt?.let { updatedAt ->
+                myList.updatedAt?.let { updatedAt ->
                     Text(
                         text = formatDateTime(updatedAt).asString(),
                         style = MaterialTheme.typography.bodyMedium,

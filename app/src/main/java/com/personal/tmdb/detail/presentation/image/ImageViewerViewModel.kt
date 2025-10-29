@@ -8,7 +8,7 @@ import com.personal.tmdb.core.navigation.Route
 import com.personal.tmdb.core.domain.util.onError
 import com.personal.tmdb.core.domain.util.onSuccess
 import com.personal.tmdb.core.domain.util.toUiText
-import com.personal.tmdb.detail.data.models.Image
+import com.personal.tmdb.detail.data.models.ImageDto
 import com.personal.tmdb.detail.domain.repository.DetailRepository
 import com.personal.tmdb.detail.domain.util.ImageType
 import com.personal.tmdb.detail.domain.util.convertImageType
@@ -25,7 +25,7 @@ class ImageViewerViewModel @Inject constructor(
     private val detailRepository: DetailRepository
 ): ViewModel() {
 
-    private val routeData = savedStateHandle.toRoute<Route.Image>()
+    private val routeData = savedStateHandle.toRoute<Route.Images>()
 
     private val _imagesState = MutableStateFlow(
         ImagesState(
@@ -60,7 +60,7 @@ class ImageViewerViewModel @Inject constructor(
                     }
                 }
                 .onSuccess { result ->
-                    val images: List<Image?>? = when (imagesState.value.imageType) {
+                    val images: List<ImageDto?>? = when (imagesState.value.imageType) {
                         ImageType.PROFILES -> result.profiles
                         ImageType.STILLS -> result.stills
                         ImageType.BACKDROPS -> result.backdrops

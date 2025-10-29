@@ -1,7 +1,7 @@
 package com.personal.tmdb.discover.presentation.discover
 
 import com.personal.tmdb.core.navigation.Route
-import com.personal.tmdb.detail.data.models.Genre
+import com.personal.tmdb.detail.domain.models.Genre
 import com.personal.tmdb.discover.presentation.discover_filters.FiltersState
 
 sealed interface DiscoverUiEvent {

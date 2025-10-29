@@ -9,7 +9,7 @@ import com.personal.tmdb.auth.data.models.RequestTokenDto
 import com.personal.tmdb.auth.data.models.SessionDto
 import com.personal.tmdb.auth.data.models.UserDto
 import com.personal.tmdb.core.data.models.ListDetailsDto
-import com.personal.tmdb.core.data.models.ListsResponseDto
+import com.personal.tmdb.core.data.models.MyListsResponseDto
 import com.personal.tmdb.core.data.models.MediaResponseDto
 import com.personal.tmdb.core.domain.models.CreateListRequest
 import com.personal.tmdb.core.domain.models.LogoutRequestBody
@@ -218,7 +218,7 @@ interface TmdbApi {
         @Path("account_object_id") accountObjectId: String,
         @Query("session_id") sessionId: String,
         @Query("page") page: Int
-    ): ListsResponseDto
+    ): MyListsResponseDto
 
     @Headers("Authorization: Bearer ${BuildConfig.TMDB_API_KEY}")
     @GET("4/list/{list_id}?")

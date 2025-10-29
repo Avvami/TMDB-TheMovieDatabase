@@ -1,11 +1,9 @@
 package com.personal.tmdb.detail.presentation.collection
 
-import androidx.compose.ui.util.fastFilter
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.onError
 import com.personal.tmdb.core.domain.util.onSuccess
 import com.personal.tmdb.core.domain.util.toUiText
@@ -60,24 +58,6 @@ class CollectionViewModel @Inject constructor(
                             loading = false,
                             collectionInfo = result,
                             originalParts = result.parts
-                        )
-                    }
-                    getGenres()
-                }
-        }
-    }
-
-    private fun getGenres(language: String? = null) {
-        viewModelScope.launch {
-            detailRepository.getGenres(MediaType.MOVIE.name.lowercase(), language)
-                .onError { error ->
-                    println(error.toUiText())
-                }
-                .onSuccess { result ->
-                    _collectionState.update { state ->
-                        val genres = result.genres.fastFilter { genre -> state.collectionInfo?.genresIds?.contains(genre.id) == true }
-                        state.copy(
-                            genres = genres
                         )
                     }
                 }

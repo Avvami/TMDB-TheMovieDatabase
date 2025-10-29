@@ -1,8 +1,8 @@
 package com.personal.tmdb.core.domain.models
 
-data class ListsResponseInfo(
+data class MyListsResponse(
     val page: Int,
-    val results: List<ListInfo>,
+    val results: List<MyList>,
     val totalPages: Int,
     val totalResults: Int
 )

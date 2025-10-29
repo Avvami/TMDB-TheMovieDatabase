@@ -431,7 +431,7 @@ private fun ListsScreen(
                                                 listsUiEvent(ListsUiEvent.SetSelectEnabled(true))
                                                 listsUiEvent(ListsUiEvent.AddSelectedItem(listInfo))
                                             },
-                                            listInfo = listInfo,
+                                            myList = listInfo,
                                             height = Dp.Unspecified
                                         )
                                     }

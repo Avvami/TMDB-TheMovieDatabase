@@ -154,7 +154,7 @@ private fun CastScreen(
                                 onNavigateTo = { castUiEvent(CastUiEvent.OnNavigateTo(it)) },
                                 profileId = cast.id,
                                 profilePath = cast.profilePath,
-                                name = cast.name,
+                                name = cast.name ?: "",
                                 character = cast.character,
                                 activity = cast.roles?.map { AnnotatedCastItem(it.creditId, it.character, it.episodeCount) }
                             )
@@ -178,7 +178,7 @@ private fun CastScreen(
                                 onNavigateTo = { castUiEvent(CastUiEvent.OnNavigateTo(it)) },
                                 profileId = cast.id,
                                 profilePath = cast.profilePath,
-                                name = cast.name,
+                                name = cast.name ?: "",
                                 character = cast.character,
                                 activity = cast.roles?.map { AnnotatedCastItem(it.creditId, it.character, it.episodeCount) }
                             )

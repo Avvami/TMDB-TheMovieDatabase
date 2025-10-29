@@ -9,9 +9,9 @@ import com.personal.tmdb.core.domain.models.MediaInfo
 import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.Result
-import com.personal.tmdb.core.domain.util.mediaPager
-import com.personal.tmdb.detail.data.mappers.toGenresInfo
-import com.personal.tmdb.detail.domain.models.GenresInfo
+import com.personal.tmdb.core.domain.util.defaultPager
+import com.personal.tmdb.detail.data.mappers.toGenres
+import com.personal.tmdb.detail.domain.models.Genres
 import com.personal.tmdb.discover.data.mappers.toCountry
 import com.personal.tmdb.discover.domain.models.Country
 import com.personal.tmdb.discover.domain.repository.DiscoverRepository
@@ -30,7 +30,7 @@ class DiscoverRepositoryImpl @Inject constructor(
     override suspend fun getPopularPeople(
         language: String?
     ): Pager<Int, MediaInfo> {
-        return mediaPager {
+        return defaultPager {
             MediaPagingSource(
                 loadPage = { page ->
                     safeApiCall {
@@ -48,9 +48,9 @@ class DiscoverRepositoryImpl @Inject constructor(
     override suspend fun getGenres(
         mediaType: String,
         language: String?
-    ): Result<GenresInfo, DataError.Remote> {
+    ): Result<Genres, DataError.Remote> {
         return safeApiCall {
-            tmdbApi.getGenres(mediaType, language).toGenresInfo()
+            tmdbApi.getGenres(mediaType, language).toGenres()
         }
     }
 
@@ -71,7 +71,7 @@ class DiscoverRepositoryImpl @Inject constructor(
         fromRuntime: Int,
         toRuntime: Int
     ):  Pager<Int, MediaInfo> {
-        return mediaPager {
+        return defaultPager {
             MediaPagingSource(
                 loadPage = { page ->
                     safeApiCall {

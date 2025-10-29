@@ -193,7 +193,7 @@ private fun EpisodeDetailsScreen(
                                             )
                                         },
                                     titlePrefix = stringResource(id = R.string.guest_stars_list),
-                                    items = guestStars.map { AnnotatedItem(id = it.id, name = it.name) }
+                                    items = guestStars.map { AnnotatedItem(id = it.id, name = it.name ?: "") }
                                 )
                             }
                         }
@@ -222,7 +222,7 @@ private fun EpisodeDetailsScreen(
                                                     ) {
                                                         episodeDetailsUiEvent(
                                                             EpisodeDetailsUiEvent.OnNavigateTo(
-                                                                Route.Image(
+                                                                Route.Images(
                                                                     imageType = ImageType.STILLS.name.lowercase(),
                                                                     imagesPath = C.EPISODE_MEDIA_IMAGES.format(
                                                                         episodeDetailsState().mediaId,
@@ -264,7 +264,7 @@ private fun EpisodeDetailsScreen(
                                                 .clickable {
                                                     episodeDetailsUiEvent(
                                                         EpisodeDetailsUiEvent.OnNavigateTo(
-                                                            Route.Image(
+                                                            Route.Images(
                                                                 imageType = ImageType.STILLS.name.lowercase(),
                                                                 imagesPath = C.EPISODE_MEDIA_IMAGES.format(
                                                                     episodeDetailsState().mediaId,

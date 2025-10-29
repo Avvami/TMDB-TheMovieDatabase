@@ -95,7 +95,7 @@ fun PersonPhotoCarousel(
                                 .clip(MaterialTheme.shapes.large)
                                 .clickable {
                                     onNavigateTo(
-                                        Route.Image(
+                                        Route.Images(
                                             imageType = ImageType.PROFILES.name.lowercase(),
                                             imagesPath = C.MEDIA_IMAGES.format(MediaType.PERSON.name.lowercase(), personInfo().id),
                                             selectedImageIndex = page % profiles.size

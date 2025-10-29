@@ -12,7 +12,7 @@ import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.Result
 import com.personal.tmdb.core.domain.util.SortType
 import com.personal.tmdb.core.domain.util.TimeWindow
-import com.personal.tmdb.core.domain.util.mediaPager
+import com.personal.tmdb.core.domain.util.defaultPager
 import com.personal.tmdb.core.domain.util.sortTypeToRequestString
 import com.personal.tmdb.home.domain.repository.HomeRepository
 import javax.inject.Inject
@@ -22,7 +22,7 @@ class HomeRepositoryImpl @Inject constructor(
 ): HomeRepository {
 
     override suspend fun getTrending(timeWindow: TimeWindow, language: String?): Pager<Int, MediaInfo> {
-        return mediaPager {
+        return defaultPager {
             MediaPagingSource(
                 loadPage = { page ->
                     safeApiCall {
@@ -44,7 +44,7 @@ class HomeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPopular(mediaType: MediaType, language: String?): Pager<Int, MediaInfo> {
-        return mediaPager {
+        return defaultPager {
             MediaPagingSource(
                 loadPage = { page ->
                     safeApiCall {
@@ -80,7 +80,7 @@ class HomeRepositoryImpl @Inject constructor(
         language: String?,
         region: String
     ): Pager<Int, MediaInfo> {
-        return mediaPager {
+        return defaultPager {
             MediaPagingSource(
                 loadPage = { page ->
                     safeApiCall {

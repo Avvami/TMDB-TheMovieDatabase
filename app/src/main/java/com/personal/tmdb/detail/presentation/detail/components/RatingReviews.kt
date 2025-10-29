@@ -312,7 +312,7 @@ private fun Review(
                         Text(
                             text = formatDate(createdAt),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.surfaceVariant
                         )
                     }
                 }

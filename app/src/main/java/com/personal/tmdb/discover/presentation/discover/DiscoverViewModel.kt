@@ -12,7 +12,7 @@ import com.personal.tmdb.core.domain.util.MediaType
 import com.personal.tmdb.core.domain.util.convertMediaType
 import com.personal.tmdb.core.domain.util.fold
 import com.personal.tmdb.core.navigation.Route
-import com.personal.tmdb.detail.domain.models.GenresInfo
+import com.personal.tmdb.detail.domain.models.Genres
 import com.personal.tmdb.discover.domain.repository.DiscoverRepository
 import com.personal.tmdb.discover.presentation.discover_filters.FiltersState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -69,7 +69,7 @@ class DiscoverViewModel @Inject constructor(
                     )
                 }
             } else {
-                val genresDeferred = if (_discoverState.value.genresInfo == null) {
+                val genresDeferred = if (_discoverState.value.genres == null) {
                     async { getGenres(mediaType, language) }
                 } else {
                     null
@@ -80,7 +80,7 @@ class DiscoverViewModel @Inject constructor(
                     it.copy(
                         loading = false,
                         discover = discover,
-                        genresInfo = genresDeferred?.await() ?: _discoverState.value.genresInfo
+                        genres = genresDeferred?.await() ?: _discoverState.value.genres
                     )
                 }
             }
@@ -112,7 +112,7 @@ class DiscoverViewModel @Inject constructor(
         )
     }
 
-    private suspend fun getGenres(mediaType: String, language: String?): GenresInfo? {
+    private suspend fun getGenres(mediaType: String, language: String?): Genres? {
         return discoverRepository.getGenres(mediaType, language).fold(
             onSuccess = { it },
             onError = { null }

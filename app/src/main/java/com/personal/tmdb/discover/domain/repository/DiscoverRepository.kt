@@ -4,7 +4,7 @@ import androidx.paging.Pager
 import com.personal.tmdb.core.domain.models.MediaInfo
 import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.Result
-import com.personal.tmdb.detail.domain.models.GenresInfo
+import com.personal.tmdb.detail.domain.models.Genres
 import com.personal.tmdb.discover.domain.models.Country
 
 interface DiscoverRepository {
@@ -13,7 +13,7 @@ interface DiscoverRepository {
 
     suspend fun getPopularPeople(language: String? = null): Pager<Int, MediaInfo>
 
-    suspend fun getGenres(mediaType: String, language: String?): Result<GenresInfo, DataError.Remote>
+    suspend fun getGenres(mediaType: String, language: String?): Result<Genres, DataError.Remote>
 
     suspend fun discoverMedia(
         mediaType: String,

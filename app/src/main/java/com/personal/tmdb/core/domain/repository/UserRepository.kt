@@ -1,8 +1,9 @@
 package com.personal.tmdb.core.domain.repository
 
+import androidx.paging.Pager
 import com.personal.tmdb.core.domain.models.CreateListRequest
 import com.personal.tmdb.core.domain.models.ListDetailsInfo
-import com.personal.tmdb.core.domain.models.ListsResponseInfo
+import com.personal.tmdb.core.domain.models.MyList
 import com.personal.tmdb.core.domain.models.MediaRequest
 import com.personal.tmdb.core.domain.models.MediaResponseInfo
 import com.personal.tmdb.core.domain.models.UpdateListMediaRequest
@@ -31,7 +32,7 @@ interface UserRepository {
 
     suspend fun updateWatchlistItem(accountId: Int, sessionId: String, mediaRequest: MediaRequest): EmptyResult<DataError.Remote>
 
-    suspend fun getLists(accountObjectId: String, sessionId: String, page: Int): Result<ListsResponseInfo, DataError.Remote>
+    suspend fun getLists(accountObjectId: String, sessionId: String): Pager<Int, MyList>
 
     suspend fun getListDetails(listId: Int, sessionId: String, page: Int, language: String? = null): Result<ListDetailsInfo, DataError.Remote>
 

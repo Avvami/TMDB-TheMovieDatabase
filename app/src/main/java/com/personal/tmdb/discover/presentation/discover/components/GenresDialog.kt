@@ -29,7 +29,7 @@ import androidx.compose.ui.window.DialogWindowProvider
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.util.fadingEdges
 import com.personal.tmdb.core.presentation.components.CustomListItem
-import com.personal.tmdb.detail.data.models.Genre
+import com.personal.tmdb.detail.domain.models.Genre
 import com.personal.tmdb.discover.presentation.discover.DiscoverState
 import com.personal.tmdb.ui.theme.onSurfaceLight
 import com.personal.tmdb.ui.theme.surfaceLight
@@ -55,7 +55,7 @@ fun GenresDialog(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                discoverState().genresInfo?.genres?.let { genres ->
+                discoverState().genres?.genres?.let { genres ->
                     LazyColumn(
                         modifier = Modifier.fadingEdges(lazyListState),
                         state = lazyListState

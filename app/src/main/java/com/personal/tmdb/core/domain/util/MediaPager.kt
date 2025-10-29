@@ -4,8 +4,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 
-fun <Key : Any, Value : Any> mediaPager(
-    pageSize: Int = 20,
+fun <Key : Any, Value : Any> defaultPager(
+    pageSize: Int = C.PAGE_SIZE,
     prefetchDistance: Int = 1,
     enablePlaceholders: Boolean = false,
     initialLoadSize: Int = pageSize,

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.personal.tmdb.R
 import com.personal.tmdb.core.domain.models.CreateListRequest
-import com.personal.tmdb.core.domain.models.ListInfo
+import com.personal.tmdb.core.domain.models.MyList
 import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.SnackbarController
 import com.personal.tmdb.core.domain.util.SnackbarEvent
@@ -43,39 +43,42 @@ class ListsViewModel @Inject constructor(
             }
             val user = userRepository.getUser()
 
-            userRepository.getLists(accountObjectId = user?.accountObjectId ?: "", sessionId = user?.sessionId ?: "", page = page)
-                .onError { error ->
-                    _listsState.update {
-                        it.copy(
-                            loading = false,
-                            paging = false,
-                            errorMessage = error.toUiText()
-                        )
-                    }
-                }
-                .onSuccess { result ->
-                    _listsState.update { state ->
-                        val lists = state.lists
-                        if (lists == null || page == 1) {
-                            state.copy(
-                                loading = false,
-                                paging = false,
-                                lists = result
-                            )
-                        } else {
-                            val mergedLists = lists.results + result.results
-                            val updatedLists = lists.copy(
-                                results = mergedLists,
-                                page = result.page
-                            )
-                            state.copy(
-                                loading = false,
-                                paging = false,
-                                lists = updatedLists
-                            )
-                        }
-                    }
-                }
+//            userRepository.getLists(
+//                accountObjectId = user?.accountObjectId ?: "",
+//                sessionId = user?.sessionId ?: ""
+//            )
+//                .onError { error ->
+//                    _listsState.update {
+//                        it.copy(
+//                            loading = false,
+//                            paging = false,
+//                            errorMessage = error.toUiText()
+//                        )
+//                    }
+//                }
+//                .onSuccess { result ->
+//                    _listsState.update { state ->
+//                        val lists = state.lists
+//                        if (lists == null || page == 1) {
+//                            state.copy(
+//                                loading = false,
+//                                paging = false,
+//                                lists = result
+//                            )
+//                        } else {
+//                            val mergedLists = lists.results + result.results
+//                            val updatedLists = lists.copy(
+//                                results = mergedLists,
+//                                page = result.page
+//                            )
+//                            state.copy(
+//                                loading = false,
+//                                paging = false,
+//                                lists = updatedLists
+//                            )
+//                        }
+//                    }
+//                }
         }
     }
 
@@ -121,13 +124,13 @@ class ListsViewModel @Inject constructor(
         }
     }
 
-    private fun deleteList(listInfo: ListInfo) {
+    private fun deleteList(myList: MyList) {
         viewModelScope.launch {
             _listsState.update { it.copy(deleting = true) }
 
             val sessionId = userRepository.getUser()?.sessionId ?: ""
 
-            userRepository.deleteList(listInfo.id, sessionId)
+            userRepository.deleteList(myList.id, sessionId)
                 .onError { error ->
                     _listsState.update { it.copy(deleting = false) }
                     SnackbarController.sendEvent(
@@ -138,8 +141,8 @@ class ListsViewModel @Inject constructor(
                 }
                 .onSuccess {
                     _listsState.update { state ->
-                        val results = state.lists?.results.orEmpty() - listInfo
-                        val updatedSelectedItems = state.selectedItems - listInfo
+                        val results = state.lists?.results.orEmpty() - myList
+                        val updatedSelectedItems = state.selectedItems - myList
                         val updatedLists = state.lists?.copy(
                             results = results
                         )
@@ -191,13 +194,13 @@ class ListsViewModel @Inject constructor(
                 _listsState.update { it.copy(publicList = event.public) }
             }
             is ListsUiEvent.AddSelectedItem -> {
-                _listsState.update { it.copy(selectedItems = it.selectedItems + event.listInfo) }
+                _listsState.update { it.copy(selectedItems = it.selectedItems + event.myList) }
             }
             is ListsUiEvent.RemoveSelectedItem -> {
-                _listsState.update { it.copy(selectedItems = it.selectedItems - event.listInfo) }
+                _listsState.update { it.copy(selectedItems = it.selectedItems - event.myList) }
             }
             is ListsUiEvent.ReplaceSelectedItem -> {
-                _listsState.update { it.copy(selectedItems = listOf(event.listInfo)) }
+                _listsState.update { it.copy(selectedItems = listOf(event.myList)) }
             }
             is ListsUiEvent.SetSelectEnabled -> {
                 if (event.enabled) {

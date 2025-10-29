@@ -1,18 +1,20 @@
 package com.personal.tmdb.core.data.repository
 
+import androidx.paging.Pager
 import com.personal.tmdb.core.data.local.UserDao
 import com.personal.tmdb.core.data.mappers.toListDetailsInfo
-import com.personal.tmdb.core.data.mappers.toListsResponseInfo
+import com.personal.tmdb.core.data.mappers.toMyListsResponse
 import com.personal.tmdb.core.data.mappers.toMediaResponseInfo
 import com.personal.tmdb.core.data.mappers.toUser
 import com.personal.tmdb.core.data.mappers.toUserEntity
 import com.personal.tmdb.core.data.remote.TmdbApi
 import com.personal.tmdb.core.data.remote.safeApiCall
+import com.personal.tmdb.core.data.source.MyListsPagingSource
 import com.personal.tmdb.core.domain.models.CreateListRequest
 import com.personal.tmdb.core.domain.models.ListDetailsInfo
-import com.personal.tmdb.core.domain.models.ListsResponseInfo
 import com.personal.tmdb.core.domain.models.MediaRequest
 import com.personal.tmdb.core.domain.models.MediaResponseInfo
+import com.personal.tmdb.core.domain.models.MyList
 import com.personal.tmdb.core.domain.models.UpdateListMediaRequest
 import com.personal.tmdb.core.domain.models.UpdateListDetailsRequest
 import com.personal.tmdb.core.domain.models.User
@@ -20,6 +22,7 @@ import com.personal.tmdb.core.domain.repository.UserRepository
 import com.personal.tmdb.core.domain.util.DataError
 import com.personal.tmdb.core.domain.util.EmptyResult
 import com.personal.tmdb.core.domain.util.Result
+import com.personal.tmdb.core.domain.util.defaultPager
 import com.personal.tmdb.detail.data.models.Rated
 import javax.inject.Inject
 
@@ -64,11 +67,20 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun getLists(
         accountObjectId: String,
-        sessionId: String,
-        page: Int
-    ): Result<ListsResponseInfo, DataError.Remote> {
-        return safeApiCall {
-            tmdbApi.getLists(accountObjectId = accountObjectId, sessionId = sessionId, page = page).toListsResponseInfo()
+        sessionId: String
+    ): Pager<Int, MyList> {
+        return defaultPager {
+            MyListsPagingSource(
+                loadPage = { page ->
+                    safeApiCall {
+                        tmdbApi.getLists(
+                            accountObjectId = accountObjectId,
+                            sessionId = sessionId,
+                            page = page
+                        ).toMyListsResponse()
+                    }
+                }
+            )
         }
     }
 
